@@ -1,0 +1,1 @@
+import{j as a}from"./index-BqAuz3Q6.js";import{P as r,a as s}from"./PlansTable-Dhibx_tO.js";import"./DataTable-Bh0FV3_X.js";import"./with-selector-CeD9Mted.js";import"./Select-DeiyPgM1.js";import"./TextField-DC-ER98q.js";function n(){return a.jsxs(a.Fragment,{children:[a.jsx(r,{}),a.jsx(s,{})]})}export{n as default};

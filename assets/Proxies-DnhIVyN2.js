@@ -1,0 +1,1 @@
+import{j as r}from"./index-BqAuz3Q6.js";import{L as t}from"./DataTable-Bh0FV3_X.js";import{I as o}from"./InfrastructuresTable-D4ujV7pX.js";import"./with-selector-CeD9Mted.js";import"./Select-DeiyPgM1.js";import"./TextField-DC-ER98q.js";function p(){return r.jsxs(r.Fragment,{children:[r.jsx(t,{selectedCount:0}),r.jsx(o,{})]})}export{p as default};
