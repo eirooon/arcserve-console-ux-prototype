@@ -1,1 +1,0 @@
-import{j as s,O as a,q as t}from"./index-BqAuz3Q6.js";function n(){return s.jsxs(a,{sx:{width:"100%",p:{xs:2,md:3}},children:[s.jsx(t,{variant:"h6",sx:{mb:1},children:"DRRunbooksDetails Content"}),s.jsx(t,{color:"text.secondary",children:"Main content area. Sidebar collapse/expand pushes this layout and persists."})]})}export{n as default};
