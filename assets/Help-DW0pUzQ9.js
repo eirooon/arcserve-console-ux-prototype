@@ -1,1 +1,0 @@
-import{j as s,O as t,l as e}from"./index-DzRkLxnS.js";function n(){return s.jsxs(t,{sx:{width:"100%",p:{xs:2,md:3}},children:[s.jsx(e,{variant:"h6",sx:{mb:1},children:"Help Content"}),s.jsx(e,{color:"text.secondary",children:"Main content area. Sidebar collapse/expand pushes this layout and persists."})]})}export{n as default};
