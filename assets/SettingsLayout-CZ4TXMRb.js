@@ -1,1 +1,0 @@
-import{c as t}from"./createSplitLayout-CwNhESfr.js";import"./index-CJJuhAYm.js";import"./SplitPageLayout-J2ubCH11.js";import"./blueGrey--y9AX6S9.js";const i=t({parentPath:"/settings",rootLabel:"Settings",defaultId:"all"});export{i as default};
