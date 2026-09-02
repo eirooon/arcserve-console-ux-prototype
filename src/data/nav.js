@@ -4,10 +4,13 @@ import {
   CorporateFare,
   EventNote,
   FmdGood,
+  Gavel,
   LibraryBooks,
+  Message,
   Monitor,
   NotificationAdd,
   PublishedWithChanges,
+  SpaceDashboard,
   VerifiedUser,
   Settings,
   Help,
@@ -15,6 +18,14 @@ import {
 } from "@mui/icons-material";
 
 export const navSections = [
+  {
+    title: "ArcGenie",
+    items: [
+      { label: "Overview", to: "/arcgenie/overview", icon: SpaceDashboard },
+      { label: "Protection Intent", to: "/arcgenie/protection-intent", icon: Gavel },
+      { label: "Messaging", to: "/arcgenie/messaging", icon: Message },
+    ],
+  },
   {
     title: "Monitor",
     items: [
@@ -30,7 +41,7 @@ export const navSections = [
     title: "Operate",
     items: [
       { label: "Jobs", to: "/jobs", icon: LibraryBooks },
-      { label: "Event Logs", to: "/event-logs", icon: EventNote },
+      { label: "Logs", to: "/logs", icon: EventNote },
     ],
   },
   {
@@ -98,6 +109,12 @@ export const routeMeta = navSections
     return acc;
   }, {});
 
+// Section titles are shown as breadcrumb labels via naive Title Case, which
+// mangles brand names with internal capitals (e.g. "ArcGenie" -> "Arcgenie").
+// Titles listed here are rendered exactly as written instead.
+const SECTION_TITLE_OVERRIDES = new Set(["ArcGenie"]);
+
 export function formatSectionTitle(title = "") {
+  if (SECTION_TITLE_OVERRIDES.has(title)) return title;
   return title.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }

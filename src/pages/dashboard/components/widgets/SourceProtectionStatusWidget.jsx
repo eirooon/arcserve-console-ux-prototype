@@ -1,5 +1,6 @@
-import CardWidget from "../../../../components/CardWidget";
-import SharedDonutChart from "../SharedDonutChart";
+import { memo, useMemo } from "react";
+import PropTypes from "prop-types";
+import StatusDonutWidget from "./StatusDonutWidget";
 
 const DEFAULT_COLORS = {
   success: "#00C853",
@@ -9,60 +10,40 @@ const DEFAULT_COLORS = {
   noPlan: "#78909C",
 };
 
-export default function SourceProtectionStatusWidget({
+function SourceProtectionStatusWidget({
   data,
   colors = DEFAULT_COLORS,
   title,
   description,
 }) {
-  const total = Object.values(data || {}).reduce(
-    (acc, val) => acc + (val || 0),
-    0,
+  const fields = useMemo(
+    () => [
+      { key: "success", label: "Success", color: colors.success },
+      { key: "failed", label: "Failed", color: colors.failed },
+      { key: "missed", label: "Missed", color: colors.missed },
+      { key: "cancelled", label: "Cancelled", color: colors.cancelled },
+      { key: "noPlan", label: "No Plan", color: colors.noPlan },
+    ],
+    [colors],
   );
-  const successRate =
-    total > 0 ? Math.round(((data?.success ?? 0) / total) * 100) : 0;
-
-  const chartData = [
-    {
-      id: "success",
-      label: `Success (${data?.success ?? 0})`,
-      value: data?.success ?? 0,
-      color: colors.success,
-    },
-    {
-      id: "failed",
-      label: `Failed (${data?.failed ?? 0})`,
-      value: data?.failed ?? 0,
-      color: colors.failed,
-    },
-    {
-      id: "missed",
-      label: `Missed (${data?.missed ?? 0})`,
-      value: data?.missed ?? 0,
-      color: colors.missed,
-    },
-    {
-      id: "cancelled",
-      label: `Cancelled (${data?.cancelled ?? 0})`,
-      value: data?.cancelled ?? 0,
-      color: colors.cancelled,
-    },
-    {
-      id: "noPlan",
-      label: `No Plan (${data?.noPlan ?? 0})`,
-      value: data?.noPlan ?? 0,
-      color: colors.noPlan,
-    },
-  ].filter((item) => item.value > 0);
 
   return (
-    <CardWidget title={title} description={description}>
-      <SharedDonutChart
-        data={chartData}
-        centerValue={`${successRate}%`}
-        centerValueColor={colors.success}
-        centerSubtext="Successful Last Backups"
-      />
-    </CardWidget>
+    <StatusDonutWidget
+      title={title}
+      description={description}
+      data={data}
+      fields={fields}
+      primaryKey="success"
+      centerSubtext="Successful Last Backups"
+    />
   );
 }
+
+SourceProtectionStatusWidget.propTypes = {
+  data: PropTypes.objectOf(PropTypes.number),
+  colors: PropTypes.objectOf(PropTypes.string),
+  title: PropTypes.node,
+  description: PropTypes.node,
+};
+
+export default memo(SourceProtectionStatusWidget);

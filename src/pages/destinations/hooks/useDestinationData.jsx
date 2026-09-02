@@ -1,25 +1,39 @@
+import { ENDPOINTS } from "../../../api/endpoints";
+import { createResourceStore, useResourceStore } from "../../../api/createResourceStore";
+
 export const columns = [
-  { field: "id", headerName: "ID", width: 90 },
-  { field: "firstName", headerName: "First name", flex: 1, editable: true },
-  { field: "lastName", headerName: "Last name", flex: 1, editable: true },
+  { field: "name", headerName: "Name", flex: 1 },
+  { field: "type", headerName: "Type", flex: 1 },
+  { field: "status", headerName: "Status", flex: 1 },
+  { field: "protected_data", headerName: "Protected Data", flex: 1 },
+  { field: "region", headerName: "Region", flex: 1 },
   {
-    field: "age",
-    headerName: "Age",
+    field: "sources_protected",
+    headerName: "Sources Protected",
     type: "number",
     flex: 1,
-    editable: true,
   },
   {
-    field: "fullName",
-    headerName: "Full name",
-    sortable: false,
+    field: "last_recovery_point",
+    headerName: "Last Recovery Point",
     flex: 1,
-    valueGetter: (value, row) => `${row.firstName || ""} ${row.lastName || ""}`,
+    valueGetter: (value) => (value ? new Date(value) : null),
+    type: "dateTime",
   },
 ];
 
-export const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 14 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 31 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 31 },
+export const fields = [
+  { field: "name", label: "Name", type: "text" },
+  { field: "type", label: "Type", type: "text" },
+  { field: "status", label: "Status", type: "text" },
+  { field: "protected_data", label: "Protected Data", type: "text" },
+  { field: "region", label: "Region", type: "text" },
+  { field: "sources_protected", label: "Sources Protected", type: "number" },
+  { field: "last_recovery_point", label: "Last Recovery Point", type: "datetime" },
 ];
+
+export const destinationStore = createResourceStore(ENDPOINTS.DESTINATIONS);
+
+export function useDestinationData(selector) {
+  return useResourceStore(destinationStore, selector);
+}

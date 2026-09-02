@@ -1,4 +1,24 @@
 export const subRoutes = {
+  "/dashboard/protection-intent-setup": {
+    id: "protection-intent-setup",
+    label: "ArcGenie Protection Intent Setup",
+    parent: "/dashboard",
+  },
+  "/arcgenie/overview/needs-attention": {
+    id: "arcgenie-needs-attention",
+    label: "Needs Attention",
+    parent: "/arcgenie/overview",
+  },
+  "__section__/arcgenie-backup-protection": {
+    id: "arcgenie-backup-protection",
+    label: "Backup Protection",
+    parent: "/arcgenie/overview",
+  },
+  "/arcgenie/overview/auto-protect": {
+    id: "arcgenie-goal-detail-auto-protect",
+    label: "Goal Details",
+    parent: "__section__/arcgenie-backup-protection",
+  },
   "/sources/all-sources": {
     id: "all",
     label: "All Sources",
@@ -124,60 +144,6 @@ export const subRoutes = {
     label: "Add DR Runbook",
     parent: "/disaster-recovery/dr-runbooks",
   },
-  "/plans/all-plans": {
-    id: "all-plans",
-    label: "All Plans",
-    parent: "/plans",
-    count: 5,
-  },
-  "/plans/agent-based-windows-backups": {
-    id: "agent-based-windows-backups",
-    label: "Agent-based Windows Backups",
-    parent: "/plans",
-    count: 5,
-  },
-  "/plans/agent-based-linux-backups": {
-    id: "agent-based-linux-backups",
-    label: "Agent-based Linux Backups",
-    parent: "/plans",
-    count: 5,
-  },
-  "/plans/agent-based-backups-to-ac-for-disaster-recovery": {
-    id: "agent-based-backups-to-ac-for-disaster-recovery",
-    label: "Agent-based Backups to AC for Disaster Recovery",
-    parent: "/plans",
-    count: 5,
-  },
-  "/plans/agent-based-backups-directly-to-arserve-cloud": {
-    id: "agent-based-backups-directly-to-arserve-cloud",
-    label: "Agent-based Backups Directly to Arserve Cloud",
-    parent: "/plans",
-    count: 5,
-  },
-  "/plans/agentless-backups": {
-    id: "agentless-backups",
-    label: "Agentless Backups",
-    parent: "/plans",
-    count: 5,
-  },
-  "/plans/copy-from-remotely-managed-rps": {
-    id: "copy-from-remotely-managed-rps",
-    label: "Copy From Remotely-managed RPS",
-    parent: "/plans",
-    count: 5,
-  },
-  "/plans/oracle-database-backups": {
-    id: "oracle-database-backups",
-    label: "Oracle Database Backups",
-    parent: "/plans",
-    count: 5,
-  },
-  "/plans/uncnfs-backups": {
-    id: "uncnfs-backups",
-    label: "UNC/NFS Backups",
-    parent: "/plans",
-    count: 5,
-  },
   "/reports/backup-jobs": {
     id: "backup-jobs",
     label: "Backup Jobs",
@@ -257,3 +223,16 @@ export const subRoutes = {
     count: 5,
   },
 };
+
+const subRouteIdToLabel = Object.fromEntries(
+  Object.values(subRoutes).map((route) => [route.id, route.label]),
+);
+
+/**
+ * Resolves a sub-nav selection id (e.g. from useOutletContext) to the
+ * contextual entity label shown in toolbars ("Add Source", "Search plans"),
+ * stripping a leading "All " (e.g. "All Sources" -> "Sources").
+ */
+export function getContextLabel(selectedId) {
+  return (subRouteIdToLabel[selectedId] ?? "").replace(/^All\s+/i, "") || null;
+}

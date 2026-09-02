@@ -1,25 +1,24 @@
+import { ENDPOINTS } from "../../../api/endpoints";
+import { createResourceStore, useResourceStore } from "../../../api/createResourceStore";
+
 export const columns = [
-  { field: "id", headerName: "ID", width: 90 },
-  { field: "firstName", headerName: "First name", flex: 1, editable: true },
-  { field: "lastName", headerName: "Last name", flex: 1, editable: true },
-  {
-    field: "age",
-    headerName: "Age",
-    type: "number",
-    flex: 1,
-    editable: true,
-  },
-  {
-    field: "fullName",
-    headerName: "Full name",
-    sortable: false,
-    flex: 1,
-    valueGetter: (value, row) => `${row.firstName || ""} ${row.lastName || ""}`,
-  },
+  { field: "name", headerName: "Name", flex: 1.5 },
+  { field: "type", headerName: "Type", flex: 1 },
+  { field: "host", headerName: "Host", flex: 1.5 },
+  { field: "status", headerName: "Status", flex: 1 },
+  { field: "version", headerName: "Version", flex: 1 },
 ];
 
-export const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 14 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 31 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 31 },
+export const fields = [
+  { field: "name", label: "Name", type: "text" },
+  { field: "type", label: "Type", type: "text" },
+  { field: "host", label: "Host", type: "text" },
+  { field: "status", label: "Status", type: "text" },
+  { field: "version", label: "Version", type: "text" },
 ];
+
+export const infrastructureStore = createResourceStore(ENDPOINTS.INFRASTRUCTURE);
+
+export function useInfrastructureData(selector) {
+  return useResourceStore(infrastructureStore, selector);
+}

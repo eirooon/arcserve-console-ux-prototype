@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 import Grid from "@mui/material/Grid";
 import {
@@ -189,7 +189,7 @@ UdpDataStoresRow.propTypes = {
   valueText: PropTypes.string.isRequired,
 };
 
-export default function StorageCapacityWatchWidget({
+function StorageCapacityWatchWidget({
   title,
   description,
   data,
@@ -199,9 +199,9 @@ export default function StorageCapacityWatchWidget({
   return (
     <CardWidget title={title} description={description}>
       <Grid container spacing={2}>
-        {data.map((c) => (
-          <Grid key={c.key} size={{ xs: 12, sm: 12, md: 4 }}>
-            <StorageMiniCard {...c} />
+        {data.map(({ key, ...cardProps }) => (
+          <Grid key={key} size={{ xs: 12, sm: 12, md: 4 }}>
+            <StorageMiniCard {...cardProps} />
           </Grid>
         ))}
       </Grid>
@@ -219,3 +219,5 @@ StorageCapacityWatchWidget.propTypes = {
     udpValueText: PropTypes.string,
   }),
 };
+
+export default memo(StorageCapacityWatchWidget);

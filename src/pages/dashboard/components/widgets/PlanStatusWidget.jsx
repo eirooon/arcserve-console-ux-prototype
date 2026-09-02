@@ -1,5 +1,6 @@
-import CardWidget from "../../../../components/CardWidget";
-import SharedDonutChart from "../SharedDonutChart";
+import { memo, useMemo } from "react";
+import PropTypes from "prop-types";
+import StatusDonutWidget from "./StatusDonutWidget";
 
 const DEFAULT_COLORS = {
   deployed: "#00C853",
@@ -8,55 +9,39 @@ const DEFAULT_COLORS = {
   disabled: "#78909C",
 };
 
-export default function PlanStatusWidget({
+function PlanStatusWidget({
   data,
   colors = DEFAULT_COLORS,
   title,
   description,
 }) {
-  const total = Object.values(data || {}).reduce(
-    (acc, val) => acc + (val || 0),
-    0,
+  const fields = useMemo(
+    () => [
+      { key: "deployed", label: "Deployed", color: colors.deployed },
+      { key: "deploying", label: "Deploying", color: colors.deploying },
+      { key: "failed", label: "Failed", color: colors.failed },
+      { key: "disabled", label: "Disabled", color: colors.disabled },
+    ],
+    [colors],
   );
-  const deployedRate =
-    total > 0 ? Math.round(((data?.deployed ?? 0) / total) * 100) : 0;
-
-  const chartData = [
-    {
-      id: "deployed",
-      label: `Deployed (${data?.deployed ?? 0})`,
-      value: data?.deployed ?? 0,
-      color: colors.deployed,
-    },
-    {
-      id: "deploying",
-      label: `Deploying (${data?.deploying ?? 0})`,
-      value: data?.deploying ?? 0,
-      color: colors.deploying,
-    },
-    {
-      id: "failed",
-      label: `Failed (${data?.failed ?? 0})`,
-      value: data?.failed ?? 0,
-      color: colors.failed,
-    },
-    {
-      id: "disabled",
-      label: `Disabled (${data?.disabled ?? 0})`,
-      value: data?.disabled ?? 0,
-      color: colors.disabled,
-    },
-  ].filter((item) => item.value > 0);
 
   return (
-    <CardWidget title={title} description={description}>
-      <SharedDonutChart
-        data={chartData}
-        centerLabel="Deployed Rate"
-        centerValue={`${deployedRate}%`}
-        centerValueColor={colors.deployed}
-        centerSubtext="Successful Deployment"
-      />
-    </CardWidget>
+    <StatusDonutWidget
+      title={title}
+      description={description}
+      data={data}
+      fields={fields}
+      primaryKey="deployed"
+      centerSubtext="Successful Deployment"
+    />
   );
 }
+
+PlanStatusWidget.propTypes = {
+  data: PropTypes.objectOf(PropTypes.number),
+  colors: PropTypes.objectOf(PropTypes.string),
+  title: PropTypes.node,
+  description: PropTypes.node,
+};
+
+export default memo(PlanStatusWidget);

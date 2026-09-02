@@ -1,25 +1,28 @@
+import { ENDPOINTS } from "../../../api/endpoints";
+import { createResourceStore, useResourceStore } from "../../../api/createResourceStore";
+
 export const columns = [
-  { field: "id", headerName: "ID", width: 90 },
-  { field: "firstName", headerName: "First name", flex: 1, editable: true },
-  { field: "lastName", headerName: "Last name", flex: 1, editable: true },
+  { field: "setting_name", headerName: "Setting", flex: 1.5 },
+  { field: "category", headerName: "Category", flex: 1 },
+  { field: "value", headerName: "Value", flex: 1 },
   {
-    field: "age",
-    headerName: "Age",
-    type: "number",
+    field: "updated_at",
+    headerName: "Updated",
     flex: 1,
-    editable: true,
-  },
-  {
-    field: "fullName",
-    headerName: "Full name",
-    sortable: false,
-    flex: 1,
-    valueGetter: (value, row) => `${row.firstName || ""} ${row.lastName || ""}`,
+    valueGetter: (value) => (value ? new Date(value) : null),
+    type: "dateTime",
   },
 ];
 
-export const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 14 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 31 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 31 },
+export const fields = [
+  { field: "setting_name", label: "Setting", type: "text" },
+  { field: "category", label: "Category", type: "text" },
+  { field: "value", label: "Value", type: "text" },
+  { field: "updated_at", label: "Updated", type: "datetime" },
 ];
+
+export const settingsStore = createResourceStore(ENDPOINTS.SETTINGS);
+
+export function useSettingsData(selector) {
+  return useResourceStore(settingsStore, selector);
+}

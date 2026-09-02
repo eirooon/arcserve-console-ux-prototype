@@ -1,47 +1,43 @@
-import CardWidget from "../../../../components/CardWidget";
-import SharedDonutChart from "../SharedDonutChart";
+import { memo, useMemo } from "react";
+import PropTypes from "prop-types";
+import StatusDonutWidget from "./StatusDonutWidget";
 
 const DEFAULT_COLORS = {
   compliant: "#00C853",
   notCompliant: "#FF1744",
 };
 
-export default function RPOComplianceWidget({
+function RPOComplianceWidget({
   data,
   colors = DEFAULT_COLORS,
   title,
   description,
 }) {
-  const total = Object.values(data || {}).reduce(
-    (acc, val) => acc + (val || 0),
-    0,
+  const fields = useMemo(
+    () => [
+      { key: "compliant", label: "Compliant", color: colors.compliant },
+      { key: "notCompliant", label: "Not Compliant", color: colors.notCompliant },
+    ],
+    [colors],
   );
-  const complianceRate =
-    total > 0 ? Math.round(((data?.compliant ?? 0) / total) * 100) : 0;
-
-  const chartData = [
-    {
-      id: "compliant",
-      label: `Compliant (${data?.compliant ?? 0})`,
-      value: data?.compliant ?? 0,
-      color: colors.compliant,
-    },
-    {
-      id: "notCompliant",
-      label: `Not Compliant (${data?.notCompliant ?? 0})`,
-      value: data?.notCompliant ?? 0,
-      color: colors.notCompliant,
-    },
-  ].filter((item) => item.value > 0);
 
   return (
-    <CardWidget title={title} description={description}>
-      <SharedDonutChart
-        data={chartData}
-        centerValue={`${complianceRate}%`}
-        centerValueColor={colors.compliant}
-        centerSubtext="Compliant within 3 days"
-      />
-    </CardWidget>
+    <StatusDonutWidget
+      title={title}
+      description={description}
+      data={data}
+      fields={fields}
+      primaryKey="compliant"
+      centerSubtext="Compliant within 3 days"
+    />
   );
 }
+
+RPOComplianceWidget.propTypes = {
+  data: PropTypes.objectOf(PropTypes.number),
+  colors: PropTypes.objectOf(PropTypes.string),
+  title: PropTypes.node,
+  description: PropTypes.node,
+};
+
+export default memo(RPOComplianceWidget);

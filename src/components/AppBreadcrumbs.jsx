@@ -27,8 +27,12 @@ export default function AppBreadcrumbs() {
           return (
             <Typography
               key={crumb.path}
+              component="h1"
               sx={{
                 fontSize: 16,
+                fontWeight: "inherit",
+                lineHeight: "inherit",
+                m: 0,
                 color: "#000",
               }}
             >

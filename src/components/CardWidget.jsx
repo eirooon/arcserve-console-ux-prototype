@@ -23,7 +23,11 @@ export default function CardWidget({
         action={action}
         subheader={description}
         titleTypographyProps={{
+          variant: "h2",
+          component: "h2",
           sx: {
+            fontSize: "inherit",
+            fontWeight: "inherit",
             display: "-webkit-box",
             WebkitLineClamp: 1,
             WebkitBoxOrient: "vertical",

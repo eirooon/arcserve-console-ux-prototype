@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { memo, useMemo, useState } from "react";
 import {
   Box,
   Typography,
@@ -16,7 +16,7 @@ import {
 } from "@mui/icons-material";
 import CardWidget from "../../../../components/CardWidget";
 
-export default function RecentJobsWidget({
+function RecentJobsWidget({
   data,
   pageSize = 5,
   title,
@@ -178,3 +178,5 @@ export default function RecentJobsWidget({
     </CardWidget>
   );
 }
+
+export default memo(RecentJobsWidget);

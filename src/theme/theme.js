@@ -1,12 +1,14 @@
 import { createTheme } from "@mui/material/styles";
 
 export const ARC_NAV_BG = "#001A70";
+const LIGHT_BG = "#ffffff";
+const DARK_BG = "#121212";
 
 export const theme = createTheme({
   colorSchemes: {
     light: {
       palette: {
-        background: { default: "#f6f7fb", paper: "#ffffff" },
+        background: { default: LIGHT_BG, paper: LIGHT_BG },
         primary: {
           light: "#BB86FC",
           main: "#8A2BFF",
@@ -23,7 +25,7 @@ export const theme = createTheme({
     },
     dark: {
       palette: {
-        background: { default: "#121212", paper: "#1e1e1e" },
+        background: { default: DARK_BG, paper: DARK_BG },
         primary: {
           // We swap the 'light' color to become the 'main' for dark mode
           main: "#BB86FC",

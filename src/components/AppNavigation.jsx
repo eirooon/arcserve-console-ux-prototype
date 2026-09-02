@@ -19,11 +19,15 @@ import {
   Switch,
   SvgIcon,
 } from "@mui/material";
+import { useColorScheme } from "@mui/material/styles";
+
+import { useLocalStorageState } from "../hooks/useLocalStorageState";
+import { useArcGenieActivation } from "../hooks/useArcGenieActivation";
 
 import {
   UnfoldMore,
-  KeyboardDoubleArrowLeftRounded,
-  KeyboardDoubleArrowRightRounded,
+  KeyboardDoubleArrowLeftOutlined,
+  KeyboardDoubleArrowRightOutlined,
   ExpandMore,
   DarkModeOutlined,
   TranslateOutlined,
@@ -34,6 +38,7 @@ import {
 import { navSections } from "../data/nav";
 import arcserveLogoFull from "../assets/arcserve-full-logo.svg";
 import arcserveLogoSmall from "../assets/arcserve-small-logo.svg";
+import arcserveConsoleWordmark from "../assets/arcserve-console-wordmark.svg";
 
 import UdpIcon from "../assets/logo-udp.svg?react";
 import CloudDirectIcon from "../assets/logo-cloud-direct.svg?react";
@@ -45,19 +50,7 @@ const CloudDirect = (props) => {
   return <SvgIcon component={CloudDirectIcon} inheritViewBox {...props} />;
 };
 
-// LocalStorage helpers
-const STORAGE_KEY = "appNavigationState:v1";
-
-function safeParse(json, fallback) {
-  try {
-    const v = JSON.parse(json);
-    return v ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-export default function AppNavigation({
+function AppNavigation({
   collapsed,
   drawerWidth,
   onToggle,
@@ -67,6 +60,15 @@ export default function AppNavigation({
   const transitionTime = prefersReducedMotion ? "0ms" : "220ms";
   const transitionCurve = "cubic-bezier(0.2, 0, 0, 1)";
   const sharedTransition = `${transitionTime} ${transitionCurve}`;
+
+  const { isArcGenieActivated } = useArcGenieActivation();
+  const visibleNavSections = React.useMemo(
+    () =>
+      navSections.filter(
+        (section) => section.title !== "ArcGenie" || isArcGenieActivated,
+      ),
+    [isArcGenieActivated],
+  );
 
   const productOptions = React.useMemo(
     () => [
@@ -84,73 +86,32 @@ export default function AppNavigation({
     [],
   );
 
-  // Load initial persisted state once
-  const persisted = React.useMemo(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return safeParse(raw, {});
-  }, []);
-
-  // Persist active product
-  const [activeProduct, setActiveProduct] = React.useState(
-    persisted.activeProduct || "udp",
-  );
-
-  const [productAnchorEl, setProductAnchorEl] = React.useState(null);
-
-  // Persist open sections
-  const [openSections, setOpenSections] = React.useState(() => {
-    // defaults: open all
+  const defaultOpenSections = React.useMemo(() => {
     const initial = {};
     navSections.forEach((s) => {
       initial[s.title] = true;
     });
-
-    // Apply persisted section state (if any)
-    if (persisted.openSections && typeof persisted.openSections === "object") {
-      Object.keys(initial).forEach((title) => {
-        if (typeof persisted.openSections[title] === "boolean") {
-          initial[title] = persisted.openSections[title];
-        }
-      });
-    }
-
     return initial;
-  });
-
-  const toggleSection = React.useCallback((title) => {
-    setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
   }, []);
 
-  // Persist collapsed state too (in addition to whatever parent controls)
-  // - This keeps UI consistent on refresh.
-  React.useEffect(() => {
-    // only write if prop is boolean
-    if (typeof collapsed === "boolean") {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const existing = safeParse(raw, {});
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          ...existing,
-          collapsed,
-        }),
-      );
-    }
-  }, [collapsed]);
+  const [activeProduct, setActiveProduct] = useLocalStorageState(
+    "arcserve.nav.activeProduct",
+    "udp",
+  );
 
-  //Persist openSections + activeProduct whenever they change
-  React.useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const existing = safeParse(raw, {});
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        ...existing,
-        activeProduct,
-        openSections,
-      }),
-    );
-  }, [activeProduct, openSections]);
+  const [productAnchorEl, setProductAnchorEl] = React.useState(null);
+
+  const [openSections, setOpenSections] = useLocalStorageState(
+    "arcserve.nav.openSections",
+    defaultOpenSections,
+  );
+
+  const toggleSection = React.useCallback(
+    (title) => {
+      setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
+    },
+    [setOpenSections],
+  );
 
   // Keep current section open based on route (won't close others)
   React.useEffect(() => {
@@ -166,7 +127,7 @@ export default function AppNavigation({
         [containingSection.title]: true,
       }));
     }
-  }, [location.pathname]);
+  }, [location.pathname, setOpenSections]);
 
   const openProductMenu = React.useCallback((e) => {
     setProductAnchorEl(e.currentTarget);
@@ -211,8 +172,12 @@ export default function AppNavigation({
     setProfileAnchorEl(null);
   }, []);
 
-  // Dark mode switch (wire this to your theme later if needed)
-  const [darkMode, setDarkMode] = React.useState(false);
+  const { mode, setMode } = useColorScheme();
+  const darkMode = mode === "dark";
+  const toggleDarkMode = React.useCallback(
+    (e) => setMode(e.target.checked ? "dark" : "light"),
+    [setMode],
+  );
 
   return (
     <Drawer
@@ -264,7 +229,10 @@ export default function AppNavigation({
                 <img src={arcserveLogoSmall} alt="Arcserve" />
               </Box>
             ) : (
-              <img src={arcserveLogoFull} alt="Arcserve" />
+              <Box sx={{ display: "flex", alignItems: "flex-end", gap: 0.5 }}>
+                <img src={arcserveLogoFull} alt="Arcserve" />
+                <img src={arcserveConsoleWordmark} alt="Console" />
+              </Box>
             )}
           </Box>
 
@@ -278,20 +246,7 @@ export default function AppNavigation({
             }}
           >
             <IconButton
-              onClick={() => {
-                // ✅ UPDATED: persist in localStorage immediately as well
-                const raw = localStorage.getItem(STORAGE_KEY);
-                const existing = safeParse(raw, {});
-                localStorage.setItem(
-                  STORAGE_KEY,
-                  JSON.stringify({
-                    ...existing,
-                    collapsed: !collapsed,
-                  }),
-                );
-
-                onToggle?.();
-              }}
+              onClick={onToggle}
               size="small"
               sx={{
                 borderRadius: 999,
@@ -303,9 +258,9 @@ export default function AppNavigation({
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {collapsed ? (
-                <KeyboardDoubleArrowRightRounded fontSize="small" />
+                <KeyboardDoubleArrowRightOutlined fontSize="small" />
               ) : (
-                <KeyboardDoubleArrowLeftRounded fontSize="small" />
+                <KeyboardDoubleArrowLeftOutlined fontSize="small" />
               )}
             </IconButton>
           </Box>
@@ -336,6 +291,13 @@ export default function AppNavigation({
           onClick={openProductMenu}
           role="button"
           tabIndex={0}
+          aria-haspopup="true"
+          aria-expanded={productMenuOpen}
+          aria-label={
+            collapsed
+              ? `${selectedProduct.label}, switch product`
+              : "Switch product"
+          }
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") openProductMenu(e);
           }}
@@ -397,10 +359,7 @@ export default function AppNavigation({
               </Box>
 
               <Box
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openProductMenu(e);
-                }}
+                aria-hidden="true"
                 sx={{
                   display: collapsed ? "none" : "grid",
                   placeItems: "center",
@@ -410,12 +369,10 @@ export default function AppNavigation({
                   color: "rgba(255,255,255,0.85)",
                   flex: "0 0 auto",
                   opacity: collapsed ? 0 : 1,
-                  pointerEvents: collapsed ? "none" : "auto",
                   transition: prefersReducedMotion
                     ? "none"
                     : "opacity 150ms ease",
                 }}
-                aria-label="Open product switcher"
               >
                 <UnfoldMore sx={{ width: 20, height: 20 }} />
               </Box>
@@ -433,7 +390,7 @@ export default function AppNavigation({
           PaperProps={{
             sx: {
               width: 380,
-              borderRadius: 4,
+              borderRadius: 3,
               boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
               overflow: "hidden",
               p: 1.5,
@@ -515,8 +472,8 @@ export default function AppNavigation({
       />
 
       <Box sx={{ flex: 1, overflow: "auto", mt: collapsed ? 0 : 1 }}>
-        {navSections.map((section, sectionIndex) => {
-          const isLast = sectionIndex === navSections.length - 1;
+        {visibleNavSections.map((section, sectionIndex) => {
+          const isLast = sectionIndex === visibleNavSections.length - 1;
           const isOpen = !!openSections[section.title];
 
           return (
@@ -527,7 +484,7 @@ export default function AppNavigation({
                     onClick={() => toggleSection(section.title)}
                     sx={{
                       borderRadius: 1,
-                      "&:hover": { bgcolor: "rgba(255,255,255,0.06)" },
+                      "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
@@ -576,10 +533,10 @@ export default function AppNavigation({
                             borderRadius: 1.5,
                             "&:first-of-type": { mt: collapsed ? 0 : 0.5 },
                             "&.active": {
-                              bgcolor: "rgba(111,83,255,0.22)",
+                              bgcolor: "rgba(255,255,255,0.18)",
                             },
                             "&.active:hover": {
-                              bgcolor: "rgba(111,83,255,0.26)",
+                              bgcolor: "rgba(255,255,255,0.24)",
                             },
                             "&:hover": {
                               bgcolor: "rgba(255,255,255,0.08)",
@@ -662,6 +619,8 @@ export default function AppNavigation({
                 onClick={openProfileMenu}
                 sx={{ p: 0.5 }}
                 aria-label="Open profile menu"
+                aria-haspopup="true"
+                aria-expanded={profileMenuOpen}
               >
                 <Avatar
                   sx={{
@@ -698,6 +657,8 @@ export default function AppNavigation({
               "&:hover": { bgcolor: "rgba(255,255,255,0.06)" },
             }}
             aria-label="Open profile menu"
+            aria-haspopup="true"
+            aria-expanded={profileMenuOpen}
           >
             <Box
               sx={{
@@ -749,12 +710,7 @@ export default function AppNavigation({
               </Box>
             </Box>
 
-            <IconButton
-              disableRipple
-              size="small"
-              sx={{ color: "rgba(255,255,255,0.75)" }}
-              aria-label="Open profile menu"
-            >
+            <Box aria-hidden="true" sx={{ color: "rgba(255,255,255,0.75)" }}>
               <ExpandMore
                 sx={{
                   fontSize: 20,
@@ -766,7 +722,7 @@ export default function AppNavigation({
                     : "transform 160ms ease",
                 }}
               />
-            </IconButton>
+            </Box>
           </Box>
         )}
 
@@ -843,8 +799,11 @@ export default function AppNavigation({
 
               <Switch
                 checked={darkMode}
-                onChange={(e) => setDarkMode(e.target.checked)}
+                onChange={toggleDarkMode}
                 onClick={(e) => e.stopPropagation()}
+                slotProps={{
+                  input: { "aria-label": "Toggle dark mode", role: "switch" },
+                }}
               />
             </ListItemButton>
 
@@ -921,3 +880,5 @@ export default function AppNavigation({
     </Drawer>
   );
 }
+
+export default React.memo(AppNavigation);

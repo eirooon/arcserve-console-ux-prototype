@@ -5,6 +5,7 @@ export default function SplitPageLayout({
   selectedId,
   onSelect,
   leftWidth = 240, // px
+  rootLabel,
   children, // right panel content
 }) {
   const formatCount = (count) => {
@@ -19,12 +20,18 @@ export default function SplitPageLayout({
           width: "100%",
           display: "flex",
           height: `calc(100vh - 64px)`,
+          overflow: "hidden",
         }}
       >
         {/* Left sub-nav */}
         <Box
+          component="nav"
+          aria-label={rootLabel}
           sx={{
             width: leftWidth,
+            flexShrink: 0,
+            height: "100%",
+            overflowY: "auto",
             borderRight: "1px solid rgba(0,0,0,0.12)",
             p: 0.75,
           }}
@@ -83,8 +90,22 @@ export default function SplitPageLayout({
         </Box>
 
         {/* Right content */}
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          {/* Optional header area on right (keep for future) */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+            // Leaf pages render a fixed toolbar followed by a table/content
+            // area (e.g. <Toolbar /><Table />); only the last one should
+            // grow and own its scrolling, so the toolbar (and, inside a
+            // DataTable, its pagination footer) stay pinned in place.
+            "& > *:not(:last-child)": { flexShrink: 0 },
+            "& > *:last-child": { flex: 1, minHeight: 0, overflow: "hidden" },
+          }}
+        >
           {children}
         </Box>
       </Box>

@@ -1,11 +1,13 @@
 import React from "react";
 import { Box } from "@mui/material";
+import { useGridApiRef } from "@mui/x-data-grid";
 import SplitPageLayout from "../../layout/SplitPageLayout";
 import ListToolbar from "../../components/ListToolbar";
 import DataTable from "../../components/DataTable";
 
 export default function Logs() {
   const [selectedId, setSelectedId] = React.useState("all");
+  const apiRef = useGridApiRef();
 
   const items = [
     { id: "all", label: "All Logs", count: 100 },
@@ -78,8 +80,9 @@ export default function Logs() {
           showSearch
           searchPlaceholder="Search logs"
           selectedCount={4}
+          apiRef={apiRef}
         />
-        <DataTable ariaLabel="Logs" columns={columns} rows={rows} />
+        <DataTable ariaLabel="Logs" columns={columns} rows={rows} apiRef={apiRef} />
       </Box>
     </SplitPageLayout>
   );

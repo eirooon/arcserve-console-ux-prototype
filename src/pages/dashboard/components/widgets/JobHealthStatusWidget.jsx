@@ -1,5 +1,6 @@
-import CardWidget from "../../../../components/CardWidget";
-import SharedDonutChart from "../SharedDonutChart";
+import { memo, useMemo } from "react";
+import PropTypes from "prop-types";
+import StatusDonutWidget from "./StatusDonutWidget";
 
 const DEFAULT_COLORS = {
   success: "#00C853",
@@ -8,55 +9,39 @@ const DEFAULT_COLORS = {
   missed: "#78909C",
 };
 
-export default function JobHealthStatusWidget({
+function JobHealthStatusWidget({
   data,
   colors = DEFAULT_COLORS,
   title,
   description,
 }) {
-  const total = Object.values(data || {}).reduce(
-    (acc, val) => acc + (val || 0),
-    0,
+  const fields = useMemo(
+    () => [
+      { key: "success", label: "Success", color: colors.success },
+      { key: "failed", label: "Failed", color: colors.failed },
+      { key: "missed", label: "Missed", color: colors.missed },
+      { key: "warning", label: "Warning", color: colors.warning },
+    ],
+    [colors],
   );
-  const successRate =
-    total > 0 ? Math.round(((data?.success ?? 0) / total) * 100) : 0;
-
-  const chartData = [
-    {
-      id: "success",
-      label: `Success (${data?.success ?? 0})`,
-      value: data?.success ?? 0,
-      color: colors.success,
-    },
-    {
-      id: "failed",
-      label: `Failed (${data?.failed ?? 0})`,
-      value: data?.failed ?? 0,
-      color: colors.failed,
-    },
-    {
-      id: "missed",
-      label: `Missed (${data?.missed ?? 0})`,
-      value: data?.missed ?? 0,
-      color: colors.missed,
-    },
-    {
-      id: "warning",
-      label: `Warning (${data?.warning ?? 0})`,
-      value: data?.warning ?? 0,
-      color: colors.warning,
-    },
-  ].filter((item) => item.value > 0);
 
   return (
-    <CardWidget title={title} description={description}>
-      <SharedDonutChart
-        data={chartData}
-        centerLabel="Success Rate"
-        centerValue={`${successRate}%`}
-        centerValueColor={colors.success}
-        centerSubtext="Successful Jobs"
-      />
-    </CardWidget>
+    <StatusDonutWidget
+      title={title}
+      description={description}
+      data={data}
+      fields={fields}
+      primaryKey="success"
+      centerSubtext="Successful Jobs"
+    />
   );
 }
+
+JobHealthStatusWidget.propTypes = {
+  data: PropTypes.objectOf(PropTypes.number),
+  colors: PropTypes.objectOf(PropTypes.string),
+  title: PropTypes.node,
+  description: PropTypes.node,
+};
+
+export default memo(JobHealthStatusWidget);

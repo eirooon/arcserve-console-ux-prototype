@@ -1,60 +1,46 @@
 import { useOutletContext } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Button,
-  OutlinedInput,
-  InputAdornment,
-} from "@mui/material";
-import { AddOutlined, FileDownload, SearchOutlined } from "@mui/icons-material";
-import { subRoutes } from "../../routes/subRoutes";
+import ListToolbar from "../../components/ListToolbar";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import { getContextLabel } from "../../routes/subRoutes";
+import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
 import SettingsTable from "./components/SettingsTable";
+import { settingsStore, useSettingsData } from "./hooks/useSettingsData";
+
+const selectSelectionState = (state) => ({
+  selectionModel: state.selectionModel,
+  saving: state.saving,
+  apiRef: state.apiRef,
+});
 
 export default function SourceGroups() {
   const { selectedId } = useOutletContext();
+  const { selectionModel, saving, apiRef } = useSettingsData(selectSelectionState);
+  const { open: confirmDeleteOpen, openConfirm, closeConfirm, confirmDelete } =
+    useDeleteConfirmation(settingsStore.deleteSelected);
 
-  const subRouteIdToLabel = Object.fromEntries(
-    Object.values(subRoutes).map((r) => [r.id, r.label]),
-  );
-  const context =
-    (subRouteIdToLabel[selectedId] ?? "").replace(/^All\s+/i, "") || null;
+  const context = getContextLabel(selectedId);
 
   return (
     <>
-      {/* Toolbar */}
-      <Box
-        sx={{
-          p: 2,
-          borderBottom: "1px solid rgba(0,0,0,0.12)",
-          alignItems: "center",
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 1,
-        }}
-      >
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Button variant="contained" startIcon={<AddOutlined />}>
-            <Typography
-              noWrap
-              component="span"
-              sx={{ width: "100%" }}
-              variant="body"
-            >
-              Add {context}
-            </Typography>
-          </Button>
-          <OutlinedInput
-            size="small"
-            placeholder={`Search ${context.toLowerCase()}`}
-            endAdornment={
-              <InputAdornment position="end">
-                <SearchOutlined />
-              </InputAdornment>
-            }
-          />
-        </Box>
-      </Box>
+      <ListToolbar
+        addLabel={`Add ${context}`}
+        onAdd={settingsStore.openAdd}
+        showSearch
+        searchPlaceholder={`Search ${context?.toLowerCase()}`}
+        selectedCount={selectionModel.length}
+        actionItems={[{ label: "Delete", onClick: openConfirm }]}
+        apiRef={apiRef}
+      />
       <SettingsTable />
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        title="Delete selected settings?"
+        description={`This will remove ${selectionModel.length} selected item(s). This cannot be undone.`}
+        confirmLabel="Delete"
+        confirming={saving}
+        onClose={closeConfirm}
+        onConfirm={confirmDelete}
+      />
     </>
   );
 }

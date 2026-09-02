@@ -1,67 +1,16 @@
-import { useOutletContext } from "react-router-dom";
-import { Box, Typography, Button, IconButton } from "@mui/material";
-import {
-  SettingsOutlined,
-  AddOutlined,
-  FileDownload,
-} from "@mui/icons-material";
-import { subRoutes } from "../../routes/subRoutes";
+import { FileDownload } from "@mui/icons-material";
+import InfrastructuresToolbar from "./components/InfrastructuresToolbar";
 import InfrastructuresTable from "./components/InfrastructuresTable";
 
 export default function Hypervisors() {
-  const { selectedId } = useOutletContext();
-
-  const subRouteIdToLabel = Object.fromEntries(
-    Object.values(subRoutes).map((r) => [r.id, r.label]),
-  );
-  const context =
-    (subRouteIdToLabel[selectedId] ?? "").replace(/^All\s+/i, "") || null;
-
   return (
     <>
-      {/* Toolbar */}
-      <Box
-        sx={{
-          p: 2,
-          borderBottom: "1px solid rgba(0,0,0,0.12)",
-          alignItems: "center",
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 1,
+      <InfrastructuresToolbar
+        secondaryAction={{
+          label: "Download VMware Appliance (.OVA)",
+          icon: <FileDownload />,
         }}
-      >
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Button variant="contained" startIcon={<AddOutlined />}>
-            <Typography
-              noWrap
-              component="span"
-              sx={{ width: "100%" }}
-              variant="body"
-            >
-              Add {context}
-            </Typography>
-          </Button>
-        </Box>
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<FileDownload />}
-          >
-            Download VMware Appliance (.OVA)
-          </Button>
-          <IconButton
-            size="small"
-            sx={{
-              border: "1px solid rgba(0, 114, 154, 0.5)",
-              borderRadius: "4px",
-              color: "#00729A",
-            }}
-          >
-            <SettingsOutlined />
-          </IconButton>
-        </Box>
-      </Box>
+      />
       <InfrastructuresTable />
     </>
   );

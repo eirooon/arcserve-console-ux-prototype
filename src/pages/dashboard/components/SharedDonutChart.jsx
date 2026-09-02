@@ -126,7 +126,6 @@ SharedDonutChart.propTypes = {
       color: PropTypes.string.isRequired,
     }),
   ).isRequired,
-  centerLabel: PropTypes.string.isRequired,
   centerValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     .isRequired,
   centerSubtext: PropTypes.node.isRequired,

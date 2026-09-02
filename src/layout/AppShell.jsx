@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { Box } from "@mui/material";
 import AppNavigation from "../components/AppNavigation";
 import AppHeader from "../components/AppHeader";
@@ -7,8 +7,8 @@ import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { headerStyleMap } from "../theme/headerStyleMap";
 import { useLocation } from "react-router-dom";
 
-const DRAWER_OPEN = 240;
-const DRAWER_CLOSED = 58;
+const DRAWER_OPEN = 260;
+const DRAWER_CLOSED = 56;
 const HEADER_H = 64;
 
 export default function AppShell({ children }) {
@@ -18,6 +18,11 @@ export default function AppShell({ children }) {
   );
 
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  const toggleCollapsed = useCallback(
+    () => setCollapsed((prev) => !prev),
+    [setCollapsed],
+  );
 
   const drawerWidth = useMemo(
     () => (collapsed ? DRAWER_CLOSED : DRAWER_OPEN),
@@ -39,7 +44,7 @@ export default function AppShell({ children }) {
       <AppNavigation
         collapsed={collapsed}
         drawerWidth={drawerWidth}
-        onToggle={() => setCollapsed(!collapsed)}
+        onToggle={toggleCollapsed}
         prefersReducedMotion={prefersReducedMotion}
       />
 

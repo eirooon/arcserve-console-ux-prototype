@@ -1,5 +1,5 @@
 {
-  "name": "nextgen-console",
+  "name": "arcserve-console-ux-prototype",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -18,10 +18,12 @@
     "@mui/material": "^7.3.7",
     "@mui/x-charts": "^8.26.0",
     "@mui/x-data-grid": "^8.25.0",
+    "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.12.0",
-    "recharts": "^3.7.0"
+    "recharts": "^3.7.0",
+    "use-sync-external-store": "^1.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -33,7 +35,13 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "gh-pages": "^6.3.0",
     "globals": "^16.5.0",
+    "msw": "^2.15.0",
     "vite": "^7.2.4",
     "vite-plugin-svgr": "^4.5.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

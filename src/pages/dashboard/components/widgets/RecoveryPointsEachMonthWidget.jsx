@@ -1,3 +1,4 @@
+import { memo } from "react";
 import CardWidget from "../../../../components/CardWidget";
 import SharedBarChart from "../SharedBarChart";
 import {
@@ -8,7 +9,7 @@ import {
   FormControl,
 } from "@mui/material";
 
-export default function RecoveryPointsEachMonthWidget({
+function RecoveryPointsEachMonthWidget({
   title,
   description,
   data,
@@ -58,3 +59,5 @@ export default function RecoveryPointsEachMonthWidget({
     </CardWidget>
   );
 }
+
+export default memo(RecoveryPointsEachMonthWidget);

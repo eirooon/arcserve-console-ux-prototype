@@ -1,3 +1,4 @@
+import { memo } from "react";
 import {
   Typography,
   Card,
@@ -33,7 +34,7 @@ const StatCard = ({ label, value, color, bgColor }) => (
   </Card>
 );
 
-export default function AIAnomalyDetectionJobsSummaryWidget({
+function AIAnomalyDetectionJobsSummaryWidget({
   title,
   description,
   data = [],
@@ -92,3 +93,5 @@ export default function AIAnomalyDetectionJobsSummaryWidget({
     </CardWidget>
   );
 }
+
+export default memo(AIAnomalyDetectionJobsSummaryWidget);
