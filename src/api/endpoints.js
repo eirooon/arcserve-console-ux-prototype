@@ -15,6 +15,7 @@ export const ENDPOINTS = {
   PLANS: `${BASE}/plans`,
   ALERT_RULES: `${BASE}/alert-rules`,
   INFRASTRUCTURE: `${BASE}/infrastructure`,
+  ACRS_SERVERS: `${BASE}/acrs-servers`,
   DISASTER_RECOVERY: `${BASE}/dr-runbooks`,
   AUDIT_LOGS: `${BASE}/audit-logs`,
   REPORTS: `${BASE}/reports`,

@@ -5,15 +5,28 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { buildRouteRegistry } from "../routes/routeRegistry";
 import { getBreadcrumbTrail } from "../routes/getBreadcrumbTrail";
 import { subRoutes } from "../routes/subRoutes";
+import { usePageBreadcrumbLabel } from "../hooks/usePageBreadcrumb";
 
 const registry = buildRouteRegistry({ subRoutes });
 
 export default function AppBreadcrumbs() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const dynamicLabel = usePageBreadcrumbLabel();
 
-  const trail = getBreadcrumbTrail(pathname, registry);
-  if (!trail.length) return null;
+  const matchedTrail = getBreadcrumbTrail(pathname, registry);
+  if (!matchedTrail.length) return null;
+
+  // The registry only knows static routes, so a dynamic segment (e.g. a
+  // specific plan's id) resolves to its nearest static ancestor. When the
+  // current page has published its own label for that segment (see
+  // usePageBreadcrumb), append it as one more crumb rather than relying on
+  // a registry entry that can't exist for every possible id.
+  const lastMatch = matchedTrail[matchedTrail.length - 1];
+  const trail =
+    dynamicLabel && lastMatch.path !== pathname
+      ? [...matchedTrail, { path: pathname, label: dynamicLabel }]
+      : matchedTrail;
 
   return (
     <Breadcrumbs aria-label="breadcrumb">

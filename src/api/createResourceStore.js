@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 import { apiClient } from "./client";
+import { toastStore } from "./toastStore";
 
 function shallowEqual(a, b) {
   if (a === b) return true;
@@ -29,7 +30,7 @@ export function createResourceStore(endpoint) {
     error: null,
     saving: false,
     selectionModel: [],
-    dialog: null, // null | { mode: "add" } | { mode: "edit", row }
+    dialog: null, // null | { mode: "add", row? } | { mode: "edit", row }
     // The DataGrid apiRef (see @mui/x-data-grid's useGridApiRef), published
     // once by the Table component so the sibling Toolbar can drive the grid
     // imperatively — e.g. opening the columns panel from its "Edit Columns"
@@ -74,8 +75,8 @@ export function createResourceStore(endpoint) {
     setApiRef(apiRef) {
       setState({ apiRef });
     },
-    openAdd() {
-      setState({ dialog: { mode: "add" } });
+    openAdd(initialValues) {
+      setState({ dialog: { mode: "add", row: initialValues } });
     },
     openEdit(row) {
       setState({ dialog: { mode: "edit", row } });
@@ -83,18 +84,31 @@ export function createResourceStore(endpoint) {
     closeDialog() {
       setState({ dialog: null });
     },
+    // Pushes a one-off status message (e.g. from a column's renderCell
+    // reacting to a click, or after a create/update) onto the app-wide toast
+    // stack (see toastStore/ToastHost) — any column definition or caller can
+    // trigger one without needing React state of its own, same reasoning as
+    // `dialog` above.
+    showSnackbar(message, severity = "success") {
+      toastStore.pushToast(message, severity);
+    },
+    // Returns the created/updated record (the mock API echoes it back, id
+    // included) so a caller that creates a new one — e.g. the Add Plan
+    // wizard switching itself into edit mode for what it just created — can
+    // find out what id it got, without every other caller needing to care.
     async save(values) {
       setState({ saving: true });
       try {
-        if (state.dialog?.mode === "edit") {
-          await apiClient.put(`${endpoint}/${state.dialog.row.id}`, values);
-        } else {
-          await apiClient.post(endpoint, values);
-        }
+        const result =
+          state.dialog?.mode === "edit"
+            ? await apiClient.put(`${endpoint}/${state.dialog.row.id}`, values)
+            : await apiClient.post(endpoint, values);
         setState({ saving: false, dialog: null });
         await load();
+        return result;
       } catch (error) {
         setState({ saving: false, error });
+        return null;
       }
     },
     async deleteSelected() {

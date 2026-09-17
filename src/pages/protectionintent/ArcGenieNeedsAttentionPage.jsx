@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Alert, Box, Button, Snackbar, Stack, Tab, Tabs, Typography } from "@mui/material";
+import { Box, Button, Stack, Tab, Tabs, Typography } from "@mui/material";
 import NeedsAttentionCard from "./components/NeedsAttentionCard";
 import { useNeedsAttention } from "./hooks/useNeedsAttention";
 import { NEEDS_ATTENTION_ITEMS } from "./arcGenieOverviewData";
@@ -14,8 +14,7 @@ const CATEGORY_TABS = [
 
 export default function ArcGenieNeedsAttentionPage() {
   const navigate = useNavigate();
-  const { items, handleAction, handleDismiss, snackbarMessage, closeSnackbar } =
-    useNeedsAttention();
+  const { items, handleAction, handleDismiss } = useNeedsAttention();
   const [activeCategory, setActiveCategory] = useState(ALL_CATEGORIES_TAB);
 
   const visibleItems = useMemo(
@@ -30,7 +29,7 @@ export default function ArcGenieNeedsAttentionPage() {
     <Box sx={{ bgcolor: "background.paper", minHeight: "calc(100vh - 64px)", py: 6 }}>
       <Stack spacing={3} sx={{ width: "100%", px: 6 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h5" fontWeight={700} color="text.primary">
+          <Typography variant="h6" color="text.primary">
             Needs Attention
           </Typography>
           <Button
@@ -74,17 +73,6 @@ export default function ArcGenieNeedsAttentionPage() {
           </Stack>
         )}
       </Stack>
-
-      <Snackbar
-        open={Boolean(snackbarMessage)}
-        autoHideDuration={4000}
-        onClose={closeSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="success" variant="filled" onClose={closeSnackbar}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

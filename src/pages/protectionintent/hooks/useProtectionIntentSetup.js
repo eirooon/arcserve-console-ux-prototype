@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PROTECTION_INTENT_STEPS } from "../protectionIntentData";
-import { PROTECTION_CATEGORY_COLUMNS } from "../protectionIntentRecommendationData";
 import { ARCHITECTING_SCENARIOS } from "../architectingScenarios";
 import { useArcGenieActivation } from "../../../hooks/useArcGenieActivation";
 import { plansStore } from "../../plans/hooks/usePlansData";
@@ -21,6 +20,7 @@ export function useProtectionIntentSetup() {
   const [isActivated, setIsActivated] = useState(false);
   const { setIsArcGenieActivated } = useArcGenieActivation();
   const {
+    categories,
     expandedCategories,
     toggleCategoryExpanded,
     extensionState,
@@ -30,11 +30,12 @@ export function useProtectionIntentSetup() {
     closeEditDialog,
     categoryFormData,
     handleSaveCategoryEdit,
-    snackbarMessage,
-    closeSnackbar,
+    isAddCategoryOpen,
+    openAddCategory,
+    closeAddCategory,
+    handleAddCategory,
   } = useProtectionCategories();
-  const { goals, toggleGoalEnabled, setGoalField, globalSettings, setGlobalField } =
-    useConfigureGoalsAutonomy();
+  const { goals, toggleGoalEnabled, setGoalField } = useConfigureGoalsAutonomy();
 
   const selectOption = useCallback((optionId) => {
     setSelectedOption(optionId);
@@ -71,6 +72,10 @@ export function useProtectionIntentSetup() {
     setActiveStep((current) => Math.max(current - 1, 0));
   }, []);
 
+  const goToStep = useCallback((step) => {
+    setActiveStep(step);
+  }, []);
+
   const handleActivate = useCallback(() => {
     setIsActivated(true);
     setIsArcGenieActivated(true);
@@ -80,7 +85,7 @@ export function useProtectionIntentSetup() {
     // the next starts — firing them in parallel let overlapping reloads
     // race and clobber each other, dropping categories from the final list.
     (async () => {
-      for (const category of PROTECTION_CATEGORY_COLUMNS) {
+      for (const category of categories) {
         const planName = `${category.label} Protection Plan`;
         await plansStore.save({
           plan_name: planName,
@@ -101,7 +106,7 @@ export function useProtectionIntentSetup() {
         });
       }
     })();
-  }, [setIsArcGenieActivated]);
+  }, [categories, setIsArcGenieActivated]);
 
   const handleViewOverview = useCallback(() => {
     navigate("/arcgenie/overview");
@@ -116,6 +121,7 @@ export function useProtectionIntentSetup() {
     setPromptText,
     handleGeneratePrompt,
     handleTryAnotherOption,
+    categories,
     handleEditCategory,
     expandedCategories,
     toggleCategoryExpanded,
@@ -125,19 +131,20 @@ export function useProtectionIntentSetup() {
     closeEditDialog,
     handleSaveCategoryEdit,
     categoryFormData,
-    snackbarMessage,
-    closeSnackbar,
+    isAddCategoryOpen,
+    openAddCategory,
+    closeAddCategory,
+    handleAddCategory,
     canProceed: phase === "recommended",
     handleCancel,
     handleNext,
     handlePrevious,
+    goToStep,
     isActivated,
     handleActivate,
     handleViewOverview,
     goals,
     toggleGoalEnabled,
     setGoalField,
-    globalSettings,
-    setGlobalField,
   };
 }

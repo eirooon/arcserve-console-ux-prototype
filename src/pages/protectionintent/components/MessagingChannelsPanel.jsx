@@ -1,43 +1,40 @@
-import { Menu, MenuItem, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import MessagingChannelCard from "./MessagingChannelCard";
-import MessagingChannelConfigDialog from "./MessagingChannelConfigDialog";
+import MessagingChannelRoutingPanel from "./MessagingChannelRoutingPanel";
 
 export default function MessagingChannelsPanel({
   channels,
-  menuState,
-  openMenu,
-  closeMenu,
+  selectedChannelId,
+  selectChannel,
+  selectedChannel,
   connectChannel,
   disconnectChannel,
-  openConfigDialog,
-  closeConfigDialog,
-  saveChannelConfig,
-  configChannel,
+  setChannelField,
 }) {
   return (
-    <>
-      <Stack direction="row" spacing={2}>
+    <Stack direction="row" spacing={4} alignItems="flex-start">
+      <Stack
+        spacing={2}
+        role="radiogroup"
+        aria-label="Messaging channel"
+        sx={{ flex: 1, minWidth: 0 }}
+      >
         {channels.map((channel) => (
           <MessagingChannelCard
             key={channel.id}
             channel={channel}
+            selected={channel.id === selectedChannelId}
+            onSelect={selectChannel}
             onConnect={connectChannel}
-            onOpenMenu={openMenu}
+            onDisconnect={disconnectChannel}
           />
         ))}
       </Stack>
 
-      <Menu anchorEl={menuState.anchorEl} open={Boolean(menuState.anchorEl)} onClose={closeMenu}>
-        <MenuItem onClick={() => openConfigDialog(menuState.channelId)}>Configure</MenuItem>
-        <MenuItem onClick={() => disconnectChannel(menuState.channelId)}>Disconnect</MenuItem>
-      </Menu>
-
-      <MessagingChannelConfigDialog
-        channelId={configChannel?.id ?? null}
-        channels={channels}
-        onClose={closeConfigDialog}
-        onSave={saveChannelConfig}
+      <MessagingChannelRoutingPanel
+        channel={selectedChannel}
+        onFieldChange={(field, value) => setChannelField(selectedChannelId, field, value)}
       />
-    </>
+    </Stack>
   );
 }

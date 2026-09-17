@@ -1,10 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
-import { PROTECTION_CATEGORY_COLUMNS } from "../protectionIntentRecommendationData";
 
-export function useProtectionCategoryEditForm(categoryId, categoryFormData) {
+export function useProtectionCategoryEditForm(categoryId, categoryFormData, categories) {
   const category = useMemo(
-    () => PROTECTION_CATEGORY_COLUMNS.find((item) => item.id === categoryId) ?? null,
-    [categoryId],
+    () => categories.find((item) => item.id === categoryId) ?? null,
+    [categoryId, categories],
   );
 
   const [formValues, setFormValues] = useState(() =>

@@ -29,18 +29,48 @@ export const PROTECTION_CATEGORY_COLUMNS = [
     id: "mission-critical",
     label: "Mission-Critical",
     description: "Core systems whose downtime halts the business",
+    sourcesCount: 4,
   },
   {
     id: "business-essential",
     label: "Business-Essential",
     description: "Important systems that support daily operations",
+    sourcesCount: 9,
   },
   {
     id: "standard",
     label: "Standard",
     description: "General-purpose systems with lower business impact",
+    sourcesCount: 17,
   },
 ];
+
+const CATEGORY_COUNT_WORDS = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+];
+
+// Spells out small counts ("three categories") to match ArcGenie's narrative
+// copy; falls back to the numeral once it's added enough custom categories
+// that a word would be awkward.
+export function getCategoryCountWord(count) {
+  return CATEGORY_COUNT_WORDS[count] ?? String(count);
+}
+
+// e.g. "Every 15 mins · kept 12 months" for the hero banner's stat tiles.
+export function getCadenceSummaryForCategory(categoryId, categoryFormData) {
+  const data = categoryFormData[categoryId];
+  const frequency = data.backupFrequency.replace("minutes", "mins");
+  return `${frequency} · kept ${data.monthlyRetention}`;
+}
+
+// e.g. "All 3 extensions on", "1 extension on", "No extensions".
+export function getExtensionSummaryLabel(categoryId, extensionState) {
+  const total = EXTENSION_ROWS.length;
+  const enabledCount = Object.values(extensionState[categoryId]).filter(Boolean).length;
+  if (enabledCount === 0) return "No extensions";
+  if (enabledCount === total) return `All ${total} extensions on`;
+  return `${enabledCount} extension${enabledCount === 1 ? "" : "s"} on`;
+}
 
 export const GENERAL_SETTINGS_ROWS = [
   {
@@ -120,6 +150,9 @@ export const EXTENSION_ROWS = [
   },
   {
     label: "Cyber Resilient",
+    // Shown for a category with no entry in `values` yet, e.g. a
+    // newly-added custom category that hasn't been individually tuned.
+    defaultDetail: "Isolated recovery, anomaly detection",
     values: {
       "mission-critical": { enabled: true, detail: "Isolated recovery" },
       "business-essential": { enabled: true, detail: "anomaly detection" },
@@ -128,6 +161,7 @@ export const EXTENSION_ROWS = [
   },
   {
     label: "DR Enabled",
+    defaultDetail: "Standby replica, configurable RPO",
     values: {
       "mission-critical": { enabled: true, detail: "15-min RPO" },
       "business-essential": { enabled: false },
@@ -135,6 +169,15 @@ export const EXTENSION_ROWS = [
     },
   },
 ];
+
+// Extension enablement for a category that isn't one of the seeded
+// PROTECTION_CATEGORY_COLUMNS, e.g. a custom category a user just added.
+export function buildDefaultExtensionState() {
+  return EXTENSION_ROWS.reduce((acc, row) => {
+    acc[row.label] = false;
+    return acc;
+  }, {});
+}
 
 export const DESTINATION_ROWS = [
   {
@@ -196,7 +239,7 @@ export function getExtensionsForCategory(categoryId, extensionState, categoryFor
     detail:
       row.label === "Compliance"
         ? `${data.lockPeriod}, ${data.extendedRetention}`
-        : row.values[categoryId].detail,
+        : (row.values[categoryId]?.detail ?? row.defaultDetail),
     enabled: extensionState[categoryId][row.label],
   }));
 }

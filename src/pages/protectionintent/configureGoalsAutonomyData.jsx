@@ -25,15 +25,9 @@ export const ASSESSMENT_FREQUENCY_OPTIONS = [
   { value: "monthly", label: "Monthly" },
 ];
 
-export const GLOBAL_GOAL_SETTINGS = {
-  autonomyLevel: "suggest-only",
-  assessmentFrequency: "daily",
-};
-
 export const GOALS_STEP_COPY = {
   title: "How would you like to configure your goals and autonomy?",
-  description:
-    "Turn on and tailor the goals below to customize settings that take precedence over the default global configurations.",
+  description: "Turn on and tailor each goal's autonomy level and assessment frequency.",
 };
 
 export const PROTECTION_FITNESS_CHECK_GOAL_ID = "protection-fitness-check";
@@ -46,7 +40,7 @@ export const INITIAL_AGENTIC_GOALS = [
     shortDescription:
       "Finds unprotected sources and assigns the right backup policy.",
     title:
-      "Auto-Protect: Discover, classify, and assign backup policies to all unprotected sources",
+      "Auto-Protect: Continuously discover new sources and auto-assign to appropriate protection categories based on type and business impact. Sources not fitting any category are flagged for review.",
     description:
       "Unprotected sources — including newly discovered hypervisor VMs and agent-based/UNC sources — are found, precisely classified into the correct policy type, assigned, deployed, and given an initial backup trigger; sources move from Unprotected to Protected/Online.",
     enabled: true,
@@ -80,23 +74,5 @@ export function getAssessmentFrequencyLabel(value) {
   return (
     ASSESSMENT_FREQUENCY_OPTIONS.find((option) => option.value === value)
       ?.label ?? value
-  );
-}
-
-function buildInheritanceLabel(valueLabel, isInherited) {
-  return `${valueLabel} (${isInherited ? "Inherit" : "Override"} Global Settings)`;
-}
-
-export function getGoalAutonomyInheritanceLabel(goal, globalSettings) {
-  return buildInheritanceLabel(
-    getAutonomyLevelLabel(goal.autonomyLevel),
-    goal.autonomyLevel === globalSettings.autonomyLevel,
-  );
-}
-
-export function getGoalFrequencyInheritanceLabel(goal, globalSettings) {
-  return buildInheritanceLabel(
-    getAssessmentFrequencyLabel(goal.assessmentFrequency),
-    goal.assessmentFrequency === globalSettings.assessmentFrequency,
   );
 }

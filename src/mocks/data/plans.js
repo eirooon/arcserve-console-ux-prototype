@@ -4,6 +4,9 @@ import { getLatestJobForPlan } from "./getLatestJobForPlan";
 // Field names mirror the legacy app's policiesDataSet shape
 // (arcservedev-cloudconsole_frontend/src/mockResponses/mockData.js). The
 // legacy app calls this concept a "policy"; this app calls it a "plan".
+// `policy_type` must exactly match a PROTECTION_TYPES[].label (see
+// src/pages/plans/addplan/data/protectionTypes.js) so the Add Plan wizard's
+// Basic step can preselect the right Protection Type card when editing.
 const basePlans = [
   {
     id: "84777c50-80a5-4b6d-a5f8-038bd5015d36",
@@ -13,7 +16,7 @@ const basePlans = [
     protected_sources: 4,
     unprotected_sources: 0,
     source_group: "UDP sources",
-    policy_type: "Agent Based Windows Backups",
+    policy_type: "Agent-based Windows Backup",
   },
   {
     id: "c76bf67c-da15-41df-b7b3-474ec0113ee6",
@@ -23,7 +26,7 @@ const basePlans = [
     protected_sources: 12,
     unprotected_sources: 1,
     source_group: null,
-    policy_type: "Cloud Direct BaaS",
+    policy_type: "Agentless VM Backup",
   },
   {
     id: "e1a5e9c1-2a3f-4b1f-9b8c-1a7e2c8f9d10",
@@ -33,7 +36,7 @@ const basePlans = [
     protected_sources: 0,
     unprotected_sources: 6,
     source_group: null,
-    policy_type: "Agentless VM Backups",
+    policy_type: "Agentless Cloud Backup",
   },
   {
     id: "f3c8b6d2-5e4a-4c9b-8a2d-3f1e0b7c6a45",
@@ -43,7 +46,7 @@ const basePlans = [
     protected_sources: 8,
     unprotected_sources: 0,
     source_group: "UDP sources",
-    policy_type: "Agent Based Windows Backups",
+    policy_type: "Agent-based Backup to Arcserve Cloud for Disaster Recovery",
   },
 ];
 

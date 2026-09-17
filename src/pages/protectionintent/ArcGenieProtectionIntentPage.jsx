@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
-import {
-  Alert,
-  Box,
-  Button,
-  Snackbar,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Stack, Tab, Tabs, Typography } from "@mui/material";
 import ProtectionCategoriesList from "./components/ProtectionCategoriesList";
 import GoalsAutonomyPanel from "./components/GoalsAutonomyPanel";
 import ProtectionCategoryEditDialog from "./components/ProtectionCategoryEditDialog";
@@ -30,6 +21,7 @@ export default function ArcGenieProtectionIntentPage() {
     location.state?.initialTab === "goals" ? "goals" : "categories",
   );
   const {
+    categories,
     expandedCategories,
     toggleCategoryExpanded,
     extensionState,
@@ -40,14 +32,10 @@ export default function ArcGenieProtectionIntentPage() {
     toggleExtension,
     handleSaveCategoryEdit,
     goals,
-    globalSettings,
     toggleGoalEnabled,
     setGoalField,
-    setGlobalField,
     isDirty,
     handleSave,
-    snackbarMessage,
-    closeSnackbar,
   } = useArcGenieProtectionIntent();
 
   return (
@@ -64,7 +52,7 @@ export default function ArcGenieProtectionIntentPage() {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Typography variant="h5" fontWeight={700} color="text.primary">
+          <Typography variant="h6" color="text.primary">
             Protection Intent
           </Typography>
           <Stack direction="row" spacing={1}>
@@ -101,6 +89,7 @@ export default function ArcGenieProtectionIntentPage() {
 
         {activeTab === "categories" && (
           <ProtectionCategoriesList
+            categories={categories}
             categoryFormData={categoryFormData}
             extensionState={extensionState}
             expandedCategories={expandedCategories}
@@ -115,8 +104,6 @@ export default function ArcGenieProtectionIntentPage() {
             goals={goals}
             toggleGoalEnabled={toggleGoalEnabled}
             setGoalField={setGoalField}
-            globalSettings={globalSettings}
-            setGlobalField={setGlobalField}
           />
         )}
       </Stack>
@@ -124,20 +111,10 @@ export default function ArcGenieProtectionIntentPage() {
       <ProtectionCategoryEditDialog
         categoryId={editDialogCategoryId}
         categoryFormData={categoryFormData}
+        categories={categories}
         onClose={closeEditDialog}
         onSave={handleSaveCategoryEdit}
       />
-
-      <Snackbar
-        open={Boolean(snackbarMessage)}
-        autoHideDuration={4000}
-        onClose={closeSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="success" variant="filled" onClose={closeSnackbar}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

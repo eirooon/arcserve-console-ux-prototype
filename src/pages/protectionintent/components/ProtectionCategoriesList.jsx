@@ -1,7 +1,6 @@
 import { Stack } from "@mui/material";
 import ProtectionCategoryAccordion from "./ProtectionCategoryAccordion";
 import {
-  PROTECTION_CATEGORY_COLUMNS,
   getDestinationSettingsForCategory,
   getExtensionCountLabel,
   getExtensionsForCategory,
@@ -10,16 +9,18 @@ import {
 } from "../protectionIntentRecommendationData";
 
 export default function ProtectionCategoriesList({
+  categories,
   categoryFormData,
   extensionState,
   expandedCategories,
   onToggleCategoryExpand,
   onToggleExtension,
   onEditCategory,
+  onExtensionInfo,
 }) {
   return (
     <Stack spacing={2}>
-      {PROTECTION_CATEGORY_COLUMNS.map((category) => (
+      {categories.map((category) => (
         <ProtectionCategoryAccordion
           key={category.id}
           category={{
@@ -35,6 +36,7 @@ export default function ProtectionCategoriesList({
           onToggleExpand={() => onToggleCategoryExpand(category.id)}
           onToggleExtension={(extensionLabel) => onToggleExtension(category.id, extensionLabel)}
           onEdit={() => onEditCategory(category.id)}
+          onExtensionInfo={onExtensionInfo}
         />
       ))}
     </Stack>

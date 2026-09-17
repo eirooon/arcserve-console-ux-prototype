@@ -39,14 +39,69 @@ export const AUTO_PROTECT_STAT_FIELDS = [
   },
 ];
 
+// Cycled across sources so the Auto-Protect goal detail table shows a mix
+// of plans rather than the same one on every pending/failed row.
+const AUTO_PROTECT_PLAN_CYCLE = ["Mission-Critical", "Standard", "Business-Essential"];
+
+// Auto-Protect assignment workflow state, derived by position rather than a
+// fixed id lookup so it stays in sync with whatever records happen to be in
+// ../../mocks/data/sources.js (a live dev-environment API snapshot that can
+// be regenerated with different ids, and isn't necessarily a multiple of
+// 10 — see AUTO_PROTECT_STATUS_COUNTS below, which derives every other
+// protected/pending/failed/unprotected count from this instead of a second,
+// independently-hardcoded split that could drift out of sync with it).
+function getAutoProtectWorkflow(index) {
+  const plan = AUTO_PROTECT_PLAN_CYCLE[index % AUTO_PROTECT_PLAN_CYCLE.length];
+
+  if (index < 10) {
+    return { status: "protected", currentPlan: plan, proposedPlan: "-", actionLabel: "View Plan" };
+  }
+  if (index < 20) {
+    return { status: "pending-classification", currentPlan: "No Plan", proposedPlan: plan, actionLabel: "Apply" };
+  }
+  if (index < 30) {
+    return {
+      status: "assignment-failed",
+      currentPlan: "No Plan",
+      proposedPlan: "No matching rule",
+      actionLabel: "Assign",
+    };
+  }
+  return { status: "unprotected", currentPlan: "No Plan", proposedPlan: plan, actionLabel: "Apply" };
+}
+
+// Table rows backing the Auto-Protect goal detail page, built from the same
+// mock sources shown on the Sources page instead of a separate fake list.
+export const AUTO_PROTECT_SOURCES = sources.map((source, index) => ({
+  id: source.id,
+  sourceName: source.source_name,
+  sourceType: source.source_type,
+  ...getAutoProtectWorkflow(index),
+}));
+
+const STATUS_TO_STAT_KEY = {
+  protected: "protected",
+  "pending-classification": "pendingClassification",
+  "assignment-failed": "assignmentFailed",
+  unprotected: "unprotected",
+};
+
+// Counted straight from AUTO_PROTECT_SOURCES (rather than a hand-maintained
+// split) so the overview stat tiles/status bar always agree with what the
+// goal detail table actually shows, however many sources mocks/data/
+// sources.js happens to contain.
+const AUTO_PROTECT_STATUS_COUNTS = AUTO_PROTECT_SOURCES.reduce(
+  (counts, source) => {
+    const key = STATUS_TO_STAT_KEY[source.status];
+    counts[key] = (counts[key] ?? 0) + 1;
+    return counts;
+  },
+  { protected: 0, pendingClassification: 0, assignmentFailed: 0, unprotected: 0 },
+);
+
 // Per-goal source counts, keyed by AUTO_PROTECT_STAT_FIELDS[].key.
 export const GOAL_STATS_BY_ID = {
-  [AUTO_PROTECT_GOAL_ID]: {
-    protected: 10,
-    pendingClassification: 10,
-    assignmentFailed: 10,
-    unprotected: 0,
-  },
+  [AUTO_PROTECT_GOAL_ID]: AUTO_PROTECT_STATUS_COUNTS,
 };
 
 export function getGoalStats(goalId) {
@@ -63,7 +118,7 @@ export function getGoalStats(goalId) {
 // Sources currently in scope of the active goals, for the overview header copy.
 export const OVERVIEW_SUMMARY = {
   activeGoalCount: 2,
-  totalSources: 30,
+  totalSources: sources.length,
 };
 
 export const ASSESSMENT_TIME_LABEL = "9:00 AM";
@@ -72,9 +127,19 @@ export const NEXT_ASSESSMENT_LABEL = "Next assessment tomorrow, 9:00 AM";
 // Segment breakdown + color shown on each goal's status bar on the overview page.
 export const GOAL_OVERVIEW_SEGMENTS_BY_ID = {
   [AUTO_PROTECT_GOAL_ID]: [
-    { key: "protected", label: "protected", value: 10, color: green[400] },
-    { key: "pendingClassification", label: "pending", value: 10, color: blue[300] },
-    { key: "assignmentFailed", label: "failed", value: 10, color: red[300] },
+    { key: "protected", label: "protected", value: AUTO_PROTECT_STATUS_COUNTS.protected, color: green[400] },
+    {
+      key: "pendingClassification",
+      label: "pending",
+      value: AUTO_PROTECT_STATUS_COUNTS.pendingClassification,
+      color: blue[300],
+    },
+    {
+      key: "assignmentFailed",
+      label: "failed",
+      value: AUTO_PROTECT_STATUS_COUNTS.assignmentFailed,
+      color: red[300],
+    },
   ],
   [PROTECTION_FITNESS_CHECK_GOAL_ID]: [
     { key: "inWindow", label: "in window", value: 412, color: green[400] },
@@ -208,53 +273,3 @@ export const SOURCE_STATUS_META = {
   "assignment-failed": { label: "Assignment Failed", color: red[700], bgColor: red[50] },
   unprotected: { label: "Unprotected", color: grey[600], bgColor: grey[100] },
 };
-
-// Auto-Protect assignment workflow state for each Sources page mock record
-// (see ../../mocks/data/sources.js), keyed by that record's id.
-const AUTO_PROTECT_WORKFLOW_BY_SOURCE_ID = {
-  "7db6f883-2719-44af-ac58-95701c946e86": {
-    status: "pending-classification",
-    currentPlan: "No Plan",
-    proposedPlan: "Mission-Critical",
-    actionLabel: "Approve",
-  },
-  "b516863b-776c-49eb-9ffc-9daf748157d2": {
-    status: "assignment-failed",
-    currentPlan: "No Plan",
-    proposedPlan: "No matching rule",
-    actionLabel: "Assign",
-  },
-  "2598b05d-7e42-4f94-8261-60f663fa25ae": {
-    status: "protected",
-    currentPlan: "Mission-Critical",
-    proposedPlan: "-",
-    actionLabel: "View Plan",
-  },
-  "af328044-e9b4-4d6f-9d7e-4edd5fe59826": {
-    status: "pending-classification",
-    currentPlan: "No Plan",
-    proposedPlan: "Standard",
-    actionLabel: "Apply",
-  },
-  "537842b1-eb8b-484b-adc2-cc87cb87eb65": {
-    status: "pending-classification",
-    currentPlan: "No Plan",
-    proposedPlan: "Business-Essential",
-    actionLabel: "Apply",
-  },
-  "15eaca94-ecfc-4460-a30e-0acee1cfd988": {
-    status: "unprotected",
-    currentPlan: "No Plan",
-    proposedPlan: "Standard",
-    actionLabel: "Apply",
-  },
-};
-
-// Table rows backing the Auto-Protect goal detail page, built from the same
-// mock sources shown on the Sources page instead of a separate fake list.
-export const AUTO_PROTECT_SOURCES = sources.map((source) => ({
-  id: source.id,
-  sourceName: source.source_name,
-  sourceType: source.source_type,
-  ...AUTO_PROTECT_WORKFLOW_BY_SOURCE_ID[source.id],
-}));

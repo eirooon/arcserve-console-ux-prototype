@@ -15,6 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import FormField from "./FormField";
 
 function toInputValue(field, rawValue) {
   if (field.type === "boolean") return Boolean(rawValue);
@@ -89,37 +90,38 @@ function EntityFormBody({ mode, entityLabel, fields, initialValues, saving, onCl
 
             if (field.type === "select") {
               return (
-                <TextField
-                  key={field.field}
-                  select
-                  fullWidth
-                  size="small"
-                  label={field.label}
-                  value={values[field.field] ?? ""}
-                  onChange={(event) => handleChange(field, event.target.value)}
-                >
-                  {field.options.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                <FormField key={field.field} label={field.label}>
+                  <TextField
+                    select
+                    fullWidth
+                    size="small"
+                    value={values[field.field] ?? ""}
+                    onChange={(event) => handleChange(field, event.target.value)}
+                  >
+                    {field.options.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </FormField>
               );
             }
 
             return (
-              <TextField
-                key={field.field}
-                fullWidth
-                size="small"
-                label={field.label}
-                type={
-                  field.type === "number" ? "number" : field.type === "datetime" ? "datetime-local" : "text"
-                }
-                slotProps={field.type === "datetime" ? { inputLabel: { shrink: true } } : undefined}
-                value={values[field.field] ?? ""}
-                onChange={(event) => handleChange(field, event.target.value)}
-              />
+              <FormField key={field.field} label={field.label}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder={field.type === "text" || !field.type ? `Enter ${field.label}` : undefined}
+                  type={
+                    field.type === "number" ? "number" : field.type === "datetime" ? "datetime-local" : "text"
+                  }
+                  slotProps={field.type === "datetime" ? { inputLabel: { shrink: true } } : undefined}
+                  value={values[field.field] ?? ""}
+                  onChange={(event) => handleChange(field, event.target.value)}
+                />
+              </FormField>
             );
           })}
         </Stack>

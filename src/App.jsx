@@ -50,11 +50,13 @@ const Sites = lazy(() => import("./pages/infrastructures/Sites"));
 const StorageArrays = lazy(() => import("./pages/infrastructures/StorageArrays"));
 const Proxies = lazy(() => import("./pages/infrastructures/Proxies"));
 const OracleHosts = lazy(() => import("./pages/infrastructures/OracleHosts"));
-const CloudProtectionOrchestrator = lazy(() => import("./pages/infrastructures/CloudProtectionOrchestrator"));
 const CloudAccounts = lazy(() => import("./pages/infrastructures/CloudAccounts"));
+const AcrsServers = lazy(() => import("./pages/infrastructures/AcrsServers"));
+const AcrsServerDetails = lazy(() => import("./pages/infrastructures/AcrsServerDetails"));
 
 //Plans
 const PlansLayout = lazy(() => import("./pages/plans/PlansLayout"));
+const AddPlanPage = lazy(() => import("./pages/plans/addplan/AddPlanPage"));
 
 // Disaster Recovery
 const DisasterRecoveryLayout = lazy(() => import("./pages/disasterrecovery/DisasterRecoveryLayout"));
@@ -155,15 +157,18 @@ export default function App() {
             <Route path="storage-arrays" element={<StorageArrays />} />
             <Route path="proxies" element={<Proxies />} />
             <Route path="oracle-hosts" element={<OracleHosts />} />
-            <Route
-              path="cloud-protection-orchestrators"
-              element={<CloudProtectionOrchestrator />}
-            />
             <Route path="cloud-accounts" element={<CloudAccounts />} />
+            <Route path="arcserve-cyber-resilient-servers" element={<AcrsServers />} />
+            <Route
+              path="arcserve-cyber-resilient-servers/:serverId"
+              element={<AcrsServerDetails />}
+            />
           </Route>
 
           {/* PLANS (single page) */}
           <Route path="/plans" element={<PlansLayout />} />
+          <Route path="/plans/new" element={<AddPlanPage />} />
+          <Route path="/plans/:planId" element={<AddPlanPage />} />
 
           {/* DISASTER RECOVERY (mixed: split layout + full page) */}
           <Route path="/disaster-recovery" element={<Outlet />}>

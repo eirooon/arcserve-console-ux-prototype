@@ -109,11 +109,11 @@ export const subRoutes = {
     parent: "/infrastructures",
     count: 5,
   },
-  "/infrastructures/cloud-protection-orchestrators": {
-    id: "cloud-protection-orchestrators",
-    label: "Cloud Protection Orchestrators",
+  "/infrastructures/arcserve-cyber-resilient-servers": {
+    id: "acrs-servers",
+    label: "Arcserve Cyber Resilient Servers",
     parent: "/infrastructures",
-    count: 5,
+    count: 2,
   },
   "/disaster-recovery/dr-runbooks": {
     id: "dr-runbooks",
@@ -143,6 +143,11 @@ export const subRoutes = {
     id: "dr-runbook-new",
     label: "Add DR Runbook",
     parent: "/disaster-recovery/dr-runbooks",
+  },
+  "/plans/new": {
+    id: "plan-new",
+    label: "Add Plan",
+    parent: "/plans",
   },
   "/reports/backup-jobs": {
     id: "backup-jobs",

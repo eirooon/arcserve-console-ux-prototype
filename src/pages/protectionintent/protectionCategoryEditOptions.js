@@ -112,6 +112,32 @@ export function buildCategoryEditFormDefaults(category, generalSettings, destina
   };
 }
 
+// Seed values for a brand-new custom category, before the user has tuned
+// anything — deliberately the lightest tier (mirrors "Standard") since a
+// custom category's actual criticality is unknown until configured.
+export function buildDefaultCategoryFormValues(categoryName) {
+  return {
+    categoryName,
+    backupFrequency: BACKUP_FREQUENCY_OPTIONS[3],
+    dailyRetention: DAILY_RETENTION_OPTIONS[0],
+    weeklyRetention: WEEKLY_RETENTION_OPTIONS[0],
+    monthlyRetention: MONTHLY_RETENTION_OPTIONS[0],
+    offsiteCopy: OFFSITE_COPY_OPTIONS[0],
+    recoveryPriority: RECOVERY_PRIORITY_OPTIONS[2],
+    recoveryValidation: RECOVERY_VALIDATION_OPTIONS[2],
+    storageTier: STORAGE_TIER_OPTIONS[2],
+    lockPeriod: LOCK_PERIOD_OPTIONS[0],
+    extendedRetention: EXTENDED_RETENTION_OPTIONS[0],
+    legalHold: LEGAL_HOLD_OPTIONS[2],
+    immutability: false,
+    auditLogging: false,
+    chainOfCustody: false,
+    backupDestination: BACKUP_DESTINATION_OPTIONS[0],
+    recoveryPointServer: RECOVERY_POINT_SERVER_OPTIONS[0],
+    dataStore: DATA_STORE_OPTIONS[0],
+  };
+}
+
 export function buildInitialCategoryFormData() {
   return PROTECTION_CATEGORY_COLUMNS.reduce((acc, category) => {
     acc[category.id] = buildCategoryEditFormDefaults(

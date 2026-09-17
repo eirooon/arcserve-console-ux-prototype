@@ -5,7 +5,7 @@ import telegramIcon from "../../assets/messaging/telegram.png";
 export const MESSAGING_STEP_COPY = {
   title: "How would you like to configure your messaging channels?",
   description:
-    "Customize your messaging preferences to ensure that ArcGenie sends you reports, alerts, and insights directly via in-app notifications and email.",
+    "Choose one messaging channel for ArcGenie to send reports, alerts, and insights to.",
 };
 
 export const NOTIFICATION_TYPES = [
@@ -20,17 +20,19 @@ export const MESSAGING_CHANNELS = [
   { id: "telegram", name: "Telegram", icon: telegramIcon, defaultChannelName: "#arcgenie-goals" },
 ];
 
+// Which room/channel within the connected service to route messages to.
+export const CHANNEL_NAME_OPTIONS = ["#arcgenie-goals", "#arcgenie-alerts", "#general"];
+
 export const MESSAGE_PREVIEW = {
   sender: "Arcserve ArcGenie",
   timestamp: "2:43 PM",
-  title: "Approval Required",
-  summary: "New source has been discovered.",
+  title: "New source found.",
+  summary:
+    "Mission-Critical is the only plan that fits this node. Approve to assign it, deploy the agent, and start the first backup.",
   details: [
-    { label: "Source", value: "sample_machine_01" },
-    { label: "Source Type", value: "Windows (Agent)" },
-    { label: "Current Plan", value: "No plan" },
-    { label: "Proposed Plan", value: "Mission-Critical" },
-    { label: "Reason", value: "The only plan configured that can protect this node." },
+    { label: "Source", value: "sample_machine_01 (Windows)" },
+    { label: "Current Plan", value: "No plan (No recovery points)" },
+    { label: "Proposed Plan", value: "Mission-Critical (hourly · 30d retention)" },
   ],
 };
 

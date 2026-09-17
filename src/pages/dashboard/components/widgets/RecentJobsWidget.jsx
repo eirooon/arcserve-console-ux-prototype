@@ -9,12 +9,15 @@ import {
   Link,
   LinearProgress,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import {
   ChevronLeftRounded,
   ChevronRightRounded,
   MoreVert,
 } from "@mui/icons-material";
 import CardWidget from "../../../../components/CardWidget";
+
+const BRAND_GRADIENT = "linear-gradient(90deg, #8A2BFF 0%, #00A7E1 100%)";
 
 function RecentJobsWidget({
   data,
@@ -54,9 +57,10 @@ function RecentJobsWidget({
           sx={{
             height,
             borderRadius: 999,
-            bgcolor: (theme) => theme.palette.grey[200],
+            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
             "& .MuiLinearProgress-bar": {
               borderRadius: 999,
+              background: BRAND_GRADIENT,
             },
           }}
         />

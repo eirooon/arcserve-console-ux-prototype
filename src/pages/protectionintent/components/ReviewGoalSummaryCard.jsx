@@ -1,10 +1,10 @@
 import { Stack, Typography } from "@mui/material";
 import {
-  getGoalAutonomyInheritanceLabel,
-  getGoalFrequencyInheritanceLabel,
+  getAssessmentFrequencyLabel,
+  getAutonomyLevelLabel,
 } from "../configureGoalsAutonomyData";
 
-export default function ReviewGoalSummaryCard({ goal, globalSettings }) {
+export default function ReviewGoalSummaryCard({ goal }) {
   return (
     <Stack
       spacing={1.5}
@@ -22,8 +22,8 @@ export default function ReviewGoalSummaryCard({ goal, globalSettings }) {
         </Typography>
       </Stack>
       <Typography variant="body2" color="text.primary">
-        {getGoalAutonomyInheritanceLabel(goal, globalSettings)} &bull;{" "}
-        {getGoalFrequencyInheritanceLabel(goal, globalSettings)}
+        {getAutonomyLevelLabel(goal.autonomyLevel)} &bull;{" "}
+        {getAssessmentFrequencyLabel(goal.assessmentFrequency)}
       </Typography>
     </Stack>
   );

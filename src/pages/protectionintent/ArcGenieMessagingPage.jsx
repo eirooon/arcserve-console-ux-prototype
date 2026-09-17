@@ -10,7 +10,7 @@ export default function ArcGenieMessagingPage() {
     <Box sx={{ bgcolor: "background.paper", minHeight: "calc(100vh - 64px)", py: 6 }}>
       <Stack spacing={4} sx={{ width: "100%", px: 6 }}>
         <Box>
-          <Typography variant="h5" fontWeight={700} color="text.primary">
+          <Typography variant="h6" color="text.primary">
             Messaging Channels
           </Typography>
           <Typography variant="body2" color="text.secondary">

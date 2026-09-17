@@ -1,63 +1,46 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
+import { toastStore } from "../../../api/toastStore";
 import { useProtectionCategories } from "./useProtectionCategories";
 import { useConfigureGoalsAutonomy } from "./useConfigureGoalsAutonomy";
+import { useDirtyState } from "../../../hooks/useDirtyState";
+
+// `track(fn)` (see useDirtyState) returns a fresh wrapper function every
+// time it's called, so calling it inline defeats useCallback's memoization.
+// This keeps that wrapper's identity stable across renders too, as long as
+// `track` and `fn` themselves are (which they are for everything below).
+function useTrackedSetter(track, fn) {
+  return useCallback((...args) => track(fn)(...args), [track, fn]);
+}
 
 export function useArcGenieProtectionIntent() {
   const categories = useProtectionCategories();
   const goalsAutonomy = useConfigureGoalsAutonomy();
-  const [isDirty, setIsDirty] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
+  // See useDirtyState — the app-standard way to keep Save disabled until
+  // something has actually changed, and disabled again right after saving.
+  const { dirty: isDirty, track, markClean } = useDirtyState();
 
-  const toggleExtension = useCallback(
-    (categoryId, extensionLabel) => {
-      categories.toggleExtension(categoryId, extensionLabel);
-      setIsDirty(true);
-    },
-    [categories],
-  );
+  const toggleExtension = useTrackedSetter(track, categories.toggleExtension);
 
   const handleSaveCategoryEdit = useCallback(
     (categoryId, formValues) => {
-      categories.handleSaveCategoryEdit(categoryId, formValues);
-      setIsDirty(true);
-      setSnackbarMessage(`${formValues.categoryName} settings updated.`);
+      track(categories.handleSaveCategoryEdit)(categoryId, formValues);
+      toastStore.pushToast(`${formValues.categoryName} settings updated.`);
     },
-    [categories],
+    [categories, track],
   );
 
-  const toggleGoalEnabled = useCallback(
-    (goalId) => {
-      goalsAutonomy.toggleGoalEnabled(goalId);
-      setIsDirty(true);
-    },
-    [goalsAutonomy],
-  );
+  const toggleGoalEnabled = useTrackedSetter(track, goalsAutonomy.toggleGoalEnabled);
 
-  const setGoalField = useCallback(
-    (goalId, field, value) => {
-      goalsAutonomy.setGoalField(goalId, field, value);
-      setIsDirty(true);
-    },
-    [goalsAutonomy],
-  );
-
-  const setGlobalField = useCallback(
-    (field, value) => {
-      goalsAutonomy.setGlobalField(field, value);
-      setIsDirty(true);
-    },
-    [goalsAutonomy],
-  );
+  const setGoalField = useTrackedSetter(track, goalsAutonomy.setGoalField);
 
   const handleSave = useCallback(() => {
-    setIsDirty(false);
-    setSnackbarMessage("Protection intent settings saved.");
-  }, []);
-
-  const closeSnackbar = useCallback(() => setSnackbarMessage(null), []);
+    markClean();
+    toastStore.pushToast("Protection intent settings saved.");
+  }, [markClean]);
 
   return {
     // Protection categories
+    categories: categories.categories,
     expandedCategories: categories.expandedCategories,
     toggleCategoryExpanded: categories.toggleCategoryExpanded,
     extensionState: categories.extensionState,
@@ -70,15 +53,11 @@ export function useArcGenieProtectionIntent() {
 
     // Goals & autonomy
     goals: goalsAutonomy.goals,
-    globalSettings: goalsAutonomy.globalSettings,
     toggleGoalEnabled,
     setGoalField,
-    setGlobalField,
 
     // Page-level
     isDirty,
     handleSave,
-    snackbarMessage,
-    closeSnackbar,
   };
 }

@@ -5,6 +5,7 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import { theme } from "./theme/theme";
 import { ArcGenieActivationProvider } from "./context/ArcGenieActivationProvider";
+import { PageBreadcrumbProvider } from "./context/PageBreadcrumbProvider";
 import App from "./App";
 import "@fontsource/inter/latin.css";
 
@@ -29,7 +30,9 @@ enableMocking().then(() => {
         <CssBaseline />
         <HashRouter>
           <ArcGenieActivationProvider>
-            <App />
+            <PageBreadcrumbProvider>
+              <App />
+            </PageBreadcrumbProvider>
           </ArcGenieActivationProvider>
         </HashRouter>
       </ThemeProvider>

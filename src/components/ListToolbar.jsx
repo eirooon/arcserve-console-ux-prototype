@@ -27,6 +27,8 @@ const DEFAULT_ACTION_ITEMS = [
 export default function ListToolbar({
   addLabel,
   onAdd,
+  addMenuItems,
+  extraAction,
   showSearch = false,
   searchPlaceholder,
   showFilters = false,
@@ -43,6 +45,12 @@ export default function ListToolbar({
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
 
+  const [addAnchorEl, setAddAnchorEl] = React.useState(null);
+  const addMenuOpen = Boolean(addAnchorEl);
+
+  const handleAddClick = (event) => setAddAnchorEl(event.currentTarget);
+  const handleAddClose = () => setAddAnchorEl(null);
+
   const handleEditColumns = (event) => {
     apiRef?.current?.setEditColumnsAnchor?.(event.currentTarget);
     apiRef?.current?.showPreferences("columns");
@@ -50,22 +58,63 @@ export default function ListToolbar({
 
   const hasLeadingContent = Boolean(showSearch || showFilters);
   const hasSelection = selectedCount !== undefined || secondaryAction;
-  const hasTrailingContent = hasSelection || showColumnsButton || addLabel;
+  const hasTrailingContent = hasSelection || showColumnsButton || addLabel || Boolean(extraAction);
+
+  // The divider between the selection controls and the Edit Columns/Add
+  // group only reads correctly while those two groups share a row — once
+  // the toolbar wraps far enough that they land on different rows, a
+  // flexItem divider renders as an orphaned line trailing off into empty
+  // space. There's no CSS-only way to know "did my sibling wrap to a new
+  // line" (it depends on this page's specific button set, not a fixed
+  // viewport breakpoint), so this measures it directly: show the divider
+  // only while the two groups' rendered offsetTop still match.
+  const toolbarRef = React.useRef(null);
+  const selectionGroupRef = React.useRef(null);
+  const addGroupRef = React.useRef(null);
+  const [dividerAligned, setDividerAligned] = React.useState(true);
+
+  React.useLayoutEffect(() => {
+    const container = toolbarRef.current;
+    if (!container) return undefined;
+
+    const checkAlignment = () => {
+      const selectionEl = selectionGroupRef.current;
+      const addEl = addGroupRef.current;
+      setDividerAligned(
+        Boolean(selectionEl && addEl && selectionEl.offsetTop === addEl.offsetTop),
+      );
+    };
+
+    checkAlignment();
+    const observer = new ResizeObserver(checkAlignment);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [hasSelection, showColumnsButton, extraAction, addLabel]);
 
   return (
     <Box
+      ref={toolbarRef}
       sx={{
         p: 2,
         borderBottom: "1px solid rgba(0,0,0,0.12)",
         alignItems: "center",
         display: "flex",
+        flexWrap: "wrap",
         justifyContent: hasLeadingContent ? "space-between" : "flex-end",
-        gap: 1,
+        gap: 1.5,
         ...sx,
       }}
     >
       {hasLeadingContent && (
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            flexWrap: "wrap",
+            "& .MuiButtonBase-root": { flexShrink: 0 },
+          }}
+        >
           {showSearch && (
             <OutlinedInput
               size="small"
@@ -76,6 +125,7 @@ export default function ListToolbar({
                   <SearchOutlined />
                 </InputAdornment>
               }
+              sx={{ minWidth: 160 }}
             />
           )}
 
@@ -92,9 +142,20 @@ export default function ListToolbar({
       )}
 
       {hasTrailingContent && (
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            alignItems: "center",
+            flexWrap: "wrap",
+            "& .MuiButtonBase-root": { flexShrink: 0 },
+          }}
+        >
           {hasSelection && (
-            <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+            <Box
+              ref={selectionGroupRef}
+              sx={{ display: "flex", gap: 1.5, alignItems: "center", flexWrap: "wrap" }}
+            >
               {selectedCount !== undefined && (
                 <Typography fontSize={14} color="text.secondary">
                   {selectedCount} selected
@@ -121,6 +182,7 @@ export default function ListToolbar({
                     variant="outlined"
                     color="secondary"
                     endIcon={<ArrowDropDown />}
+                    disabled={!selectedCount}
                   >
                     Actions
                   </Button>
@@ -148,27 +210,81 @@ export default function ListToolbar({
             </Box>
           )}
 
-          {hasSelection && showColumnsButton && (
+          {hasSelection && showColumnsButton && dividerAligned && (
             <Divider orientation="vertical" flexItem sx={{ my: 0.5 }} />
           )}
 
-          {showColumnsButton && (
-            <Button
-              variant="outlined"
-              color="secondary"
-              startIcon={<SettingsOutlined />}
-              onClick={handleEditColumns}
+          {(showColumnsButton || extraAction || addLabel) && (
+            <Box
+              ref={addGroupRef}
+              sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}
             >
-              Edit Columns
-            </Button>
-          )}
+              {showColumnsButton && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  startIcon={<SettingsOutlined />}
+                  onClick={handleEditColumns}
+                >
+                  Edit Columns
+                </Button>
+              )}
 
-          {addLabel && (
-            <Button variant="contained" startIcon={<AddOutlined />} onClick={onAdd}>
-              <Typography noWrap component="span" sx={{ width: "100%" }} variant="body">
-                {addLabel}
-              </Typography>
-            </Button>
+              {extraAction && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  startIcon={extraAction.icon}
+                  onClick={extraAction.onClick}
+                >
+                  {extraAction.label}
+                </Button>
+              )}
+
+              {addLabel && addMenuItems?.length > 0 && (
+                <>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddOutlined />}
+                    endIcon={<ArrowDropDown />}
+                    aria-haspopup="true"
+                    aria-expanded={addMenuOpen ? "true" : undefined}
+                    onClick={handleAddClick}
+                  >
+                    <Typography noWrap component="span" sx={{ width: "100%" }} variant="body">
+                      {addLabel}
+                    </Typography>
+                  </Button>
+                  <Menu
+                    anchorEl={addAnchorEl}
+                    open={addMenuOpen}
+                    onClose={handleAddClose}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                    transformOrigin={{ vertical: "top", horizontal: "left" }}
+                  >
+                    {addMenuItems.map((item) => (
+                      <MenuItem
+                        key={item.label}
+                        onClick={() => {
+                          item.onClick?.();
+                          handleAddClose();
+                        }}
+                      >
+                        {item.label}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </>
+              )}
+
+              {addLabel && !addMenuItems?.length && (
+                <Button variant="contained" startIcon={<AddOutlined />} onClick={() => onAdd?.()}>
+                  <Typography noWrap component="span" sx={{ width: "100%" }} variant="body">
+                    {addLabel}
+                  </Typography>
+                </Button>
+              )}
+            </Box>
           )}
         </Box>
       )}
@@ -179,6 +295,17 @@ export default function ListToolbar({
 ListToolbar.propTypes = {
   addLabel: PropTypes.node,
   onAdd: PropTypes.func,
+  addMenuItems: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      onClick: PropTypes.func,
+    }),
+  ),
+  extraAction: PropTypes.shape({
+    label: PropTypes.node.isRequired,
+    icon: PropTypes.node,
+    onClick: PropTypes.func,
+  }),
   showSearch: PropTypes.bool,
   searchPlaceholder: PropTypes.string,
   showFilters: PropTypes.bool,

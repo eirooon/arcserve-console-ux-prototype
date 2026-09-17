@@ -6,6 +6,7 @@ import { jobs } from "../data/jobs";
 import { plans } from "../data/plans";
 import { alertRules } from "../data/alertRules";
 import { infrastructure } from "../data/infrastructure";
+import { acrsServers } from "../data/acrsServers";
 import { disasterRecoveryRunbooks } from "../data/disasterRecovery";
 import { auditLogs } from "../data/auditLogs";
 import { reports } from "../data/reports";
@@ -20,6 +21,7 @@ export const handlers = [
   ...createCrudHandlers(ENDPOINTS.PLANS, plans),
   ...createCrudHandlers(ENDPOINTS.ALERT_RULES, alertRules),
   ...createCrudHandlers(ENDPOINTS.INFRASTRUCTURE, infrastructure),
+  ...createCrudHandlers(ENDPOINTS.ACRS_SERVERS, acrsServers),
   ...createCrudHandlers(ENDPOINTS.DISASTER_RECOVERY, disasterRecoveryRunbooks),
   ...createCrudHandlers(ENDPOINTS.AUDIT_LOGS, auditLogs),
   ...createCrudHandlers(ENDPOINTS.REPORTS, reports),

@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import ListToolbar from "../../../components/ListToolbar";
 import ConfirmDialog from "../../../components/ConfirmDialog";
 import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
@@ -10,6 +11,7 @@ const selectSelectionState = (state) => ({
 });
 
 export default function PlansToolbar() {
+  const navigate = useNavigate();
   const { selectionModel, saving, apiRef } = usePlansData(selectSelectionState);
   const { open: confirmDeleteOpen, openConfirm, closeConfirm, confirmDelete } =
     useDeleteConfirmation(plansStore.deleteSelected);
@@ -18,7 +20,7 @@ export default function PlansToolbar() {
     <>
       <ListToolbar
         addLabel="Add Plans"
-        onAdd={plansStore.openAdd}
+        onAdd={() => navigate("/plans/new")}
         showSearch
         searchPlaceholder="Search plans"
         selectedCount={selectionModel.length}

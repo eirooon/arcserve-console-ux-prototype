@@ -6,16 +6,16 @@ const totalSourceCount = sources.length;
 export const ARCHITECTING_SCENARIOS = {
   "arcgenie-suggest": {
     durationMs: 25000,
-    heading: "Analysing your environment",
-    subheading: "No policy given, so ArcGenie is inferring one from workload signals.",
+    heading: "Architecting your protection policy",
+    subheading: "No policy given, so ArcGenie is building one from your discovered inventory.",
     steps: [
       {
         id: "inventory",
-        label: "Read source inventory and tags",
+        label: "Loading your discovered inventory and tags",
         target: totalSourceCount,
         unit: "sources",
       },
-      { id: "workload-types", label: "Detected workload types and change rates", target: 6, unit: "types" },
+      { id: "workload-types", label: "Grouping sources by workload type and change rate", target: 6, unit: "types" },
       { id: "criticality", label: "Inferring criticality per source", target: totalSourceCount, showFraction: true },
       { id: "schedules", label: "Deriving schedules and retention" },
       { id: "destinations", label: "Selecting storage destinations" },

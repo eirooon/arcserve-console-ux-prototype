@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useGridApiRef } from "@mui/x-data-grid";
 import DataTable from "../../../components/DataTable";
@@ -8,6 +8,7 @@ import {
   columnVisibilityModel,
   fields,
   filterSourcesByCategory,
+  getSourceRowActionGroups,
   sourceStore,
   useSourceData,
 } from "../hooks/useSourceData";
@@ -22,6 +23,9 @@ export default function SourcesTable() {
     () => filterSourcesByCategory(rows, selectedId),
     [rows, selectedId],
   );
+  // Stable identity so it doesn't defeat DataTable's effectiveColumns
+  // useMemo (which depends on this prop) on every render.
+  const rowActionsAriaLabel = useCallback((row) => `Actions for ${row.source_name}`, []);
 
   return (
     <>
@@ -33,6 +37,8 @@ export default function SourcesTable() {
         getRowId={(row) => row.id}
         apiRef={apiRef}
         initialState={{ columns: { columnVisibilityModel } }}
+        rowActions={getSourceRowActionGroups}
+        rowActionsAriaLabel={rowActionsAriaLabel}
         rowSelectionModel={selectionModel}
         onRowSelectionModelChange={sourceStore.setSelectionModel}
         onRowDoubleClick={(params) => sourceStore.openEdit(params.row)}

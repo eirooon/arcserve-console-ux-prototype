@@ -1,27 +1,45 @@
-import { Box, Button, IconButton, Paper, Stack, Typography } from "@mui/material";
-import MoreVertOutlined from "@mui/icons-material/MoreVertOutlined";
+import { Box, Button, Paper, Radio, Stack, Typography } from "@mui/material";
 import { green } from "@mui/material/colors";
 import { MESSAGING_CHANNELS } from "../messagingChannelsData";
 
-export default function MessagingChannelCard({ channel, onConnect, onOpenMenu }) {
+export default function MessagingChannelCard({
+  channel,
+  selected,
+  onSelect,
+  onConnect,
+  onDisconnect,
+}) {
   const definition = MESSAGING_CHANNELS.find((entry) => entry.id === channel.id);
 
   return (
     <Paper
       variant="outlined"
+      role="radio"
+      aria-checked={selected}
+      aria-label={definition.name}
+      tabIndex={0}
+      onClick={() => onSelect(channel.id)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect(channel.id);
+        }
+      }}
       sx={{
-        flex: 1,
-        minWidth: 0,
-        borderRadius: 2,
+        borderRadius: 1,
+        borderColor: selected ? "primary.main" : "divider",
         px: 3,
         py: 2,
+        cursor: "pointer",
+        width: "100%",
       }}
     >
       <Stack direction="row" spacing={2} alignItems="center">
+        <Radio checked={selected} tabIndex={-1} sx={{ p: 0 }} inputProps={{ "aria-hidden": true }} />
         <Box
           component="img"
           src={definition.icon}
-          alt={`${definition.name} logo`}
+          alt=""
           sx={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }}
         />
         <Stack spacing={0.25} sx={{ flex: 1, minWidth: 0 }}>
@@ -30,29 +48,37 @@ export default function MessagingChannelCard({ channel, onConnect, onOpenMenu })
           </Typography>
           <Typography
             variant="body2"
-            color="text.secondary"
-            sx={channel.connected ? { color: green[700] } : undefined}
+            sx={channel.connected ? { color: green[700] } : { color: "text.secondary" }}
           >
             {channel.connected ? "Connected" : "Not connected"}
           </Typography>
         </Stack>
-        {channel.connected ? (
-          <IconButton
-            aria-label={`${definition.name} channel actions`}
-            onClick={(event) => onOpenMenu(event, channel.id)}
-          >
-            <MoreVertOutlined />
-          </IconButton>
-        ) : (
-          <Button
-            variant="outlined"
-            color="secondary"
-            size="small"
-            onClick={() => onConnect(channel.id)}
-          >
-            Connect
-          </Button>
-        )}
+        {selected &&
+          (channel.connected ? (
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              onClick={(event) => {
+                event.stopPropagation();
+                onDisconnect(channel.id);
+              }}
+            >
+              Disconnect
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="small"
+              onClick={(event) => {
+                event.stopPropagation();
+                onConnect(channel.id);
+              }}
+            >
+              Connect
+            </Button>
+          ))}
       </Stack>
     </Paper>
   );

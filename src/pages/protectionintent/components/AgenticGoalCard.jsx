@@ -1,24 +1,17 @@
 import { MenuItem, Stack, Switch, TextField, Typography } from "@mui/material";
+import FormField from "../../../components/FormField";
 import { ASSESSMENT_FREQUENCY_OPTIONS, AUTONOMY_LEVEL_OPTIONS } from "../configureGoalsAutonomyData";
 
-function GoalFieldSelect({ label, value, options, isOverride, onChange }) {
+function GoalFieldSelect({ label, value, options, disabled, onChange }) {
   return (
-    <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
-      <Typography variant="body2" color="text.primary" sx={{ width: 200 }}>
-        {label}
-      </Typography>
+    <FormField label={label} sx={{ flex: 1, minWidth: 0 }}>
       <TextField
         select
         size="small"
         fullWidth
+        disabled={disabled}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        helperText={isOverride ? "Override Global Goal Settings" : "Inherit Global Goal Settings"}
-        sx={{
-          "& .MuiFormHelperText-root": {
-            color: isOverride ? "warning.main" : undefined,
-          },
-        }}
       >
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
@@ -26,11 +19,11 @@ function GoalFieldSelect({ label, value, options, isOverride, onChange }) {
           </MenuItem>
         ))}
       </TextField>
-    </Stack>
+    </FormField>
   );
 }
 
-export default function AgenticGoalCard({ goal, globalSettings, onToggleEnabled, onFieldChange }) {
+export default function AgenticGoalCard({ goal, onToggleEnabled, onFieldChange }) {
   return (
     <Stack
       spacing={2}
@@ -71,14 +64,14 @@ export default function AgenticGoalCard({ goal, globalSettings, onToggleEnabled,
           label="Autonomy Level"
           value={goal.autonomyLevel}
           options={AUTONOMY_LEVEL_OPTIONS}
-          isOverride={goal.autonomyLevel !== globalSettings.autonomyLevel}
+          disabled={!goal.enabled}
           onChange={(value) => onFieldChange("autonomyLevel", value)}
         />
         <GoalFieldSelect
           label="Assessment Frequency"
           value={goal.assessmentFrequency}
           options={ASSESSMENT_FREQUENCY_OPTIONS}
-          isOverride={goal.assessmentFrequency !== globalSettings.assessmentFrequency}
+          disabled={!goal.enabled}
           onChange={(value) => onFieldChange("assessmentFrequency", value)}
         />
       </Stack>

@@ -1,11 +1,29 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { Typography } from "@mui/material";
-import StatusPill from "../components/StatusPill";
+import StatusPill from "../../../components/StatusPill";
 import CellContent from "../components/DataGridCellContent";
-import SourceActionSplitButton from "../components/SourceActionSplitButton";
 import { SOURCE_STATUS_META } from "../arcGenieOverviewData";
 
-export function useAutoProtectSourcesColumns({ onPrimaryAction, onOpenMenu }) {
+// Row-actions groups for DataTable's `rowActions` prop (see
+// ArcGenieGoalDetailPage) — the same shared mechanism PlansTable/
+// SourcesTable use, instead of this table hand-building its own actions
+// column with RowActionsMenu wired up manually.
+export function useAutoProtectSourceRowActions({ onPrimaryAction, onViewDetails, onDismissSource }) {
+  return useCallback(
+    (row) => [
+      { items: [{ label: row.actionLabel, onClick: () => onPrimaryAction(row) }] },
+      {
+        items: [
+          { label: "View Details", onClick: () => onViewDetails(row.id) },
+          { label: "Dismiss", onClick: () => onDismissSource(row.id) },
+        ],
+      },
+    ],
+    [onPrimaryAction, onViewDetails, onDismissSource],
+  );
+}
+
+export function useAutoProtectSourcesColumns() {
   return useMemo(
     () => [
       {
@@ -37,27 +55,7 @@ export function useAutoProtectSourcesColumns({ onPrimaryAction, onOpenMenu }) {
       },
       { field: "currentPlan", headerName: "Current Plan", flex: 1 },
       { field: "proposedPlan", headerName: "Proposed Plan", flex: 1 },
-      {
-        field: "actions",
-        headerName: "Actions",
-        width: 160,
-        sortable: false,
-        filterable: false,
-        resizable: false,
-        align: "right",
-        headerAlign: "right",
-        renderCell: (params) => (
-          <CellContent justifyContent="flex-end">
-            <SourceActionSplitButton
-              label={params.row.actionLabel}
-              sourceName={params.row.sourceName}
-              onPrimaryAction={() => onPrimaryAction(params.row)}
-              onOpenMenu={(event) => onOpenMenu(event, params.row.id)}
-            />
-          </CellContent>
-        ),
-      },
     ],
-    [onPrimaryAction, onOpenMenu],
+    [],
   );
 }

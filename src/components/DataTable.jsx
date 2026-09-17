@@ -1,8 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Box } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { visuallyHidden } from "@mui/utils";
+import RowActionsMenu from "./RowActionsMenu";
+
+// Exported so a caller that needs the actions column pinned (see
+// ArcGenieGoalDetailPage) can reference its field name in `initialState`
+// without hardcoding a copy of this string.
+export const ACTIONS_COLUMN_FIELD = "__rowActions";
+// MUI's built-in checkbox-selection column field. Excluded from the "Edit
+// Columns" panel below since toggling it there wouldn't be meaningful.
+const CHECKBOX_SELECTION_FIELD = "__check__";
 
 export default function DataTable({
   columns,
@@ -20,6 +29,12 @@ export default function DataTable({
   initialState,
   apiRef,
   slotProps,
+  // Opt-in leading "Actions" column (checkbox, then Actions, then the rest).
+  // Omit it and the grid renders exactly as before — every existing table
+  // using DataTable is unaffected. Pass it to add a per-row dropdown menu:
+  // `rowActions={(row) => [{ section: "Job", items: [{ label, onClick }] }]}`.
+  rowActions,
+  rowActionsAriaLabel,
   ...gridProps
 }) {
   // The "Edit Columns" trigger lives in ListToolbar, outside the DataGrid's
@@ -57,6 +72,30 @@ export default function DataTable({
       }
     : undefined;
 
+  const effectiveColumns = useMemo(() => {
+    if (!rowActions) return columns;
+    return [
+      {
+        field: ACTIONS_COLUMN_FIELD,
+        headerName: "Actions",
+        width: 72,
+        sortable: false,
+        filterable: false,
+        disableColumnMenu: true,
+        resizable: false,
+        align: "center",
+        headerAlign: "center",
+        renderCell: ({ row }) => (
+          <RowActionsMenu
+            groups={rowActions(row)}
+            ariaLabel={rowActionsAriaLabel?.(row)}
+          />
+        ),
+      },
+      ...columns,
+    ];
+  }, [columns, rowActions, rowActionsAriaLabel]);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box role="status" aria-live="polite" sx={visuallyHidden}>
@@ -65,7 +104,7 @@ export default function DataTable({
       <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
         <DataGrid
           rows={rows}
-          columns={columns}
+          columns={effectiveColumns}
           loading={loading}
           getRowId={getRowId}
           aria-label={ariaLabel}
@@ -83,6 +122,22 @@ export default function DataTable({
           slotProps={{
             ...slotProps,
             panel: { target: editColumnsAnchor, ...slotProps?.panel },
+            columnsManagement: {
+              // Checkbox selection and the row-actions column aren't
+              // meaningful things to show/hide, so they're left out of the
+              // "Edit Columns" panel entirely. The panel's own reset button
+              // stays intact for the remaining columns.
+              getTogglableColumns: (cols) =>
+                cols
+                  .filter(
+                    (col) =>
+                      col.field !== CHECKBOX_SELECTION_FIELD &&
+                      col.field !== ACTIONS_COLUMN_FIELD,
+                  )
+                  .map((col) => col.field),
+              disableShowHideToggle: true,
+              ...slotProps?.columnsManagement,
+            },
           }}
           {...gridProps}
         />
@@ -107,4 +162,6 @@ DataTable.propTypes = {
   loading: PropTypes.bool,
   apiRef: PropTypes.shape({ current: PropTypes.object }),
   slotProps: PropTypes.object,
+  rowActions: PropTypes.func,
+  rowActionsAriaLabel: PropTypes.func,
 };

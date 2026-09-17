@@ -2,6 +2,7 @@ import { useCallback, useMemo } from "react";
 import { Box } from "@mui/material";
 import AppNavigation from "../components/AppNavigation";
 import AppHeader from "../components/AppHeader";
+import ToastHost from "../components/ToastHost";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { headerStyleMap } from "../theme/headerStyleMap";
@@ -53,6 +54,8 @@ export default function AppShell({ children }) {
         <AppHeader height={HEADER_H} sx={headerSx} />
         <Box component="main">{children}</Box>
       </Box>
+
+      <ToastHost topOffset={HEADER_H + 16} />
     </Box>
   );
 }

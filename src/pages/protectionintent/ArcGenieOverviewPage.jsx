@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { green, blueGrey } from "@mui/material/colors";
-import { Alert, Box, Chip, Snackbar, Stack, Typography } from "@mui/material";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 import NeedsAttentionCard from "./components/NeedsAttentionCard";
 import GoalStatusCard from "./components/GoalStatusCard";
-import StatusPill from "./components/StatusPill";
+import StatusPill from "../../components/StatusPill";
 import { useNeedsAttention } from "./hooks/useNeedsAttention";
 import {
   INITIAL_AGENTIC_GOALS,
@@ -56,7 +56,7 @@ function SectionHeading({ children, badge, action }) {
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
       <Stack direction="row" alignItems="center" spacing={1}>
-        <Typography variant="h6" color="text.primary">
+        <Typography variant="body1" fontWeight={700} color="text.primary">
           {children}
         </Typography>
         {badge}
@@ -68,8 +68,7 @@ function SectionHeading({ children, badge, action }) {
 
 export default function ArcGenieOverviewPage() {
   const navigate = useNavigate();
-  const { items, handleAction, handleDismiss, snackbarMessage, closeSnackbar } =
-    useNeedsAttention();
+  const { items, handleAction, handleDismiss } = useNeedsAttention();
   const { rows: activityLogItems } = useApiResource(
     ENDPOINTS.ARCGENIE_ACTIVITY_LOG,
   );
@@ -84,34 +83,29 @@ export default function ArcGenieOverviewPage() {
       sx={{
         bgcolor: "background.paper",
         minHeight: "calc(100vh - 64px)",
-        py: 3,
+        py: 6,
       }}
     >
-      <Stack
-        direction="row"
-        spacing={4}
-        alignItems="flex-start"
-        sx={{ width: "100%", px: 4 }}
-      >
-        <Stack spacing={3} sx={{ flex: 1, minWidth: 0 }}>
-          <Stack spacing={0.5}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="h6" color="text.primary">
-                Your Protection Overview
-              </Typography>
-              <StatusPill label="Agent Active" bgcolor={green[50]} color={green[700]} dot fontWeight={700} />
-            </Stack>
-
-            <Typography variant="body2" color="text.secondary">
-              {`${OVERVIEW_SUMMARY.activeGoalCount} automations running across ${OVERVIEW_SUMMARY.totalSources} sources. `}
-              <Typography component="span" variant="body2" fontWeight={500} color="text.primary">
-                {`${totalWaiting} decisions are waiting on you`}
-              </Typography>
-              {` — the oldest since ${WAITING_ON_YOU_OLDEST_SINCE_LABEL}.`}
+      <Stack spacing={3} sx={{ width: "100%", px: 6 }}>
+        <Stack spacing={0.5}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Typography variant="h6" color="text.primary">
+              Your Protection Overview
             </Typography>
+            <StatusPill label="Agent Active" bgcolor={green[50]} color={green[700]} dot fontWeight={700} />
           </Stack>
 
-          <Stack spacing={2}>
+          <Typography variant="body2" color="text.secondary">
+            {`${OVERVIEW_SUMMARY.activeGoalCount} automations running across ${OVERVIEW_SUMMARY.totalSources} sources. `}
+            <Typography component="span" variant="body2" fontWeight={500} color="text.primary">
+              {`${totalWaiting} decisions are waiting on you`}
+            </Typography>
+            {` — the oldest since ${WAITING_ON_YOU_OLDEST_SINCE_LABEL}.`}
+          </Typography>
+        </Stack>
+
+        <Stack direction="row" spacing={4} alignItems="flex-start">
+          <Stack spacing={2} sx={{ flex: 1, minWidth: 0 }}>
             <SectionHeading
               badge={
                 items.length > 0 && (
@@ -149,76 +143,65 @@ export default function ArcGenieOverviewPage() {
               </Stack>
             )}
           </Stack>
-        </Stack>
 
-        <Stack spacing={4} sx={{ width: 400, flexShrink: 0 }}>
-          <Stack spacing={2}>
-            <SectionHeading action={<ViewAllLink onClick={goToGoals}>View All</ViewAllLink>}>
-              Automated Workflows
-            </SectionHeading>
-
+          <Stack spacing={4} sx={{ flex: 1, minWidth: 0 }}>
             <Stack spacing={2}>
-              {TRACKED_GOALS.map((goal) => (
-                <GoalStatusCard
-                  key={goal.id}
-                  title={goal.shortTitle}
-                  description={goal.shortDescription}
-                  statusChip={getGoalStatusChip(goal.id)}
-                  segments={GOAL_OVERVIEW_SEGMENTS_BY_ID[goal.id]}
-                  autonomyLabel={getAutonomyLevelLabel(goal.autonomyLevel)}
-                  frequencyLabel={`${getAssessmentFrequencyLabel(goal.assessmentFrequency)} · ${ASSESSMENT_TIME_LABEL}`}
-                  onOpen={() => navigate(`/arcgenie/overview/${goal.id}`)}
-                />
-              ))}
-            </Stack>
-          </Stack>
+              <SectionHeading action={<ViewAllLink onClick={goToGoals}>View All</ViewAllLink>}>
+                Automated Workflows
+              </SectionHeading>
 
-          <Stack spacing={2}>
-            <Typography variant="h6" color="text.primary">
-              Activity Log
-            </Typography>
-
-            {activityLogItems.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">
-                No recent activities. ArcGenie will log automated policy
-                checks and optimizations here as they occur.
-              </Typography>
-            ) : (
-              <Stack>
-                {activityLogItems.map((activity) => (
-                  <Stack
-                    key={activity.id}
-                    spacing={0.5}
-                    sx={{
-                      py: 2,
-                      borderBottom: 1,
-                      borderColor: "divider",
-                    }}
-                  >
-                    <Typography variant="body2" color="text.primary">
-                      {activity.message}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: blueGrey[500] }}>
-                      Approved by {activity.approvedBy} on {activity.date}
-                    </Typography>
-                  </Stack>
+              <Stack spacing={2}>
+                {TRACKED_GOALS.map((goal) => (
+                  <GoalStatusCard
+                    key={goal.id}
+                    title={goal.shortTitle}
+                    description={goal.shortDescription}
+                    statusChip={getWaitingCount(goal.id) > 0 ? getGoalStatusChip(goal.id) : null}
+                    segments={GOAL_OVERVIEW_SEGMENTS_BY_ID[goal.id]}
+                    autonomyLabel={getAutonomyLevelLabel(goal.autonomyLevel)}
+                    frequencyLabel={`${getAssessmentFrequencyLabel(goal.assessmentFrequency)} · ${ASSESSMENT_TIME_LABEL}`}
+                    onOpen={() => navigate(`/arcgenie/overview/${goal.id}`)}
+                  />
                 ))}
               </Stack>
-            )}
+            </Stack>
+
+            <Stack spacing={2}>
+              <Typography variant="body1" fontWeight={700} color="text.primary">
+                Activity Log
+              </Typography>
+
+              {activityLogItems.length === 0 ? (
+                <Typography variant="body2" color="text.secondary">
+                  No recent activities. ArcGenie will log automated policy
+                  checks and optimizations here as they occur.
+                </Typography>
+              ) : (
+                <Stack>
+                  {activityLogItems.map((activity) => (
+                    <Stack
+                      key={activity.id}
+                      spacing={0.5}
+                      sx={{
+                        py: 2,
+                        borderBottom: 1,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Typography variant="body2" color="text.primary">
+                        {activity.message}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: blueGrey[500] }}>
+                        Approved by {activity.approvedBy} on {activity.date}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Stack>
+              )}
+            </Stack>
           </Stack>
         </Stack>
       </Stack>
-
-      <Snackbar
-        open={Boolean(snackbarMessage)}
-        autoHideDuration={4000}
-        onClose={closeSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="success" variant="filled" onClose={closeSnackbar}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

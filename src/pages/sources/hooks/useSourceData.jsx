@@ -1,6 +1,17 @@
 import { useMemo } from "react";
+import { Link } from "@mui/material";
+import FolderRoundedIcon from "@mui/icons-material/FolderRounded";
+import MonitorRoundedIcon from "@mui/icons-material/MonitorRounded";
+import DynamicFeedRoundedIcon from "@mui/icons-material/DynamicFeedRounded";
+import WifiRoundedIcon from "@mui/icons-material/WifiRounded";
+import WifiOffRoundedIcon from "@mui/icons-material/WifiOffRounded";
+import GppGoodRoundedIcon from "@mui/icons-material/GppGoodRounded";
+import RemoveModeratorRoundedIcon from "@mui/icons-material/RemoveModeratorRounded";
+import WindowsLogoIcon from "../../../assets/windows-logo.svg?react";
+import LinuxLogoIcon from "../../../assets/linux-logo.svg?react";
 import { ENDPOINTS } from "../../../api/endpoints";
 import { createResourceStore, useResourceStore } from "../../../api/createResourceStore";
+import { iconColumn } from "../../../utils/iconColumn";
 
 // Every field returned by GET /sources (flattened in src/mocks/data/sources.js)
 // is exposed as a column so no information from the API response is hidden
@@ -52,11 +63,80 @@ function humanize(value) {
     .join(" ");
 }
 
+const OS_ICON_META_BY_MAJOR = {
+  windows: { icon: WindowsLogoIcon, label: "Windows" },
+  linux: { icon: LinuxLogoIcon, label: "Linux" },
+};
+
+const CONNECTION_ICON_META_BY_STATUS = {
+  online: { icon: WifiRoundedIcon, label: "Online", color: "success.main" },
+  offline: { icon: WifiOffRoundedIcon, label: "Offline", color: "text.disabled" },
+};
+
+const PROTECTION_ICON_META_BY_STATUS = {
+  protect: { icon: GppGoodRoundedIcon, label: "Protected", color: "success.main" },
+  unprotect: { icon: RemoveModeratorRoundedIcon, label: "Unprotected", color: "error.main" },
+};
+
+// Icon + label for the Type column, keyed by source_type. A type not listed
+// here still gets an icon (see getSourceTypeIconMeta) — the generic Monitor
+// icon with a title-cased fallback label instead of a curated one.
+const SOURCE_TYPE_ICON_META = {
+  udp_windows: { icon: MonitorRoundedIcon, label: "Windows Agent" },
+  udp_linux: { icon: MonitorRoundedIcon, label: "Linux Agent" },
+  udp_linux_backup_server: { icon: MonitorRoundedIcon, label: "Linux Backup Server" },
+  agentless_vm: { icon: DynamicFeedRoundedIcon, label: "Agentless VM" },
+};
+
+// isUncNfsSource is declared further below (function declarations hoist),
+// shared here so the folder icon choice matches the same predicate the left
+// sub-nav uses to categorize UNC/NFS sources.
+function getSourceTypeIconMeta(sourceType) {
+  if (!sourceType) return null;
+  if (isUncNfsSource({ source_type: sourceType })) {
+    return { icon: FolderRoundedIcon, label: "Network Share", color: "action.active" };
+  }
+  const meta = SOURCE_TYPE_ICON_META[sourceType] ?? {
+    icon: MonitorRoundedIcon,
+    label: humanize(sourceType),
+  };
+  return { ...meta, color: "action.active" };
+}
+
 const rawColumns = [
-  { field: "source_name", headerName: "Name", flex: 1, minWidth: 160 },
-  { field: "os_name", headerName: "OS", flex: 1, minWidth: 200 },
-  { field: "protection_status", headerName: "Status", flex: 1, minWidth: 120 },
-  { field: "connection_status", headerName: "Connection", flex: 1, minWidth: 120 },
+  iconColumn("source_type", "Type", (row) => getSourceTypeIconMeta(row.source_type)),
+  {
+    field: "source_name",
+    headerName: "Name",
+    flex: 1,
+    minWidth: 160,
+    renderCell: ({ value }) => {
+      if (!value) return EMPTY_DISPLAY;
+      return (
+        <Link
+          component="button"
+          type="button"
+          variant="body2"
+          color="secondary"
+          underline="hover"
+          onClick={() => sourceStore.showSnackbar(`View details for "${value}"`)}
+        >
+          {value}
+        </Link>
+      );
+    },
+  },
+  iconColumn("os_name", "OS", (row) => OS_ICON_META_BY_MAJOR[row.os_major] ?? null),
+  iconColumn(
+    "protection_status",
+    "Status",
+    (row) => PROTECTION_ICON_META_BY_STATUS[row.protection_status] ?? null,
+  ),
+  iconColumn(
+    "connection_status",
+    "Connection",
+    (row) => CONNECTION_ICON_META_BY_STATUS[row.connection_status] ?? null,
+  ),
   {
     field: "latest_job",
     headerName: "Latest Job",
@@ -90,7 +170,6 @@ const rawColumns = [
     valueGetter: (value, row) => row.hypervisor_name || row.cloud_account || null,
   },
   { field: "vm_name", headerName: "VM Name", flex: 1, minWidth: 160 },
-  { field: "source_type", headerName: "Type", flex: 1, minWidth: 160 },
   { field: "source_product", headerName: "Source Product", flex: 1, minWidth: 140 },
   { field: "site_name", headerName: "Site", flex: 1, minWidth: 160 },
   { field: "site_id", headerName: "Site ID", flex: 1, minWidth: 220 },
@@ -188,10 +267,44 @@ const rawColumns = [
 
 export const columns = rawColumns.map(withEmptyDash);
 
+// Per-row "Action" menu groups for the Sources table (see DataTable's
+// `rowActions` prop). Presentational only, like this page's "Filters" button
+// and its own "Add Source(s)" discovery items — none of these are wired to a
+// real backend flow yet, so onClick is intentionally omitted.
+export function getSourceRowActionGroups() {
+  return [
+    {
+      section: "Job",
+      items: [{ label: "Start Backup" }, { label: "Start Recovery" }],
+    },
+    {
+      section: "Manage",
+      items: [
+        { label: "Assign Policy" },
+        { label: "Remove Policy" },
+        { label: "Deploy Policy" },
+        { label: "Delete" },
+        { label: "Update" },
+      ],
+    },
+    {
+      section: "Action",
+      items: [
+        { label: "Copy Recovery Points" },
+        { label: "Run Assured Recovery Test Now" },
+        { label: "Run Assured Security - Malware Scan" },
+        { label: "View Assured Security - Malware Scan Results" },
+        { label: "View Assured Security - AI Anomaly Detection Results" },
+      ],
+    },
+  ];
+}
+
 // The default column set for the grid — every other field from GET /sources
 // (flattened in src/mocks/data/sources.js) is still a real, sortable/
 // filterable column, just collapsed until toggled on from "Edit Columns".
 const visibleByDefault = [
+  "source_type",
   "source_name",
   "os_name",
   "protection_status",

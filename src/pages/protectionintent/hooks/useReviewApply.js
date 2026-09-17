@@ -1,15 +1,18 @@
 import { useCallback, useState } from "react";
-import { PROTECTION_CATEGORY_COLUMNS } from "../protectionIntentRecommendationData";
+import { DEFAULT_APPLY_SCOPE } from "../protectionIntentData";
 
-function buildInitialExpandedState() {
-  return PROTECTION_CATEGORY_COLUMNS.reduce((acc, category) => {
+function buildInitialExpandedState(categories) {
+  return categories.reduce((acc, category) => {
     acc[category.id] = true;
     return acc;
   }, {});
 }
 
-export function useReviewApply() {
-  const [expandedCategories, setExpandedCategories] = useState(buildInitialExpandedState);
+export function useReviewApply(categories) {
+  const [expandedCategories, setExpandedCategories] = useState(() =>
+    buildInitialExpandedState(categories),
+  );
+  const [applyScope, setApplyScope] = useState(DEFAULT_APPLY_SCOPE);
 
   const toggleCategoryExpanded = useCallback((categoryId) => {
     setExpandedCategories((current) => ({
@@ -18,5 +21,5 @@ export function useReviewApply() {
     }));
   }, []);
 
-  return { expandedCategories, toggleCategoryExpanded };
+  return { expandedCategories, toggleCategoryExpanded, applyScope, setApplyScope };
 }

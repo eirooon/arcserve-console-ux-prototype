@@ -2,6 +2,7 @@ import { AutoFixHigh, AutoAwesomeMosaic, Edit } from "@mui/icons-material";
 import { amber, blueGrey, purple } from "@mui/material/colors";
 
 export const PROTECTION_INTENT_STEPS = [
+  "Discovery",
   "Define Protection Intent",
   "Configure Goals & Autonomy",
   "Configure Messaging Channels",
@@ -27,6 +28,26 @@ export const REVIEW_STEP_COPY = {
   description:
     "Confirm your protection categories, agentic goals, and global autonomy settings before activating ArcGenie.",
 };
+
+export const APPLY_SCOPE_OPTIONS = [
+  {
+    value: "existing",
+    label: "Existing sources only",
+    description: "Apply these policies only to sources already discovered.",
+  },
+  {
+    value: "new",
+    label: "New sources only",
+    description: "Apply these policies only to sources ArcGenie discovers going forward.",
+  },
+  {
+    value: "both",
+    label: "Both existing and new sources",
+    description: "Apply these policies to everything discovered so far, and anything found later.",
+  },
+];
+
+export const DEFAULT_APPLY_SCOPE = "both";
 
 export const CUSTOM_PROMPT_COPY = {
   instructions:

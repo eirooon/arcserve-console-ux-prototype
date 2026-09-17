@@ -1,4 +1,4 @@
-import { blueGrey } from "@mui/material/colors";
+import { blueGrey, grey } from "@mui/material/colors";
 import { Box, List, ListItemButton, ListItemText, Chip } from "@mui/material";
 export default function SplitPageLayout({
   items = [], // [{ id, label, count }]
@@ -32,11 +32,11 @@ export default function SplitPageLayout({
             flexShrink: 0,
             height: "100%",
             overflowY: "auto",
+            bgcolor: "#fff",
             borderRight: "1px solid rgba(0,0,0,0.12)",
-            p: 0.75,
           }}
         >
-          <List disablePadding sx={{ p: 0.5 }}>
+          <List disablePadding sx={{ py: 1 }}>
             {items.map((item) => {
               const active = item.id === selectedId;
 
@@ -46,24 +46,25 @@ export default function SplitPageLayout({
                   selected={active}
                   onClick={() => onSelect?.(item.id)}
                   sx={{
-                    mb: 0.5,
-                    "&.Mui-selected": { bgcolor: "rgba(111,83,255,0.10)" },
-                    "&.Mui-selected:hover": {
-                      bgcolor: "rgba(111,83,255,0.14)",
-                    },
+                    "&.Mui-selected": { bgcolor: "action.selected" },
+                    "&.Mui-selected:hover": { bgcolor: "action.selected" },
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
                     gap: 2,
-                    p: 1,
-                    borderRadius: 1.5,
+                    px: 2,
+                    py: 1,
                   }}
                 >
                   <ListItemText
                     primary={item.label}
-                    sx={{ m: 0, flex: 1, minWidth: 0 }}
+                    sx={{ m: 0, flex: 1, minWidth: 0, py: 0.5 }}
                     primaryTypographyProps={{
                       fontSize: 14,
+                      letterSpacing: "0.17px",
+                      lineHeight: 1.43,
+                      color: "text.primary",
+                      sx: { wordBreak: "break-word" },
                     }}
                   />
 
@@ -73,12 +74,13 @@ export default function SplitPageLayout({
                         label={formatCount(item.count)}
                         size="small"
                         sx={{
-                          height: 22,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          bgcolor: active ? blueGrey[700] : "rgba(0,0,0,0.08)",
-                          color: active ? "#fff" : "inherit",
-                          "& .MuiChip-label": { px: 1 },
+                          height: 24,
+                          fontSize: 13,
+                          fontWeight: 400,
+                          letterSpacing: "0.16px",
+                          bgcolor: active ? blueGrey[800] : grey[300],
+                          color: active ? "#fff" : "text.primary",
+                          "& .MuiChip-label": { px: 0.75 },
                         }}
                       />
                     </Box>

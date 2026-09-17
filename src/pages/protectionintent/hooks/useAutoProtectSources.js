@@ -1,12 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
+import { toastStore } from "../../../api/toastStore";
 import { AUTO_PROTECT_SOURCES } from "../arcGenieOverviewData";
 
 export function useAutoProtectSources() {
   const [sources, setSources] = useState(AUTO_PROTECT_SOURCES);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [menuState, setMenuState] = useState({ anchorEl: null, sourceId: null });
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
 
   const filteredSources = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -17,43 +16,29 @@ export function useAutoProtectSources() {
     });
   }, [sources, searchTerm, statusFilter]);
 
-  const openMenu = useCallback((event, sourceId) => {
-    setMenuState({ anchorEl: event.currentTarget, sourceId });
-  }, []);
-
-  const closeMenu = useCallback(() => {
-    setMenuState({ anchorEl: null, sourceId: null });
-  }, []);
-
   const handlePrimaryAction = useCallback((source) => {
-    setSnackbarMessage(`${source.actionLabel}: ${source.sourceName} → ${source.proposedPlan}.`);
+    toastStore.pushToast(`${source.actionLabel}: ${source.sourceName} → ${source.proposedPlan}.`);
   }, []);
 
   const handleDismissSource = useCallback(
     (sourceId) => {
       const source = sources.find((existing) => existing.id === sourceId);
       setSources((current) => current.filter((existing) => existing.id !== sourceId));
-      setSnackbarMessage(source ? `${source.sourceName} dismissed.` : null);
-      closeMenu();
+      if (source) toastStore.pushToast(`${source.sourceName} dismissed.`);
     },
-    [sources, closeMenu],
+    [sources],
   );
 
   const handleViewDetails = useCallback(
     (sourceId) => {
       const source = sources.find((existing) => existing.id === sourceId);
-      setSnackbarMessage(source ? `Opening details for ${source.sourceName}.` : null);
-      closeMenu();
+      if (source) toastStore.pushToast(`Opening details for ${source.sourceName}.`);
     },
-    [sources, closeMenu],
+    [sources],
   );
 
   const handleRunNow = useCallback(() => {
-    setSnackbarMessage("Auto-Protect run started.");
-  }, []);
-
-  const closeSnackbar = useCallback(() => {
-    setSnackbarMessage(null);
+    toastStore.pushToast("Auto-Protect run started.");
   }, []);
 
   return {
@@ -62,14 +47,9 @@ export function useAutoProtectSources() {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    menuState,
-    openMenu,
-    closeMenu,
     handlePrimaryAction,
     handleDismissSource,
     handleViewDetails,
     handleRunNow,
-    snackbarMessage,
-    closeSnackbar,
   };
 }

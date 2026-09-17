@@ -10,6 +10,7 @@ export default function ConfigureMessagingChannelsStep({
   nextStepLabel,
 }) {
   const messagingChannels = useMessagingChannels();
+  const canProceed = Boolean(messagingChannels.selectedChannel?.connected);
 
   return (
     <Stack spacing={3}>
@@ -32,7 +33,7 @@ export default function ConfigureMessagingChannelsStep({
           <Button variant="outlined" color="secondary" onClick={onPrevious}>
             Previous
           </Button>
-          <Button variant="contained" onClick={onNext}>
+          <Button variant="contained" disabled={!canProceed} onClick={onNext}>
             {nextStepLabel ? `Next: ${nextStepLabel}` : "Next"}
           </Button>
         </Stack>

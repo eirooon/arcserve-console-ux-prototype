@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiClient } from "../../../api/client";
 import { ENDPOINTS } from "../../../api/endpoints";
+import { toastStore } from "../../../api/toastStore";
 
 const ACTION_MESSAGES = {
   approve: (item) => `${item.source} approved and assigned to the ${item.proposedPlan} plan.`,
@@ -11,7 +12,6 @@ const ACTION_MESSAGES = {
 export function useNeedsAttention() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -35,7 +35,8 @@ export function useNeedsAttention() {
 
   const handleAction = useCallback(
     (item, actionKey) => {
-      setSnackbarMessage(ACTION_MESSAGES[actionKey]?.(item) ?? null);
+      const message = ACTION_MESSAGES[actionKey]?.(item);
+      if (message) toastStore.pushToast(message);
 
       if (actionKey === "approve" || actionKey === "assign") {
         resolveItem(item);
@@ -58,18 +59,10 @@ export function useNeedsAttention() {
   const handleDismiss = useCallback(
     (item) => {
       resolveItem(item);
-      setSnackbarMessage(`${item.title} set aside for now.`);
+      toastStore.pushToast(`${item.title} set aside for now.`);
     },
     [resolveItem],
   );
 
-  const closeSnackbar = useCallback(() => {
-    setSnackbarMessage(null);
-  }, []);
-
-  const notify = useCallback((message) => {
-    setSnackbarMessage(message);
-  }, []);
-
-  return { items, loading, handleAction, handleDismiss, notify, snackbarMessage, closeSnackbar };
+  return { items, loading, handleAction, handleDismiss };
 }

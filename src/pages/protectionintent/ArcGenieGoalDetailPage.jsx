@@ -1,19 +1,12 @@
+import { useCallback } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import {
-  Alert,
-  Box,
-  Button,
-  Menu,
-  MenuItem,
-  Snackbar,
-  Stack,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import DataTable from "../../components/DataTable";
+import { Box, Button, MenuItem, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import DataTable, { ACTIONS_COLUMN_FIELD } from "../../components/DataTable";
 import { useAutoProtectSources } from "./hooks/useAutoProtectSources";
-import { useAutoProtectSourcesColumns } from "./hooks/useAutoProtectSourcesColumns";
+import {
+  useAutoProtectSourceRowActions,
+  useAutoProtectSourcesColumns,
+} from "./hooks/useAutoProtectSourcesColumns";
 import AutoProtectStatTile from "./components/AutoProtectStatTile";
 import { INITIAL_AGENTIC_GOALS } from "./configureGoalsAutonomyData";
 import { AUTO_PROTECT_STAT_FIELDS, SOURCE_STATUS_OPTIONS, getGoalStats } from "./arcGenieOverviewData";
@@ -29,21 +22,19 @@ export default function ArcGenieGoalDetailPage() {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    menuState,
-    openMenu,
-    closeMenu,
     handlePrimaryAction,
     handleDismissSource,
     handleViewDetails,
     handleRunNow,
-    snackbarMessage,
-    closeSnackbar,
   } = useAutoProtectSources();
 
-  const columns = useAutoProtectSourcesColumns({
+  const columns = useAutoProtectSourcesColumns();
+  const rowActions = useAutoProtectSourceRowActions({
     onPrimaryAction: handlePrimaryAction,
-    onOpenMenu: openMenu,
+    onViewDetails: handleViewDetails,
+    onDismissSource: handleDismissSource,
   });
+  const rowActionsAriaLabel = useCallback((row) => `Actions for ${row.sourceName}`, []);
 
   if (!goal) {
     return <Navigate to="/arcgenie/overview" replace />;
@@ -55,7 +46,7 @@ export default function ArcGenieGoalDetailPage() {
     <Box sx={{ bgcolor: "background.paper", minHeight: "calc(100vh - 64px)", py: 6 }}>
       <Stack spacing={4} sx={{ width: "100%", px: 6 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
-          <Typography variant="h5" fontWeight={700} color="text.primary" sx={{ maxWidth: 900 }}>
+          <Typography variant="h6" color="text.primary" sx={{ maxWidth: 900 }}>
             {goal.title}
           </Typography>
           <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
@@ -122,7 +113,9 @@ export default function ArcGenieGoalDetailPage() {
             getRowId={(row) => row.id}
             checkboxSelection={false}
             autoHeight
-            initialState={{ pinnedColumns: { right: ["actions"] } }}
+            rowActions={rowActions}
+            rowActionsAriaLabel={rowActionsAriaLabel}
+            initialState={{ pinnedColumns: { left: [ACTIONS_COLUMN_FIELD] } }}
             slots={{
               noRowsOverlay: () => (
                 <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
@@ -133,28 +126,6 @@ export default function ArcGenieGoalDetailPage() {
           />
         </Box>
       </Stack>
-
-      <Menu
-        anchorEl={menuState.anchorEl}
-        open={Boolean(menuState.anchorEl)}
-        onClose={closeMenu}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <MenuItem onClick={() => handleViewDetails(menuState.sourceId)}>View Details</MenuItem>
-        <MenuItem onClick={() => handleDismissSource(menuState.sourceId)}>Dismiss</MenuItem>
-      </Menu>
-
-      <Snackbar
-        open={Boolean(snackbarMessage)}
-        autoHideDuration={4000}
-        onClose={closeSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="success" variant="filled" onClose={closeSnackbar}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

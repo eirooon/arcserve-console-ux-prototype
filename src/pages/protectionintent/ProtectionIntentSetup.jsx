@@ -1,14 +1,16 @@
-import { Alert, Box, Button, Snackbar, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import ProtectionIntentStepper from "./components/ProtectionIntentStepper";
 import ProtectionIntentOptionCard from "./components/ProtectionIntentOptionCard";
 import ProtectionIntentCustomPromptPanel from "./components/ProtectionIntentCustomPromptPanel";
 import ProtectionIntentArchitectingPanel from "./components/ProtectionIntentArchitectingPanel";
-import ProtectionIntentRecommendationPanel from "./components/ProtectionIntentRecommendationPanel";
+import ProtectionIntentRecommendationPanelEnhanced from "./components/ProtectionIntentRecommendationPanelEnhanced";
 import ProtectionCategoryEditDialog from "./components/ProtectionCategoryEditDialog";
-import ConfigureGoalsAutonomyStep from "./components/ConfigureGoalsAutonomyStep";
+import ProtectionCategoryAddDialog from "./components/ProtectionCategoryAddDialog";
+import EnvironmentDiscoveryStep from "./components/EnvironmentDiscoveryStep";
+import ConfigureGoalsAutonomyStepEnhanced from "./components/ConfigureGoalsAutonomyStepEnhanced";
 import ConfigureMessagingChannelsStep from "./components/ConfigureMessagingChannelsStep";
-import ReviewApplyStep from "./components/ReviewApplyStep";
-import ProtectionIntentActivatedPanel from "./components/ProtectionIntentActivatedPanel";
+import ReviewApplyStepEnhanced from "./components/ReviewApplyStepEnhanced";
+import ProtectionIntentActivationSuccess from "./components/ProtectionIntentActivationSuccess";
 import { useProtectionIntentSetup } from "./hooks/useProtectionIntentSetup";
 import {
   PROTECTION_INTENT_OPTIONS,
@@ -27,6 +29,7 @@ export default function ProtectionIntentSetup() {
     setPromptText,
     handleGeneratePrompt,
     handleTryAnotherOption,
+    categories,
     handleEditCategory,
     expandedCategories,
     toggleCategoryExpanded,
@@ -36,20 +39,21 @@ export default function ProtectionIntentSetup() {
     closeEditDialog,
     handleSaveCategoryEdit,
     categoryFormData,
-    snackbarMessage,
-    closeSnackbar,
+    isAddCategoryOpen,
+    openAddCategory,
+    closeAddCategory,
+    handleAddCategory,
     canProceed,
     handleCancel,
     handleNext,
     handlePrevious,
+    goToStep,
     isActivated,
     handleActivate,
     handleViewOverview,
     goals,
     toggleGoalEnabled,
     setGoalField,
-    globalSettings,
-    setGlobalField,
   } = useProtectionIntentSetup();
 
   const nextStepLabel = PROTECTION_INTENT_STEPS[activeStep + 1];
@@ -68,11 +72,7 @@ export default function ProtectionIntentSetup() {
       }}
     >
       {isActivated ? (
-        <ProtectionIntentActivatedPanel
-          goals={goals}
-          globalSettings={globalSettings}
-          onViewOverview={handleViewOverview}
-        />
+        <ProtectionIntentActivationSuccess onViewDashboard={() => handleViewOverview()} />
       ) : (
         <Stack spacing={4} sx={{ maxWidth: "1132px", mx: "auto", px: 6 }}>
           <Box>
@@ -99,7 +99,16 @@ export default function ProtectionIntentSetup() {
             activeStep={activeStep}
           />
 
+          {/* STEP 0: Environment Discovery */}
           {activeStep === 0 && (
+            <EnvironmentDiscoveryStep
+              onDiscoveryComplete={handleNext}
+              onCancel={handleCancel}
+            />
+          )}
+
+          {/* STEP 1: Define Protection Intent (formerly Step 0) */}
+          {activeStep === 1 && (
             <>
               <Stack spacing={3}>
                 {(phase === "select" || phase === "customPrompt") && (
@@ -148,9 +157,12 @@ export default function ProtectionIntentSetup() {
                 )}
 
                 {phase === "recommended" && (
-                  <ProtectionIntentRecommendationPanel
+                  <ProtectionIntentRecommendationPanelEnhanced
+                    recommendationData={{ sourcesCount: 31 }}
                     onTryAnotherOption={handleTryAnotherOption}
+                    categories={categories}
                     onEditCategory={handleEditCategory}
+                    onAddCategory={openAddCategory}
                     expandedCategories={expandedCategories}
                     onToggleCategoryExpand={toggleCategoryExpanded}
                     extensionState={extensionState}
@@ -177,8 +189,9 @@ export default function ProtectionIntentSetup() {
             </>
           )}
 
-          {activeStep === 1 && (
-            <ConfigureGoalsAutonomyStep
+          {/* STEP 2: Configure Goals & Autonomy (formerly Step 1) */}
+          {activeStep === 2 && (
+            <ConfigureGoalsAutonomyStepEnhanced
               onCancel={handleCancel}
               onPrevious={handlePrevious}
               onNext={handleNext}
@@ -186,12 +199,11 @@ export default function ProtectionIntentSetup() {
               goals={goals}
               toggleGoalEnabled={toggleGoalEnabled}
               setGoalField={setGoalField}
-              globalSettings={globalSettings}
-              setGlobalField={setGlobalField}
             />
           )}
 
-          {activeStep === 2 && (
+          {/* STEP 3: Configure Messaging Channels (formerly Step 2) */}
+          {activeStep === 3 && (
             <ConfigureMessagingChannelsStep
               onCancel={handleCancel}
               onPrevious={handlePrevious}
@@ -200,19 +212,23 @@ export default function ProtectionIntentSetup() {
             />
           )}
 
-          {activeStep === 3 && (
-            <ReviewApplyStep
+          {/* STEP 4: Review & Apply (formerly Step 3) */}
+          {activeStep === 4 && (
+            <ReviewApplyStepEnhanced
+              categories={categories}
               categoryFormData={categoryFormData}
               extensionState={extensionState}
               goals={goals}
-              globalSettings={globalSettings}
               onCancel={handleCancel}
               onPrevious={handlePrevious}
               onActivate={handleActivate}
+              onEditProtection={() => goToStep(1)}
+              onEditGoals={() => goToStep(2)}
+              onEditNotifications={() => goToStep(3)}
             />
           )}
 
-          {activeStep > 3 && (
+          {activeStep > 4 && (
             <Box sx={{ py: 8, textAlign: "center" }}>
               <Typography variant="body1" color="text.secondary">
                 {PROTECTION_INTENT_STEPS[activeStep]} is coming soon.
@@ -228,20 +244,16 @@ export default function ProtectionIntentSetup() {
       <ProtectionCategoryEditDialog
         categoryId={editDialogCategoryId}
         categoryFormData={categoryFormData}
+        categories={categories}
         onClose={closeEditDialog}
         onSave={handleSaveCategoryEdit}
       />
 
-      <Snackbar
-        open={Boolean(snackbarMessage)}
-        autoHideDuration={4000}
-        onClose={closeSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="success" variant="filled" onClose={closeSnackbar}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <ProtectionCategoryAddDialog
+        open={isAddCategoryOpen}
+        onClose={closeAddCategory}
+        onSave={handleAddCategory}
+      />
     </Box>
   );
 }

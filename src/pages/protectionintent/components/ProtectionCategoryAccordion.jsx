@@ -1,15 +1,6 @@
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
-  Chip,
-  Stack,
-  Switch,
-  Typography,
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Box, Button, Chip, IconButton, Stack, Switch, Tooltip, Typography } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import AccordionShell from "../../../components/AccordionShell";
 
 export function DetailRow({ label, value }) {
   return (
@@ -35,165 +26,168 @@ export default function ProtectionCategoryAccordion({
   onToggleExpand,
   onToggleExtension,
   onEdit,
+  onExtensionInfo,
   readOnly = false,
 }) {
   const visibleExtensions = readOnly
     ? extensions.filter((extension) => extension.enabled)
     : extensions;
   return (
-    <Accordion
+    <AccordionShell
       expanded={expanded}
-      onChange={onToggleExpand}
-      disableGutters
-      elevation={0}
-      sx={{
-        border: 1,
-        borderColor: "divider",
-        borderTopLeftRadius: "8px !important",
-        borderTopRightRadius: "8px !important",
-        borderBottomLeftRadius: "8px !important",
-        borderBottomRightRadius: "8px !important",
-        overflow: "hidden",
-        "&:before": { display: "none" },
+      onToggleExpand={onToggleExpand}
+      summaryContentSx={{ justifyContent: "space-between", gap: 3 }}
+      summarySx={{
+        "& .MuiAccordionSummary-expandIconWrapper": {
+          marginLeft: "16px",
+          marginRight: 0,
+        },
       }}
-    >
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        sx={{
-          px: 3,
-          py: 1,
-          borderBottom: expanded ? 1 : 0,
-          borderColor: "divider",
-          "& .MuiAccordionSummary-content": {
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 3,
-            my: 2,
-            minWidth: 0,
-          },
-          "& .MuiAccordionSummary-expandIconWrapper": {
-            marginLeft: "16px",
-            marginRight: 0,
-          },
-        }}
-      >
-        <Stack sx={{ width: 400, flexShrink: 0 }}>
-          <Typography variant="body1" fontWeight={700} color="text.primary">
-            {category.label}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" noWrap>
-            {category.description}
-          </Typography>
-        </Stack>
-        <Stack direction="row" spacing={3} sx={{ flex: 1, minWidth: 0 }}>
-          {quickStats.map((stat) => (
-            <Typography key={stat} variant="body2" color="text.secondary" noWrap>
-              {stat}
+      summary={
+        <>
+          <Stack sx={{ width: 400, flexShrink: 0 }}>
+            <Typography variant="body1" fontWeight={700} color="text.primary">
+              {category.label}
             </Typography>
-          ))}
-        </Stack>
-        <Chip label={extensionCountLabel} size="small" sx={{ flexShrink: 0 }} />
-      </AccordionSummary>
-      <AccordionDetails sx={{ p: 3 }}>
-        <Stack direction="row" spacing={4}>
-          <Stack spacing={4} sx={{ flex: 1, minWidth: 0 }}>
-            <Stack spacing={2}>
-              <Typography variant="subtitle2" fontWeight={500} color="text.primary">
-                General Settings
-              </Typography>
-              <Stack spacing={0.5}>
-                {generalSettings.map((row) => (
-                  <DetailRow key={row.label} label={row.label} value={row.value} />
-                ))}
-              </Stack>
-            </Stack>
-            <Stack spacing={2}>
-              <Typography variant="subtitle2" fontWeight={500} color="text.primary">
-                Default Destination Settings
-              </Typography>
-              <Stack spacing={0.5}>
-                {destinationSettings.map((row) => (
-                  <DetailRow key={row.label} label={row.label} value={row.value} />
-                ))}
-              </Stack>
-            </Stack>
-            {!readOnly && (
-              <Button
-                variant="outlined"
-                size="small"
-                color="secondary"
-                sx={{ width: "fit-content" }}
-                onClick={onEdit}
-              >
-                Edit This Category
-              </Button>
-            )}
+            <Typography variant="body2" color="text.secondary" noWrap>
+              {category.description}
+            </Typography>
           </Stack>
-          <Stack spacing={2} sx={{ flex: 1, minWidth: 0 }}>
+          <Stack direction="row" spacing={3} sx={{ flex: 1, minWidth: 0 }}>
+            {quickStats.map((stat) => (
+              <Typography key={stat} variant="body2" color="text.secondary" noWrap>
+                {stat}
+              </Typography>
+            ))}
+          </Stack>
+          <Chip label={extensionCountLabel} size="small" sx={{ flexShrink: 0 }} />
+        </>
+      }
+    >
+      <Stack direction="row" spacing={4}>
+        <Stack spacing={4} sx={{ flex: 1, minWidth: 0 }}>
+          <Stack spacing={2}>
             <Typography variant="subtitle2" fontWeight={500} color="text.primary">
-              Extensions
+              General Settings
             </Typography>
-            {readOnly ? (
-              visibleExtensions.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">
-                  No extensions selected.
-                </Typography>
-              ) : (
-                <Box>
-                  {visibleExtensions.map((extension, index) => (
-                    <Stack
-                      key={extension.label}
-                      spacing={0.5}
-                      sx={{
-                        py: 2,
-                        borderBottom: index === visibleExtensions.length - 1 ? 0 : 1,
-                        borderColor: "divider",
-                      }}
-                    >
+            <Stack spacing={0.5}>
+              {generalSettings.map((row) => (
+                <DetailRow key={row.label} label={row.label} value={row.value} />
+              ))}
+            </Stack>
+          </Stack>
+          <Stack spacing={2}>
+            <Typography variant="subtitle2" fontWeight={500} color="text.primary">
+              Default Destination Settings
+            </Typography>
+            <Stack spacing={0.5}>
+              {destinationSettings.map((row) => (
+                <DetailRow key={row.label} label={row.label} value={row.value} />
+              ))}
+            </Stack>
+          </Stack>
+          {!readOnly && (
+            <Button
+              variant="outlined"
+              size="small"
+              color="secondary"
+              sx={{ width: "fit-content" }}
+              onClick={onEdit}
+            >
+              Edit This Category
+            </Button>
+          )}
+        </Stack>
+        <Stack spacing={2} sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="subtitle2" fontWeight={500} color="text.primary">
+            Extensions
+          </Typography>
+          {readOnly ? (
+            visibleExtensions.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                No extensions selected.
+              </Typography>
+            ) : (
+              <Box>
+                {visibleExtensions.map((extension, index) => (
+                  <Stack
+                    key={extension.label}
+                    spacing={0.5}
+                    sx={{
+                      py: 2,
+                      borderBottom: index === visibleExtensions.length - 1 ? 0 : 1,
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Stack direction="row" spacing={0.5} alignItems="center">
                       <Typography variant="body2" fontWeight={700} color="text.primary">
                         {extension.label}
                       </Typography>
-                      {extension.detail && (
-                        <Typography variant="caption" color="text.secondary">
-                          {extension.detail}
-                        </Typography>
+                      {onExtensionInfo && (
+                        <Tooltip title={`${extension.label} details & impact`}>
+                          <IconButton
+                            size="small"
+                            onClick={() => onExtensionInfo(extension.label)}
+                            aria-label={`${extension.label} details & impact`}
+                          >
+                            <InfoOutlinedIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                          </IconButton>
+                        </Tooltip>
                       )}
                     </Stack>
-                  ))}
-                </Box>
-              )
-            ) : (
-              <Box>
-                {extensions.map((extension) => (
-                  <Stack
-                    key={extension.label}
-                    direction="row"
-                    spacing={2}
-                    sx={{ py: 2, borderBottom: 1, borderColor: "divider" }}
-                  >
-                    <Switch
-                      size="small"
-                      checked={extension.enabled}
-                      onChange={() => onToggleExtension(extension.label)}
-                      aria-label={`Toggle ${extension.label}`}
-                    />
-                    <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-                      <Typography variant="body2" color="text.primary">
-                        {extension.label}
+                    {extension.detail && (
+                      <Typography variant="caption" color="text.secondary">
+                        {extension.detail}
                       </Typography>
-                      {extension.detail && (
-                        <Typography variant="caption" color="text.secondary">
-                          {extension.detail}
-                        </Typography>
-                      )}
-                    </Stack>
+                    )}
                   </Stack>
                 ))}
               </Box>
-            )}
-          </Stack>
+            )
+          ) : (
+            <Box>
+              {extensions.map((extension) => (
+                <Stack
+                  key={extension.label}
+                  direction="row"
+                  spacing={2}
+                  sx={{ py: 2, borderBottom: 1, borderColor: "divider" }}
+                >
+                  <Switch
+                    size="small"
+                    checked={extension.enabled}
+                    onChange={() => onToggleExtension(extension.label)}
+                    aria-label={`Toggle ${extension.label}`}
+                  />
+                  <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      <Typography variant="body2" color="text.primary">
+                        {extension.label}
+                      </Typography>
+                      {onExtensionInfo && (
+                        <Tooltip title={`${extension.label} details & impact`}>
+                          <IconButton
+                            size="small"
+                            onClick={() => onExtensionInfo(extension.label)}
+                            aria-label={`${extension.label} details & impact`}
+                          >
+                            <InfoOutlinedIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Stack>
+                    {extension.detail && (
+                      <Typography variant="caption" color="text.secondary">
+                        {extension.detail}
+                      </Typography>
+                    )}
+                  </Stack>
+                </Stack>
+              ))}
+            </Box>
+          )}
         </Stack>
-      </AccordionDetails>
-    </Accordion>
+      </Stack>
+    </AccordionShell>
   );
 }

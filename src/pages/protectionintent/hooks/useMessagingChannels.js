@@ -3,70 +3,49 @@ import { buildInitialMessagingChannels } from "../messagingChannelsData";
 
 export function useMessagingChannels() {
   const [channels, setChannels] = useState(buildInitialMessagingChannels);
-  const [menuState, setMenuState] = useState({ anchorEl: null, channelId: null });
-  const [configChannelId, setConfigChannelId] = useState(null);
+  // Only one messaging channel can be connected at a time — this tracks
+  // which row is focused in the list, independent of connection state.
+  const [selectedChannelId, setSelectedChannelId] = useState(
+    () => buildInitialMessagingChannels()[0]?.id ?? null,
+  );
 
-  const openMenu = useCallback((event, channelId) => {
-    setMenuState({ anchorEl: event.currentTarget, channelId });
+  const selectChannel = useCallback((channelId) => {
+    setSelectedChannelId(channelId);
   }, []);
 
-  const closeMenu = useCallback(() => {
-    setMenuState({ anchorEl: null, channelId: null });
-  }, []);
-
+  // Connecting a channel supersedes whichever channel (if any) was
+  // previously connected, since only one may be active at a time.
   const connectChannel = useCallback((channelId) => {
     setChannels((current) =>
-      current.map((channel) =>
-        channel.id === channelId ? { ...channel, connected: true } : channel,
-      ),
+      current.map((channel) => ({ ...channel, connected: channel.id === channelId })),
     );
   }, []);
 
-  const disconnectChannel = useCallback(
-    (channelId) => {
-      setChannels((current) =>
-        current.map((channel) =>
-          channel.id === channelId ? { ...channel, connected: false } : channel,
-        ),
-      );
-      closeMenu();
-    },
-    [closeMenu],
-  );
-
-  const openConfigDialog = useCallback(
-    (channelId) => {
-      setConfigChannelId(channelId);
-      closeMenu();
-    },
-    [closeMenu],
-  );
-
-  const closeConfigDialog = useCallback(() => {
-    setConfigChannelId(null);
-  }, []);
-
-  const saveChannelConfig = useCallback((channelId, updates) => {
+  const disconnectChannel = useCallback((channelId) => {
     setChannels((current) =>
       current.map((channel) =>
-        channel.id === channelId ? { ...channel, ...updates } : channel,
+        channel.id === channelId ? { ...channel, connected: false } : channel,
       ),
     );
-    setConfigChannelId(null);
   }, []);
 
-  const configChannel = channels.find((channel) => channel.id === configChannelId) ?? null;
+  const setChannelField = useCallback((channelId, field, value) => {
+    setChannels((current) =>
+      current.map((channel) =>
+        channel.id === channelId ? { ...channel, [field]: value } : channel,
+      ),
+    );
+  }, []);
+
+  const selectedChannel = channels.find((channel) => channel.id === selectedChannelId) ?? null;
 
   return {
     channels,
-    menuState,
-    openMenu,
-    closeMenu,
+    selectedChannelId,
+    selectChannel,
+    selectedChannel,
     connectChannel,
     disconnectChannel,
-    openConfigDialog,
-    closeConfigDialog,
-    saveChannelConfig,
-    configChannel,
+    setChannelField,
   };
 }
