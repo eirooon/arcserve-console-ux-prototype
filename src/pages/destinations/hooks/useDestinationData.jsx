@@ -32,6 +32,27 @@ export const fields = [
   { field: "last_recovery_point", label: "Last Recovery Point", type: "datetime" },
 ];
 
+// Maps each Destinations sub-nav category (see subRoutes.js) to the
+// destination `type` value that identifies it in the mock data (see
+// src/mocks/data/destinations.js) — mirrors filterSourcesByCategory in
+// ../../sources/hooks/useSourceData.jsx. Every Destinations sub-page shows
+// exactly one type, so an unrecognized categoryId defensively returns rows
+// unchanged instead of filtering everything out.
+export function filterDestinationsByCategory(rows, categoryId) {
+  switch (categoryId) {
+    case "rps":
+      return rows.filter((row) => row.type === "recovery_point_server");
+    case "datastores":
+      return rows.filter((row) => row.type === "data_store");
+    case "acrsaccounts":
+      return rows.filter((row) => row.type === "cloud_volume");
+    case "share-folders":
+      return rows.filter((row) => row.type === "shared_folder");
+    default:
+      return rows;
+  }
+}
+
 export const destinationStore = createResourceStore(ENDPOINTS.DESTINATIONS);
 
 export function useDestinationData(selector) {

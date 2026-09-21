@@ -12,6 +12,7 @@ import LinuxLogoIcon from "../../../assets/linux-logo.svg?react";
 import { ENDPOINTS } from "../../../api/endpoints";
 import { createResourceStore, useResourceStore } from "../../../api/createResourceStore";
 import { iconColumn } from "../../../utils/iconColumn";
+import { humanize } from "../../../utils/text";
 
 // Every field returned by GET /sources (flattened in src/mocks/data/sources.js)
 // is exposed as a column so no information from the API response is hidden
@@ -53,16 +54,6 @@ function withEmptyDash(column) {
   };
 }
 
-// Title-cases a snake_case API enum value for display, e.g.
-// "backup_incremental" -> "Backup Incremental".
-function humanize(value) {
-  if (!value) return null;
-  return value
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
 const OS_ICON_META_BY_MAJOR = {
   windows: { icon: WindowsLogoIcon, label: "Windows" },
   linux: { icon: LinuxLogoIcon, label: "Linux" },
@@ -90,8 +81,10 @@ const SOURCE_TYPE_ICON_META = {
 
 // isUncNfsSource is declared further below (function declarations hoist),
 // shared here so the folder icon choice matches the same predicate the left
-// sub-nav uses to categorize UNC/NFS sources.
-function getSourceTypeIconMeta(sourceType) {
+// sub-nav uses to categorize UNC/NFS sources. Exported so sourcesFilters.js
+// can reuse the same curated labels for the "Type" filter's options instead
+// of falling back to `humanize` for every source type.
+export function getSourceTypeIconMeta(sourceType) {
   if (!sourceType) return null;
   if (isUncNfsSource({ source_type: sourceType })) {
     return { icon: FolderRoundedIcon, label: "Network Share", color: "action.active" };

@@ -147,6 +147,20 @@ export const theme = createTheme({
       },
     },
 
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          "&.Mui-disabled": {
+            backgroundColor: theme.palette.action.disabledBackground,
+            cursor: "not-allowed",
+          },
+          "&.Mui-disabled .MuiInputBase-input, &.Mui-disabled .MuiSelect-select": {
+            cursor: "not-allowed",
+          },
+        }),
+      },
+    },
+
     MuiDataGrid: {
       styleOverrides: {
         root: {

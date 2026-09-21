@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { visuallyHidden } from "@mui/utils";
 import RowActionsMenu from "./RowActionsMenu";
+import DraggableColumnsManagement from "./DraggableColumnsManagement";
 
 // Exported so a caller that needs the actions column pinned (see
 // ArcGenieGoalDetailPage) can reference its field name in `initialState`
@@ -29,6 +30,7 @@ export default function DataTable({
   initialState,
   apiRef,
   slotProps,
+  slots,
   // Opt-in leading "Actions" column (checkbox, then Actions, then the rest).
   // Omit it and the grid renders exactly as before — every existing table
   // using DataTable is unaffected. Pass it to add a per-row dropdown menu:
@@ -96,6 +98,26 @@ export default function DataTable({
     ];
   }, [columns, rowActions, rowActionsAriaLabel]);
 
+  // User-driven column order from dragging rows in the "Edit Columns" panel
+  // (see DraggableColumnsManagement) — a list of fields for every column
+  // except the pinned Actions column, which always stays first. `null` means
+  // "no customization yet, use `effectiveColumns`' own order" (and is also
+  // what the panel's Reset button restores). The DataGrid Community edition
+  // has no public API to reorder its already-rendered columns (see
+  // DraggableColumnsManagement's comment), so reordering is done here instead
+  // — feeding the grid a new `columns` array in the desired order, which its
+  // normal "columns prop changed" handling picks up.
+  const [columnOrder, setColumnOrder] = useState(null);
+  const orderedColumns = useMemo(() => {
+    if (!columnOrder) return effectiveColumns;
+    const lookup = new Map(effectiveColumns.map((column) => [column.field, column]));
+    const actionsColumn = lookup.get(ACTIONS_COLUMN_FIELD);
+    const ordered = columnOrder.map((field) => lookup.get(field)).filter(Boolean);
+    const orderedFields = new Set([ACTIONS_COLUMN_FIELD, ...columnOrder]);
+    const missing = effectiveColumns.filter((column) => !orderedFields.has(column.field));
+    return [...(actionsColumn ? [actionsColumn] : []), ...ordered, ...missing];
+  }, [effectiveColumns, columnOrder]);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box role="status" aria-live="polite" sx={visuallyHidden}>
@@ -104,7 +126,7 @@ export default function DataTable({
       <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
         <DataGrid
           rows={rows}
-          columns={effectiveColumns}
+          columns={orderedColumns}
           loading={loading}
           getRowId={getRowId}
           aria-label={ariaLabel}
@@ -119,14 +141,20 @@ export default function DataTable({
           rowSelectionModel={gridSelectionModel}
           onRowSelectionModelChange={handleSelectionModelChange}
           apiRef={apiRef}
+          slots={{
+            // Adds drag-and-drop reordering to every table's "Edit Columns"
+            // menu — see DraggableColumnsManagement for why this replaces
+            // the grid's built-in panel instead of extending it.
+            columnsManagement: DraggableColumnsManagement,
+            ...slots,
+          }}
           slotProps={{
             ...slotProps,
             panel: { target: editColumnsAnchor, ...slotProps?.panel },
             columnsManagement: {
               // Checkbox selection and the row-actions column aren't
-              // meaningful things to show/hide, so they're left out of the
-              // "Edit Columns" panel entirely. The panel's own reset button
-              // stays intact for the remaining columns.
+              // meaningful things to show/hide (or reorder), so they're left
+              // out of the "Edit Columns" panel entirely.
               getTogglableColumns: (cols) =>
                 cols
                   .filter(
@@ -135,7 +163,7 @@ export default function DataTable({
                       col.field !== ACTIONS_COLUMN_FIELD,
                   )
                   .map((col) => col.field),
-              disableShowHideToggle: true,
+              onReorder: setColumnOrder,
               ...slotProps?.columnsManagement,
             },
           }}
@@ -162,6 +190,7 @@ DataTable.propTypes = {
   loading: PropTypes.bool,
   apiRef: PropTypes.shape({ current: PropTypes.object }),
   slotProps: PropTypes.object,
+  slots: PropTypes.object,
   rowActions: PropTypes.func,
   rowActionsAriaLabel: PropTypes.func,
 };

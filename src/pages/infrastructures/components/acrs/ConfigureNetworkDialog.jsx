@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -18,6 +19,17 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import FormField from "../../../../components/FormField";
+import PlaceholderSelect from "../../../../components/PlaceholderSelect";
+import { useDirtyState } from "../../../../hooks/useDirtyState";
+import {
+  ENTRY_POINT,
+  RECONNECT_WARNING,
+  SUBMIT_ACTION,
+  SUBMIT_LABEL,
+  hasNetworkConfig,
+  requiresReconnect,
+  resolveSubmitAction,
+} from "../../hooks/networkInterfaceConfig";
 
 const LINK_SPEED_OPTIONS = [
   "Auto Negotiation",
@@ -27,6 +39,29 @@ const LINK_SPEED_OPTIONS = [
   "100 Mbps Full Duplex",
   "1.0 Gbps Full Duplex",
 ];
+
+// Example values shown in empty address fields (until the admin types). Mask
+// is a prefix length for IPv6.
+const FIELD_PLACEHOLDERS = {
+  ipv4: {
+    ipAddress: "e.g. 192.168.1.10",
+    networkMask: "e.g. 255.255.255.0",
+    defaultGateway: "e.g. 192.168.1.1",
+    primaryDnsServer: "e.g. 8.8.8.8",
+    secondaryDnsServer: "e.g. 8.8.4.4",
+  },
+  ipv6: {
+    ipAddress: "e.g. 2001:db8::10",
+    networkMask: "e.g. 64",
+    defaultGateway: "e.g. 2001:db8::1",
+    primaryDnsServer: "e.g. 2001:4860:4860::8888",
+    secondaryDnsServer: "e.g. 2001:4860:4860::8844",
+  },
+};
+
+// Placeholder text in a muted secondary color at full opacity (MUI's default
+// 0.42 opacity falls short of WCAG AA contrast).
+const PLACEHOLDER_SX = { "& input::placeholder": { color: "text.secondary", opacity: 1 } };
 
 const EMPTY_PROTOCOL_CONFIG = {
   mode: "manual",
@@ -41,26 +76,56 @@ const EMPTY_PROTOCOL_CONFIG = {
 // the `nic &&` guard below), so it mounts fresh — seeded straight from that
 // NIC's current settings — every time "Configure" is clicked, the same
 // reasoning as EntityFormDialog's inner form body.
-function ConfigureNetworkForm({ nic, onClose, onSave, saving }) {
+function ConfigureNetworkForm({ nic, entryPoint, onClose, onSave, saving }) {
+  const { dirty, track } = useDirtyState();
   const [tcpIpType, setTcpIpType] = useState(nic.tcpIpType ?? "ipv4");
   const [protocolConfig, setProtocolConfig] = useState({
     ipv4: { ...EMPTY_PROTOCOL_CONFIG, ...nic.ipv4 },
     ipv6: { ...EMPTY_PROTOCOL_CONFIG, ...nic.ipv6 },
   });
   const [linkSpeed, setLinkSpeed] = useState(nic.linkSpeed ?? LINK_SPEED_OPTIONS[0]);
+  const changeTcpIpType = track(setTcpIpType);
+  const changeProtocolConfig = track(setProtocolConfig);
+  const changeLinkSpeed = track(setLinkSpeed);
 
   const activeConfig = protocolConfig[tcpIpType];
   const isManual = activeConfig.mode === "manual";
 
+  const draftNic = { ...nic, tcpIpType, ipv4: protocolConfig.ipv4, ipv6: protocolConfig.ipv6, linkSpeed };
+  const submitAction = resolveSubmitAction({
+    entryPoint,
+    connected: Boolean(nic.connected),
+    reconnectRequired: requiresReconnect(nic, draftNic),
+  });
+  // Plain "Save" waits for an edit; the connect/reconnect variants do real
+  // work on the link, so they stay available even before anything changes.
+  // Connecting additionally needs usable settings (DHCP, or an IP address).
+  const canSubmit =
+    !saving &&
+    (dirty || submitAction !== SUBMIT_ACTION.SAVE) &&
+    (submitAction !== SUBMIT_ACTION.SAVE_AND_CONNECT || hasNetworkConfig(draftNic));
+
+  // Shared props for the five address/DNS inputs. Placeholders only show
+  // while the field is editable — under DHCP the values are assigned.
+  const addressFieldProps = (field) => ({
+    size: "small",
+    fullWidth: true,
+    disabled: !isManual,
+    value: activeConfig[field],
+    placeholder: isManual ? FIELD_PLACEHOLDERS[tcpIpType][field] : undefined,
+    onChange: (event) => setActiveField(field, event.target.value),
+    sx: PLACEHOLDER_SX,
+  });
+
   const setActiveField = (field, value) => {
-    setProtocolConfig((current) => ({
+    changeProtocolConfig((current) => ({
       ...current,
       [tcpIpType]: { ...current[tcpIpType], [field]: value },
     }));
   };
 
   const handleClear = () => {
-    setProtocolConfig((current) => ({
+    changeProtocolConfig((current) => ({
       ...current,
       [tcpIpType]: {
         ...current[tcpIpType],
@@ -74,7 +139,8 @@ function ConfigureNetworkForm({ nic, onClose, onSave, saving }) {
   };
 
   const handleSave = () => {
-    onSave({ ...nic, tcpIpType, ipv4: protocolConfig.ipv4, ipv6: protocolConfig.ipv6, linkSpeed });
+    if (!canSubmit) return;
+    onSave(draftNic, submitAction);
   };
 
   return (
@@ -91,7 +157,7 @@ function ConfigureNetworkForm({ nic, onClose, onSave, saving }) {
       <DialogContent dividers sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         <Stack direction="row" spacing={2}>
           <FormField label="TCP/IP Type">
-            <RadioGroup row value={tcpIpType} onChange={(event) => setTcpIpType(event.target.value)}>
+            <RadioGroup row value={tcpIpType} onChange={(event) => changeTcpIpType(event.target.value)}>
               <FormControlLabel value="ipv4" control={<Radio />} label="IPV4" />
               <FormControlLabel value="ipv6" control={<Radio />} label="IPV6" />
             </RadioGroup>
@@ -121,31 +187,13 @@ function ConfigureNetworkForm({ nic, onClose, onSave, saving }) {
 
         <Stack spacing={2}>
           <FormField label="IP Address">
-            <TextField
-              size="small"
-              fullWidth
-              disabled={!isManual}
-              value={activeConfig.ipAddress}
-              onChange={(event) => setActiveField("ipAddress", event.target.value)}
-            />
+            <TextField {...addressFieldProps("ipAddress")} />
           </FormField>
           <FormField label="Network Mask">
-            <TextField
-              size="small"
-              fullWidth
-              disabled={!isManual}
-              value={activeConfig.networkMask}
-              onChange={(event) => setActiveField("networkMask", event.target.value)}
-            />
+            <TextField {...addressFieldProps("networkMask")} />
           </FormField>
           <FormField label="Default Gateway">
-            <TextField
-              size="small"
-              fullWidth
-              disabled={!isManual}
-              value={activeConfig.defaultGateway}
-              onChange={(event) => setActiveField("defaultGateway", event.target.value)}
-            />
+            <TextField {...addressFieldProps("defaultGateway")} />
           </FormField>
         </Stack>
 
@@ -153,42 +201,34 @@ function ConfigureNetworkForm({ nic, onClose, onSave, saving }) {
 
         <Stack direction="row" spacing={2}>
           <FormField label="Primary DNS Server" sx={{ flex: 1 }}>
-            <TextField
-              size="small"
-              fullWidth
-              disabled={!isManual}
-              value={activeConfig.primaryDnsServer}
-              onChange={(event) => setActiveField("primaryDnsServer", event.target.value)}
-            />
+            <TextField {...addressFieldProps("primaryDnsServer")} />
           </FormField>
           <FormField label="Secondary DNS Server" sx={{ flex: 1 }}>
-            <TextField
-              size="small"
-              fullWidth
-              disabled={!isManual}
-              value={activeConfig.secondaryDnsServer}
-              onChange={(event) => setActiveField("secondaryDnsServer", event.target.value)}
-            />
+            <TextField {...addressFieldProps("secondaryDnsServer")} />
           </FormField>
         </Stack>
 
         <Divider />
 
         <FormField label="Link Speed and Duplex Settings">
-          <TextField
-            select
+          <PlaceholderSelect
             size="small"
             fullWidth
+            placeholder="Select link speed"
             value={linkSpeed}
-            onChange={(event) => setLinkSpeed(event.target.value)}
+            onChange={(event) => changeLinkSpeed(event.target.value)}
           >
             {LINK_SPEED_OPTIONS.map((option) => (
               <MenuItem key={option} value={option}>
                 {option}
               </MenuItem>
             ))}
-          </TextField>
+          </PlaceholderSelect>
         </FormField>
+
+        {submitAction === SUBMIT_ACTION.SAVE_AND_RECONNECT && (
+          <Alert severity="warning">{RECONNECT_WARNING}</Alert>
+        )}
       </DialogContent>
 
       <DialogActions sx={{ px: 2, py: 1, justifyContent: "space-between" }}>
@@ -207,8 +247,8 @@ function ConfigureNetworkForm({ nic, onClose, onSave, saving }) {
           >
             Clear
           </Button>
-          <Button variant="contained" onClick={handleSave} disabled={saving}>
-            Save
+          <Button variant="contained" onClick={handleSave} disabled={!canSubmit}>
+            {SUBMIT_LABEL[submitAction]}
           </Button>
         </Stack>
       </DialogActions>
@@ -225,10 +265,12 @@ const nicPropType = PropTypes.shape({
   ipv4: PropTypes.object,
   ipv6: PropTypes.object,
   linkSpeed: PropTypes.string,
+  connected: PropTypes.bool,
 });
 
 ConfigureNetworkForm.propTypes = {
   nic: nicPropType.isRequired,
+  entryPoint: PropTypes.oneOf(Object.values(ENTRY_POINT)).isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   saving: PropTypes.bool,
@@ -239,17 +281,31 @@ ConfigureNetworkForm.propTypes = {
  * covers both IPv4 and IPv6 for a NIC — the "TCP/IP Type" radio switches
  * which protocol's fields are shown, each with its own Manually/Using DHCP
  * mode that enables or disables the address fields below it.
+ *
+ * The primary button adapts to `entryPoint` (Connect vs Configure), the NIC's
+ * `connected` state and whether the edits need the link to cycle — see
+ * `resolveSubmitAction`. `onSave(updatedNic, action)` receives the resolved
+ * `SUBMIT_ACTION` so the caller knows whether to connect or reconnect.
  */
-export default function ConfigureNetworkDialog({ nic, onClose, onSave, saving }) {
+export default function ConfigureNetworkDialog({ nic, entryPoint = ENTRY_POINT.CONFIGURE, onClose, onSave, saving }) {
   return (
     <Dialog open={Boolean(nic)} onClose={onClose} maxWidth="sm" fullWidth>
-      {nic && <ConfigureNetworkForm nic={nic} onClose={onClose} onSave={onSave} saving={saving} />}
+      {nic && (
+        <ConfigureNetworkForm
+          nic={nic}
+          entryPoint={entryPoint}
+          onClose={onClose}
+          onSave={onSave}
+          saving={saving}
+        />
+      )}
     </Dialog>
   );
 }
 
 ConfigureNetworkDialog.propTypes = {
   nic: nicPropType,
+  entryPoint: PropTypes.oneOf(Object.values(ENTRY_POINT)),
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   saving: PropTypes.bool,

@@ -88,7 +88,7 @@ export default function ArcGenieGoalDetailPage() {
             placeholder="Search source name"
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
-            sx={{ flex: 1, maxWidth: 420 }}
+            sx={{ flex: 1, maxWidth: 400 }}
           />
           <TextField
             select

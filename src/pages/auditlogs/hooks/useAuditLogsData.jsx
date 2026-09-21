@@ -25,6 +25,6 @@ export const fields = [
 
 export const auditLogsStore = createResourceStore(ENDPOINTS.AUDIT_LOGS);
 
-export function useAuditLogsData() {
-  return useResourceStore(auditLogsStore);
+export function useAuditLogsData(selector) {
+  return useResourceStore(auditLogsStore, selector);
 }

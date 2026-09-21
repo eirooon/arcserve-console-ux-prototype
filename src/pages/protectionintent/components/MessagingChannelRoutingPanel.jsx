@@ -1,5 +1,6 @@
-import { MenuItem, Stack, Switch, TextField, Typography } from "@mui/material";
+import { MenuItem, Stack, Switch, Typography } from "@mui/material";
 import FormField from "../../../components/FormField";
+import PlaceholderSelect from "../../../components/PlaceholderSelect";
 import MessagingPreviewCard from "./MessagingPreviewCard";
 import { CHANNEL_NAME_OPTIONS, NOTIFICATION_TYPES } from "../messagingChannelsData";
 
@@ -11,24 +12,20 @@ export default function MessagingChannelRoutingPanel({ channel, onFieldChange })
   return (
     <Stack spacing={3} sx={{ flex: 1, minWidth: 0 }}>
       <FormField label="Select Channel">
-        <TextField
-          select
+        <PlaceholderSelect
+          placeholder="Select channel"
           size="small"
           fullWidth
           disabled={disabled}
           value={disabled ? "" : (channel.channelName ?? "")}
           onChange={(event) => onFieldChange("channelName", event.target.value)}
-          SelectProps={{ displayEmpty: true }}
         >
-          <MenuItem value="" disabled>
-            Select channel
-          </MenuItem>
           {CHANNEL_NAME_OPTIONS.map((option) => (
             <MenuItem key={option} value={option}>
               {option}
             </MenuItem>
           ))}
-        </TextField>
+        </PlaceholderSelect>
       </FormField>
 
       <Stack spacing={2}>

@@ -21,6 +21,28 @@ export const fields = [
   { field: "last_generated", label: "Last Generated", type: "datetime" },
 ];
 
+// Mirrors the left sub-navigation items in subRoutes.js (id -> report_type)
+// so selecting "Backup Jobs", "Data Transfer", etc. filters the shared
+// Reports table down to just that category.
+export function filterReportsByCategory(rows, categoryId) {
+  switch (categoryId) {
+    case "backup-jobs":
+      return rows.filter((row) => row.report_type === "backup_jobs");
+    case "data-transfer":
+      return rows.filter((row) => row.report_type === "capacity_usage");
+    case "managed-report-schedules":
+      return rows.filter((row) => row.report_type === "report_schedule");
+    case "recovery-point":
+      return rows.filter((row) => row.report_type === "restore_jobs");
+    case "source-protection":
+      return rows.filter((row) => row.report_type === "policy_tasks");
+    case "stored-data":
+      return rows.filter((row) => row.report_type === "stored_data");
+    default:
+      return rows;
+  }
+}
+
 export const reportsStore = createResourceStore(ENDPOINTS.REPORTS);
 
 export function useReportsData(selector) {

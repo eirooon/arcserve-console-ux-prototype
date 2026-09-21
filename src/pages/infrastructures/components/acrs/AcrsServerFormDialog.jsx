@@ -15,6 +15,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import FormField from "../../../../components/FormField";
 import PasswordField from "../../../../components/PasswordField";
+import PlaceholderSelect from "../../../../components/PlaceholderSelect";
 import { useInfrastructureData } from "../../hooks/useInfrastructureData";
 
 const selectSiteRows = (state) => ({ rows: state.rows });
@@ -57,25 +58,24 @@ function AcrsServerForm({ mode, initialValues, saving, onClose, onSubmit }) {
       </DialogTitle>
 
       <DialogContent dividers sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Typography variant="body2" color="text.secondary">
+          Configure to access a new storage location.
+        </Typography>
         <FormField label="Site">
-          <TextField
-            select
+          <PlaceholderSelect
+            placeholder="Select site"
             size="small"
             fullWidth
             disabled={mode === "edit"}
             value={values.site}
             onChange={(event) => setField("site", event.target.value)}
-            SelectProps={{ displayEmpty: true }}
           >
-            <MenuItem value="" disabled>
-              Select site
-            </MenuItem>
             {sites.map((site) => (
               <MenuItem key={site.id} value={site.name}>
                 {site.name}
               </MenuItem>
             ))}
-          </TextField>
+          </PlaceholderSelect>
         </FormField>
         <FormField label="Display Name" required>
           <TextField

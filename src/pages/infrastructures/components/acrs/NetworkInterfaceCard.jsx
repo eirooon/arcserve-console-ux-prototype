@@ -1,7 +1,16 @@
+import { memo } from "react";
 import PropTypes from "prop-types";
 import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 
-export default function NetworkInterfaceCard({ nic, connecting, onConfigure, onToggleConnection }) {
+/**
+ * One interface row. "Configure" and the Connect/Disconnect toggle are
+ * independent controls and both are always available: Configure is never
+ * hidden or disabled by connection state, so an admin can pre-stage settings
+ * (e.g. an IP) on an interface that isn't connected yet.
+ */
+function NetworkInterfaceCard({ nic, connecting, onConfigure, onToggleConnection }) {
+  const connectionLabel = nic.connected ? "Disconnect" : "Connect";
+
   return (
     <Box
       sx={{
@@ -18,6 +27,8 @@ export default function NetworkInterfaceCard({ nic, connecting, onConfigure, onT
       <Stack spacing={0.5} sx={{ flex: 1, minWidth: 0 }}>
         <Stack direction="row" spacing={1} alignItems="center">
           <Box
+            role="img"
+            aria-label={nic.connected ? "Connected" : "Disconnected"}
             sx={{
               width: 8,
               height: 8,
@@ -36,18 +47,24 @@ export default function NetworkInterfaceCard({ nic, connecting, onConfigure, onT
       </Stack>
 
       <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ flexShrink: 0 }}>
-        <Button size="small" color="secondary" onClick={() => onConfigure(nic)}>
+        <Button
+          size="small"
+          color="secondary"
+          aria-label={`Configure ${nic.name}`}
+          onClick={() => onConfigure(nic)}
+        >
           Configure
         </Button>
         <Button
           size="small"
           variant="outlined"
           color={!connecting && nic.connected ? "error" : "secondary"}
+          aria-label={`${connectionLabel} ${nic.name}`}
           loading={connecting}
           loadingIndicator={<CircularProgress color="secondary" size={16} />}
           onClick={() => onToggleConnection(nic)}
         >
-          {nic.connected ? "Disconnect" : "Connect"}
+          {connectionLabel}
         </Button>
       </Stack>
     </Box>
@@ -59,8 +76,11 @@ NetworkInterfaceCard.propTypes = {
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
     connected: PropTypes.bool,
+    managementSession: PropTypes.bool,
   }).isRequired,
   connecting: PropTypes.bool,
   onConfigure: PropTypes.func.isRequired,
   onToggleConnection: PropTypes.func.isRequired,
 };
+
+export default memo(NetworkInterfaceCard);

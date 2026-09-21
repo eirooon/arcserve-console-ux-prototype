@@ -1,56 +1,48 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Box, Stack, Typography } from "@mui/material";
-import { apiClient } from "../../../../api/client";
-import { ENDPOINTS } from "../../../../api/endpoints";
-import { acrsServersStore } from "../../hooks/useAcrsServersData";
+import ConfirmDialog from "../../../../components/ConfirmDialog";
+import { useNetworkInterfaceActions } from "../../hooks/useNetworkInterfaceActions";
+import { ENTRY_POINT, getDisconnectDescription } from "../../hooks/networkInterfaceConfig";
 import NetworkInterfaceCard from "./NetworkInterfaceCard";
 import ConfigureNetworkDialog from "./ConfigureNetworkDialog";
 
-// The mock API resolves a PUT almost instantly, which would make the
-// Connect/Disconnect button's loading state flash too briefly to actually
-// see. Holding it for at least this long keeps it perceivable without
-// meaningfully slowing down the action.
-const MIN_CONNECTING_DURATION_MS = 500;
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export default function AcrsNetworksTab({ server }) {
   const nics = useMemo(() => server.networkInterfaces ?? [], [server.networkInterfaces]);
-  const [configuringNic, setConfiguringNic] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [connectingIds, setConnectingIds] = useState(() => new Set());
+  // `nic` is a snapshot taken when the modal opens, so the form (and its
+  // "did anything change" baseline) stays stable while saving refetches.
+  const [configuring, setConfiguring] = useState(null);
+  const openConnectConfigure = useCallback(
+    (nic) => setConfiguring({ nic, entryPoint: ENTRY_POINT.CONNECT }),
+    [],
+  );
+  const {
+    saving,
+    busyIds,
+    pendingDisconnect,
+    toggleConnection,
+    confirmDisconnect,
+    cancelDisconnect,
+    saveConfig,
+  } = useNetworkInterfaceActions({
+    serverId: server.id,
+    nics,
+    onConfigureRequired: openConnectConfigure,
+  });
 
-  const persistNics = async (nextNics) => {
-    setSaving(true);
-    try {
-      await apiClient.put(`${ENDPOINTS.ACRS_SERVERS}/${server.id}`, { networkInterfaces: nextNics });
-      await acrsServersStore.refetch();
-    } finally {
-      setSaving(false);
-    }
-  };
+  const openConfigure = useCallback(
+    (nic) => setConfiguring({ nic, entryPoint: ENTRY_POINT.CONFIGURE }),
+    [],
+  );
+  const closeConfigure = useCallback(() => setConfiguring(null), []);
 
-  const handleSaveConfig = async (updatedNic) => {
-    const nextNics = nics.map((nic) => (nic.id === updatedNic.id ? updatedNic : nic));
-    await persistNics(nextNics);
-    setConfiguringNic(null);
-  };
-
-  const handleToggleConnection = async (nic) => {
-    setConnectingIds((current) => new Set(current).add(nic.id));
-    const nextNics = nics.map((candidate) =>
-      candidate.id === nic.id ? { ...candidate, connected: !candidate.connected } : candidate,
-    );
-    try {
-      await Promise.all([persistNics(nextNics), wait(MIN_CONNECTING_DURATION_MS)]);
-    } finally {
-      setConnectingIds((current) => {
-        const next = new Set(current);
-        next.delete(nic.id);
-        return next;
-      });
-    }
-  };
+  const handleSave = useCallback(
+    async (updatedNic, action) => {
+      await saveConfig(updatedNic, action);
+      setConfiguring(null);
+    },
+    [saveConfig],
+  );
 
   return (
     <Box sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
@@ -65,9 +57,9 @@ export default function AcrsNetworksTab({ server }) {
               <NetworkInterfaceCard
                 key={nic.id}
                 nic={nic}
-                connecting={connectingIds.has(nic.id)}
-                onConfigure={setConfiguringNic}
-                onToggleConnection={handleToggleConnection}
+                connecting={busyIds.has(nic.id)}
+                onConfigure={openConfigure}
+                onToggleConnection={toggleConnection}
               />
             ))}
           </Stack>
@@ -75,10 +67,20 @@ export default function AcrsNetworksTab({ server }) {
       </Box>
 
       <ConfigureNetworkDialog
-        nic={configuringNic}
+        nic={configuring?.nic ?? null}
+        entryPoint={configuring?.entryPoint ?? ENTRY_POINT.CONFIGURE}
         saving={saving}
-        onClose={() => setConfiguringNic(null)}
-        onSave={handleSaveConfig}
+        onClose={closeConfigure}
+        onSave={handleSave}
+      />
+
+      <ConfirmDialog
+        open={Boolean(pendingDisconnect)}
+        title={pendingDisconnect ? `Disconnect ${pendingDisconnect.name}?` : "Disconnect interface?"}
+        description={getDisconnectDescription(pendingDisconnect)}
+        confirmLabel="Disconnect"
+        onClose={cancelDisconnect}
+        onConfirm={confirmDisconnect}
       />
     </Box>
   );

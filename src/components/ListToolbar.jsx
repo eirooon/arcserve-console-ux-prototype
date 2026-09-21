@@ -31,7 +31,11 @@ export default function ListToolbar({
   extraAction,
   showSearch = false,
   searchPlaceholder,
+  searchValue,
+  onSearchChange,
+  onSearchSubmit,
   showFilters = false,
+  onFiltersClick,
   secondaryAction,
   selectedCount,
   actionItems = DEFAULT_ACTION_ITEMS,
@@ -57,8 +61,9 @@ export default function ListToolbar({
   };
 
   const hasLeadingContent = Boolean(showSearch || showFilters);
-  const hasSelection = selectedCount !== undefined || secondaryAction;
-  const hasTrailingContent = hasSelection || showColumnsButton || addLabel || Boolean(extraAction);
+  const hasSelection = selectedCount !== undefined;
+  const hasTrailingContent =
+    hasSelection || showColumnsButton || addLabel || Boolean(extraAction) || Boolean(secondaryAction);
 
   // The divider between the selection controls and the Edit Columns/Add
   // group only reads correctly while those two groups share a row — once
@@ -68,10 +73,25 @@ export default function ListToolbar({
   // line" (it depends on this page's specific button set, not a fixed
   // viewport breakpoint), so this measures it directly: show the divider
   // only while the two groups' rendered offsetTop still match.
+  //
+  // A similar measurement tells us whether the leading group (search +
+  // Filters) has wrapped onto its own row, separate from the trailing group
+  // — when it has, the search field is no longer sharing that row with
+  // anything else, so its usual max-width is dropped to let it fill the
+  // freed-up space instead of leaving a dead gap next to the Filters button.
+  // This can't reuse the offsetTop-equality check above: with the toolbar's
+  // own `alignItems: "center"`, two same-row items of different heights (an
+  // input vs. a row of buttons) get vertically centered — not top-aligned —
+  // so their offsetTops legitimately differ even while sharing a row.
+  // Checking for actual vertical overlap between the two rects is the
+  // height-agnostic way to tell "same row" from "wrapped to a new one".
   const toolbarRef = React.useRef(null);
+  const leadingGroupRef = React.useRef(null);
+  const trailingGroupRef = React.useRef(null);
   const selectionGroupRef = React.useRef(null);
   const addGroupRef = React.useRef(null);
   const [dividerAligned, setDividerAligned] = React.useState(true);
+  const [toolbarWrapped, setToolbarWrapped] = React.useState(false);
 
   React.useLayoutEffect(() => {
     const container = toolbarRef.current;
@@ -83,13 +103,32 @@ export default function ListToolbar({
       setDividerAligned(
         Boolean(selectionEl && addEl && selectionEl.offsetTop === addEl.offsetTop),
       );
+
+      const leadingEl = leadingGroupRef.current;
+      const trailingEl = trailingGroupRef.current;
+      if (!leadingEl || !trailingEl) {
+        setToolbarWrapped(false);
+      } else {
+        const a = leadingEl.getBoundingClientRect();
+        const b = trailingEl.getBoundingClientRect();
+        const sameRow = a.top < b.bottom && b.top < a.bottom;
+        setToolbarWrapped(!sameRow);
+      }
     };
 
     checkAlignment();
     const observer = new ResizeObserver(checkAlignment);
     observer.observe(container);
     return () => observer.disconnect();
-  }, [hasSelection, showColumnsButton, extraAction, addLabel]);
+  }, [
+    hasSelection,
+    showColumnsButton,
+    extraAction,
+    secondaryAction,
+    addLabel,
+    hasLeadingContent,
+    hasTrailingContent,
+  ]);
 
   return (
     <Box
@@ -107,11 +146,13 @@ export default function ListToolbar({
     >
       {hasLeadingContent && (
         <Box
+          ref={leadingGroupRef}
           sx={{
             display: "flex",
             gap: 1,
             alignItems: "center",
             flexWrap: "wrap",
+            flex: "1 1 auto",
             "& .MuiButtonBase-root": { flexShrink: 0 },
           }}
         >
@@ -125,7 +166,15 @@ export default function ListToolbar({
                   <SearchOutlined />
                 </InputAdornment>
               }
-              sx={{ minWidth: 160 }}
+              sx={{ flexGrow: 1, minWidth: 160, maxWidth: toolbarWrapped ? "100%" : 300 }}
+              value={searchValue}
+              onChange={(event) => onSearchChange?.(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  onSearchSubmit?.();
+                }
+              }}
             />
           )}
 
@@ -134,6 +183,7 @@ export default function ListToolbar({
               variant="outlined"
               color="secondary"
               startIcon={<FilterListOutlined />}
+              onClick={onFiltersClick}
             >
               Filters
             </Button>
@@ -143,6 +193,7 @@ export default function ListToolbar({
 
       {hasTrailingContent && (
         <Box
+          ref={trailingGroupRef}
           sx={{
             display: "flex",
             gap: 2,
@@ -160,17 +211,6 @@ export default function ListToolbar({
                 <Typography fontSize={14} color="text.secondary">
                   {selectedCount} selected
                 </Typography>
-              )}
-
-              {secondaryAction && (
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  startIcon={secondaryAction.icon}
-                  onClick={secondaryAction.onClick}
-                >
-                  {secondaryAction.label}
-                </Button>
               )}
 
               {selectedCount !== undefined && (
@@ -210,11 +250,11 @@ export default function ListToolbar({
             </Box>
           )}
 
-          {hasSelection && showColumnsButton && dividerAligned && (
-            <Divider orientation="vertical" flexItem sx={{ my: 0.5 }} />
-          )}
+          {hasSelection &&
+            (showColumnsButton || extraAction || secondaryAction || addLabel) &&
+            dividerAligned && <Divider orientation="vertical" flexItem sx={{ my: 0.5 }} />}
 
-          {(showColumnsButton || extraAction || addLabel) && (
+          {(showColumnsButton || extraAction || secondaryAction || addLabel) && (
             <Box
               ref={addGroupRef}
               sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}
@@ -238,6 +278,17 @@ export default function ListToolbar({
                   onClick={extraAction.onClick}
                 >
                   {extraAction.label}
+                </Button>
+              )}
+
+              {secondaryAction && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  startIcon={secondaryAction.icon}
+                  onClick={secondaryAction.onClick}
+                >
+                  {secondaryAction.label}
                 </Button>
               )}
 
@@ -308,7 +359,11 @@ ListToolbar.propTypes = {
   }),
   showSearch: PropTypes.bool,
   searchPlaceholder: PropTypes.string,
+  searchValue: PropTypes.string,
+  onSearchChange: PropTypes.func,
+  onSearchSubmit: PropTypes.func,
   showFilters: PropTypes.bool,
+  onFiltersClick: PropTypes.func,
   secondaryAction: PropTypes.shape({
     label: PropTypes.node.isRequired,
     icon: PropTypes.node,

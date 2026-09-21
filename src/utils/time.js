@@ -30,3 +30,16 @@ export function formatRelativeTime(isoString, now = new Date()) {
   if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
   return formatAbsoluteTimestamp(isoString);
 }
+
+// Formats a duration given in seconds as "H:MM:SS" (e.g. 120 -> "0:02:00"),
+// matching the clock-style duration format jobs are shown with elsewhere.
+export function formatDuration(totalSeconds) {
+  if (totalSeconds === null || totalSeconds === undefined || Number.isNaN(totalSeconds)) {
+    return null;
+  }
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${hours}:${pad(minutes)}:${pad(seconds)}`;
+}

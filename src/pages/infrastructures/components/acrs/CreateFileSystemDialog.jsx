@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import FormField from "../../../../components/FormField";
+import PlaceholderSelect from "../../../../components/PlaceholderSelect";
 
 const POOL_OPTIONS = ["Pool 1", "Pool 2"];
 
@@ -64,23 +65,19 @@ function CreateFileSystemForm({ saving, onClose, onSubmit }) {
           />
         </FormField>
         <FormField label="Pool">
-          <TextField
-            select
+          <PlaceholderSelect
+            placeholder="Select pool"
             size="small"
             fullWidth
             value={values.pool}
             onChange={(event) => setField("pool", event.target.value)}
-            SelectProps={{ displayEmpty: true }}
           >
-            <MenuItem value="" disabled>
-              Select pool
-            </MenuItem>
             {POOL_OPTIONS.map((pool) => (
               <MenuItem key={pool} value={pool}>
                 {pool}
               </MenuItem>
             ))}
-          </TextField>
+          </PlaceholderSelect>
         </FormField>
         <FormControlLabel
           control={

@@ -7,7 +7,7 @@ export default function Hypervisors() {
     <>
       <InfrastructuresToolbar
         secondaryAction={{
-          label: "Download VMware Appliance (.OVA)",
+          label: "Download VMware Appliance",
           icon: <FileDownload />,
         }}
       />

@@ -2,23 +2,35 @@
 // page — Figma "UXD-16 CRS Management" file, nodes 7290:18391 (list),
 // 7283:9445 / 7284:17735 (device details tabs) and 7290:18992 / 7301:4927
 // (network configuration dialogs).
-function buildNetworkInterface({ id, name, description, connected, ipAddress, macAddress }) {
+function buildNetworkInterface({
+  id,
+  name,
+  description,
+  connected,
+  managementSession,
+  ipAddress,
+  macAddress,
+  unconfigured,
+}) {
   return {
     id,
     name,
     description,
     connected,
+    managementSession,
     hostname: "SampleHostname123456",
     macAddress,
     tcpIpType: "ipv4",
-    ipv4: {
-      mode: "manual",
-      ipAddress,
-      networkMask: "255.255.255.0",
-      defaultGateway: "192.168.20.1",
-      primaryDnsServer: "192.168.20.122",
-      secondaryDnsServer: "192.168.20.21",
-    },
+    ipv4: unconfigured
+      ? { mode: "manual", ipAddress: "", networkMask: "", defaultGateway: "", primaryDnsServer: "", secondaryDnsServer: "" }
+      : {
+          mode: "manual",
+          ipAddress,
+          networkMask: "255.255.255.0",
+          defaultGateway: "192.168.20.1",
+          primaryDnsServer: "192.168.20.122",
+          secondaryDnsServer: "192.168.20.21",
+        },
     ipv6: {
       mode: "manual",
       ipAddress: "",
@@ -27,7 +39,9 @@ function buildNetworkInterface({ id, name, description, connected, ipAddress, ma
       primaryDnsServer: "",
       secondaryDnsServer: "",
     },
-    linkSpeed: "100 Mbps Full Duplex",
+    // Empty (not undefined) so the modal shows its placeholder rather than
+    // falling back to the first option.
+    linkSpeed: unconfigured ? "" : "100 Mbps Full Duplex",
   };
 }
 
@@ -35,7 +49,14 @@ function buildNetworkInterface({ id, name, description, connected, ipAddress, ma
 // CRS Management", node 7284:17767) — only the id/IP/MAC are per-server so
 // each device's Networks tab has distinct, non-colliding identifiers.
 const SAMPLE_NETWORK_INTERFACES = [
-  { name: "Ethernet0", description: "Intel® 82574L Gigabit Network Connection", connected: true },
+  {
+    name: "Ethernet0",
+    description: "Intel® 82574L Gigabit Network Connection",
+    connected: true,
+    // The adapter the admin's console session is routed through — disconnecting
+    // it asks for confirmation first.
+    managementSession: true,
+  },
   { name: "Ethernet2", description: "Broadcom NetXtreme BCM5720 Gigabit Ethernet", connected: false },
   { name: "Ethernet3", description: "Realtek PCIe GbE Family Controller", connected: false },
   { name: "Ethernet4", description: "Intel® X550-T2 10GbE Network Adapter", connected: true },
@@ -67,13 +88,15 @@ const SAMPLE_NETWORK_INTERFACES = [
   { name: "Teredo Tunneling", description: "Microsoft Teredo Tunneling Adapter", connected: false },
 ];
 
-export function buildSampleNetworkInterfaces(serverId, ipOctet3, { allDisconnected = false } = {}) {
+export function buildSampleNetworkInterfaces(serverId, ipOctet3, { allDisconnected = false, unconfigured = false } = {}) {
   return SAMPLE_NETWORK_INTERFACES.map((nic, index) =>
     buildNetworkInterface({
       id: `${serverId}-nic-${index}`,
       name: nic.name,
       description: nic.description,
       connected: allDisconnected ? false : nic.connected,
+      managementSession: !allDisconnected && Boolean(nic.managementSession),
+      unconfigured,
       ipAddress: `192.168.${ipOctet3}.${101 + index}`,
       macAddress: `AA:BB:CC:DD:${ipOctet3.toString(16).toUpperCase().padStart(2, "0")}:${(index + 1)
         .toString(16)
@@ -98,8 +121,10 @@ export const acrsServers = [
       {
         id: "acrs-server-1-fs-0",
         name: "File System A",
+        pool: "Pool 1",
         status: "Mounted",
         free: "280 GB",
+        poolUsage: "53%",
         used: "320 GB",
         recoveryPointServer: "Sample RPS Name",
         dataStore: "Sample Data Store Name",
@@ -107,8 +132,10 @@ export const acrsServers = [
       {
         id: "acrs-server-1-fs-1",
         name: "File System B",
+        pool: "Pool 2",
         status: "Unmounted",
         free: "280 GB",
+        poolUsage: "53%",
         used: "320 GB",
         recoveryPointServer: "Sample RPS Name",
         dataStore: "Sample Data Store Name",

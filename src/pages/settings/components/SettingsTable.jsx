@@ -1,11 +1,16 @@
 import { useEffect } from "react";
+import PropTypes from "prop-types";
 import { useGridApiRef } from "@mui/x-data-grid";
 import DataTable from "../../../components/DataTable";
 import EntityFormDialog from "../../../components/EntityFormDialog";
 import { columns, fields, settingsStore, useSettingsData } from "../hooks/useSettingsData";
 
-export default function SettingsTable() {
-  const { rows, loading, selectionModel, dialog, saving } = useSettingsData();
+// `rows` lets SourceGroups hand down the filtered result set (see
+// settingsFilters.js) instead of the store's full, unfiltered rows —
+// loading, selection, and the dialog still come from the store either way.
+export default function SettingsTable({ rows: rowsOverride }) {
+  const { rows: storeRows, loading, selectionModel, dialog, saving } = useSettingsData();
+  const rows = rowsOverride ?? storeRows;
   const apiRef = useGridApiRef();
   useEffect(() => settingsStore.setApiRef(apiRef), [apiRef]);
 
@@ -35,3 +40,7 @@ export default function SettingsTable() {
     </>
   );
 }
+
+SettingsTable.propTypes = {
+  rows: PropTypes.array,
+};

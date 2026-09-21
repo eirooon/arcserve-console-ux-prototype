@@ -31,4 +31,18 @@ export const reports = [
     schedule: "Monthly - 1st 08:00",
     last_generated: "2026-08-01T08:00:00.000Z",
   },
+  {
+    id: "rpt-005",
+    report_name: "Report Schedule Summary",
+    report_type: "report_schedule",
+    schedule: "Weekly - Fri 09:00",
+    last_generated: "2026-08-22T09:00:00.000Z",
+  },
+  {
+    id: "rpt-006",
+    report_name: "Stored Data Summary",
+    report_type: "stored_data",
+    schedule: "Monthly - 1st 06:00",
+    last_generated: "2026-08-01T06:00:00.000Z",
+  },
 ];

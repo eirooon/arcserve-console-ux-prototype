@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Box, Button, Divider, Menu, MenuItem, Stack, Typography } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
 import { green, blueGrey } from "@mui/material/colors";
 import DataTable from "../../../../components/DataTable";
@@ -33,6 +34,7 @@ function useFileSystemColumns() {
           </Stack>
         ),
       },
+      { field: "pool", headerName: "Pool", flex: 1, minWidth: 120 },
       {
         field: "status",
         headerName: "Status",
@@ -48,38 +50,27 @@ function useFileSystemColumns() {
         },
       },
       { field: "free", headerName: "Free", width: 100, align: "right", headerAlign: "right" },
+      {
+        field: "poolUsage",
+        headerName: "Pool Usage",
+        width: 120,
+        align: "right",
+        headerAlign: "right",
+      },
       { field: "used", headerName: "Used", width: 100, align: "right", headerAlign: "right" },
       {
         field: "recoveryPointServer",
         headerName: "Recovery Point Server",
         flex: 1,
         minWidth: 160,
-        renderCell: ({ value }) =>
-          value && value !== "-" ? (
-            <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
-              <Typography variant="body2" color="secondary" sx={{ textDecoration: "underline" }}>
-                {value}
-              </Typography>
-            </Box>
-          ) : (
-            (value ?? "-")
-          ),
+        valueGetter: (value) => value ?? "-",
       },
       {
         field: "dataStore",
         headerName: "Data Store",
         flex: 1,
         minWidth: 160,
-        renderCell: ({ value }) =>
-          value && value !== "-" ? (
-            <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
-              <Typography variant="body2" color="secondary" sx={{ textDecoration: "underline" }}>
-                {value}
-              </Typography>
-            </Box>
-          ) : (
-            (value ?? "-")
-          ),
+        valueGetter: (value) => value ?? "-",
       },
     ],
     [],
@@ -114,6 +105,7 @@ export default function AcrsFileSystemsTab({ server }) {
       mountAutomatically: values.mountAutomatically,
       status: "Mounted",
       free: "-",
+      poolUsage: "-",
       used: "-",
       recoveryPointServer: "-",
       dataStore: "-",
@@ -208,7 +200,7 @@ export default function AcrsFileSystemsTab({ server }) {
           </Menu>
         </Stack>
         <Divider orientation="vertical" flexItem sx={{ my: 0.5, mx: 2 }} />
-        <Button variant="contained" onClick={() => setCreating(true)}>
+        <Button variant="contained" startIcon={<AddOutlinedIcon />} onClick={() => setCreating(true)}>
           Create File System
         </Button>
       </Stack>

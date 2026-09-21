@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { useGridApiRef } from "@mui/x-data-grid";
 import DataTable from "../../../components/DataTable";
@@ -14,9 +15,21 @@ import {
   useAcrsServersRowActions,
 } from "../hooks/useAcrsServersData";
 
-export default function AcrsServersTable() {
+const selectTableState = (state) => ({
+  rows: state.rows,
+  loading: state.loading,
+  selectionModel: state.selectionModel,
+  dialog: state.dialog,
+  saving: state.saving,
+});
+
+// `rows` lets AcrsServers hand down the filtered result set (see
+// acrsServersFilters.js) instead of the store's full, unfiltered rows —
+// loading and selection still come from the store either way.
+export default function AcrsServersTable({ rows: rowsOverride }) {
   const navigate = useNavigate();
-  const { rows, loading, selectionModel, dialog, saving } = useAcrsServersData();
+  const { rows: storeRows, loading, selectionModel, dialog, saving } = useAcrsServersData(selectTableState);
+  const rows = rowsOverride ?? storeRows;
   const apiRef = useGridApiRef();
   useEffect(() => acrsServersStore.setApiRef(apiRef), [apiRef]);
 
@@ -41,9 +54,11 @@ export default function AcrsServersTable() {
       fileSystems: [],
       // New servers ship with the same example adapters as every other ACRS
       // server (see buildSampleNetworkInterfaces), but since the device was
-      // just added, none of them are connected yet.
+      // just added, none of them are connected or configured yet — only the
+      // read-only hostname/MAC are filled in.
       networkInterfaces: buildSampleNetworkInterfaces(newServerId, 40 + (Date.now() % 200), {
         allDisconnected: true,
+        unconfigured: true,
       }),
     });
     if (result) {
@@ -98,3 +113,7 @@ export default function AcrsServersTable() {
     </>
   );
 }
+
+AcrsServersTable.propTypes = {
+  rows: PropTypes.array,
+};

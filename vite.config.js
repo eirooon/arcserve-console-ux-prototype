@@ -6,6 +6,10 @@ import svgr from "vite-plugin-svgr";
 export default defineConfig({
   plugins: [react(), svgr()],
   base: "/arcserve-console-ux-prototype/",
+  test: {
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.js"],
+  },
   build: {
     rollupOptions: {
       output: {

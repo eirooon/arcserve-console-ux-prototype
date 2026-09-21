@@ -43,4 +43,28 @@ export const infrastructure = [
     status: "offline",
     version: "6.8",
   },
+  {
+    id: "site-001",
+    name: "hq-datacenter",
+    type: "site",
+    host: "-",
+    status: "online",
+    version: "-",
+  },
+  {
+    id: "oh-001",
+    name: "oracle-db-01",
+    type: "oracle_host",
+    host: "oracle-db-01.corp.local",
+    status: "online",
+    version: "19c",
+  },
+  {
+    id: "ca-001",
+    name: "aws-prod-account",
+    type: "cloud_account",
+    host: "-",
+    status: "online",
+    version: "-",
+  },
 ];
