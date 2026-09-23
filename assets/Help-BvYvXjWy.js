@@ -1,1 +1,0 @@
-import{j as s,aE as e,af as a}from"./vendor-mui-C-Q2twcm.js";import"./vendor-react-zaN-mCG2.js";function n(){return s.jsxs(e,{sx:{width:"100%",p:{xs:2,md:3}},children:[s.jsx(a,{variant:"h6",sx:{mb:1},children:"Help Content"}),s.jsx(a,{color:"text.secondary",children:"Main content area. Sidebar collapse/expand pushes this layout and persists."})]})}export{n as default};

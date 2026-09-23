@@ -1,0 +1,1 @@
+import{r as n}from"./vendor-react-BQrpwvQH.js";function s(t){const[o,e]=n.useState(!1);return{open:o,openConfirm:()=>e(!0),closeConfirm:()=>e(!1),confirmDelete:async()=>{await t(),e(!1)}}}export{s as u};

@@ -1,1 +1,0 @@
-import{r as t}from"./vendor-react-zaN-mCG2.js";function l(){const[e,a]=t.useState(!1),r=t.useCallback(c=>(...o)=>{a(!0),c(...o)},[]),s=t.useCallback(()=>a(!1),[]);return{dirty:e,track:r,markClean:s}}export{l as u};
