@@ -1,1 +1,0 @@
-import{c as r}from"./createSplitLayout-CPwEvi1Y.js";import"./vendor-mui-pm3voONt.js";import"./vendor-react-BQrpwvQH.js";import"./SplitPageLayout-C5r3eiMH.js";import"./index-CfuF8ufU.js";const i=r({parentPath:"/disaster-recovery",rootLabel:"Disaster Recovery",defaultId:"dr-runbooks"});export{i as default};
