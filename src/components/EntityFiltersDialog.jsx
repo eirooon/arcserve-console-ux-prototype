@@ -26,10 +26,10 @@ import { buildEmptyFilters, resolveFieldOptions } from "../utils/entityFilters";
 // self-reference wins over `htmlFor` *and* over a plain `aria-label`,
 // silently discarding the visible label text unless `labelId` is folded
 // into that same `aria-labelledby` chain.
-function FilterSelectField({ id, label, sx, selectProps, children, ...selectFieldProps }) {
+function FilterSelectField({ id, label, selectProps, children, ...selectFieldProps }) {
   const labelId = `${id}-label`;
   return (
-    <Stack spacing={1} sx={{ minWidth: 0, ...sx }}>
+    <Stack spacing={1} sx={{ minWidth: 0 }}>
       <Typography id={labelId} variant="body2" color="text.primary" component="label">
         {label}
       </Typography>
@@ -71,21 +71,37 @@ function FiltersFormBody({ title, fields, rows, initialFilters, onClose, onSearc
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ display: "flex", flexWrap: "wrap", gap: 3, alignContent: "flex-start" }}>
-        {fields.map((field) => {
-          const fieldId = `${baseId}-${field.key}`;
-          const options = resolveFieldOptions(field, rows);
-          const disabled = options.length === 0;
-
-          if (field.type === "multiselect") {
+      <DialogContent dividers>
+        <Stack spacing={3}>
+          {fields.map((field) => {
+            const fieldId = `${baseId}-${field.key}`;
+            const options = resolveFieldOptions(field, rows);
             const value = filters[field.key];
+
+            if (field.type === "dateRange") {
+              return (
+                <FilterSelectField
+                  key={field.key}
+                  id={fieldId}
+                  label={field.label}
+                  value={value}
+                  onChange={(event) => setField(field.key, event.target.value)}
+                >
+                  {options.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </FilterSelectField>
+              );
+            }
+
             return (
               <FilterSelectField
                 key={field.key}
                 id={fieldId}
                 label={field.label}
-                sx={{ flex: "1 1 240px" }}
-                disabled={disabled}
+                disabled={options.length === 0}
                 value={value}
                 onChange={(event) => setField(field.key, event.target.value)}
                 selectProps={{
@@ -113,26 +129,8 @@ function FiltersFormBody({ title, fields, rows, initialFilters, onClose, onSearc
                 ))}
               </FilterSelectField>
             );
-          }
-
-          return (
-            <FilterSelectField
-              key={field.key}
-              id={fieldId}
-              label={field.label}
-              sx={{ flex: "1 1 240px" }}
-              disabled={disabled}
-              value={filters[field.key]}
-              onChange={(event) => setField(field.key, event.target.value)}
-            >
-              {options.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </FilterSelectField>
-          );
-        })}
+          })}
+        </Stack>
       </DialogContent>
       <DialogActions sx={{ p: 1 }}>
         <Button variant="outlined" color="secondary" onClick={onClose}>

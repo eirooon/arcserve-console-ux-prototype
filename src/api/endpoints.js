@@ -20,6 +20,7 @@ export const ENDPOINTS = {
   AUDIT_LOGS: `${BASE}/audit-logs`,
   REPORTS: `${BASE}/reports`,
   SETTINGS: `${BASE}/settings`,
-  NEEDS_ATTENTION: `${BASE}/arcgenie/needs-attention`,
+  WAITING_ON_YOU: `${BASE}/arcgenie/waiting-on-you`,
   ARCGENIE_ACTIVITY_LOG: `${BASE}/arcgenie/activity-log`,
+  ARCGENIE_DISMISSALS: `${BASE}/arcgenie/dismissals`,
 };

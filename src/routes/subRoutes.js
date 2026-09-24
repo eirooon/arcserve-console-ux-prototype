@@ -4,9 +4,9 @@ export const subRoutes = {
     label: "ArcGenie Protection Intent Setup",
     parent: "/dashboard",
   },
-  "/arcgenie/overview/needs-attention": {
-    id: "arcgenie-needs-attention",
-    label: "Needs Attention",
+  "/arcgenie/overview/waiting-on-you": {
+    id: "arcgenie-waiting-on-you",
+    label: "Waiting On You",
     parent: "/arcgenie/overview",
   },
   "__section__/arcgenie-backup-protection": {

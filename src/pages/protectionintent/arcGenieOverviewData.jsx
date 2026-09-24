@@ -2,6 +2,9 @@ import GppGoodRoundedIcon from "@mui/icons-material/GppGoodRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
 import RemoveModeratorRoundedIcon from "@mui/icons-material/RemoveModeratorRounded";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import LightbulbRoundedIcon from "@mui/icons-material/LightbulbRounded";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import { green, blue, red, orange, grey, purple, deepPurple } from "@mui/material/colors";
 import { PROTECTION_FITNESS_CHECK_GOAL_ID } from "./configureGoalsAutonomyData";
 import { sources } from "../../mocks/data/sources";
@@ -175,11 +178,53 @@ export function getGoalStatusChip(goalId) {
     : { label: "Healthy", ...GOAL_STATUS_CHIP_TONES.onTrack };
 }
 
-export const NEEDS_ATTENTION_ITEMS = [
+const GOAL_SUGGESTION_CHIP_TONE = { bgcolor: blue[50], color: blue[800] };
+
+// A goal's live "N suggestions" chip, derived from the actual Waiting on
+// You items (not the static GOAL_STATS_BY_ID machinery above, which only
+// ever tracked Auto-Protect's approval/blocked counts) — so dismissing a
+// suggestion updates this the same way approving/blocking updates the rest.
+export function getSuggestionChip(items, goalId) {
+  const count = items.filter((item) => item.goalId === goalId && item.type === "suggestion").length;
+  if (count === 0) return null;
+  return { label: `${count} suggestion${count === 1 ? "" : "s"}`, ...GOAL_SUGGESTION_CHIP_TONE };
+}
+
+// Tonal badge + copy for each Waiting on You request type, so the card and
+// its segmented filter always agree on label/color/icon for a given type.
+export const WAITING_ON_YOU_TYPE_META = {
+  approval: {
+    label: "Needs approval",
+    icon: CheckRoundedIcon,
+    bgcolor: deepPurple[50],
+    color: deepPurple[700],
+    titleColor: "secondary.main",
+    dismissLabel: "Not Now",
+  },
+  suggestion: {
+    label: "Suggestion",
+    icon: LightbulbRoundedIcon,
+    bgcolor: blue[50],
+    color: blue[800],
+    titleColor: "text.primary",
+    dismissLabel: "Dismiss",
+  },
+  exception: {
+    label: "Blocked",
+    icon: WarningAmberRoundedIcon,
+    bgcolor: red[50],
+    color: red[700],
+    titleColor: "secondary.main",
+    dismissLabel: "Not Now",
+  },
+};
+
+export const WAITING_ON_YOU_ITEMS = [
   {
     id: "approval-required-1",
     goalId: AUTO_PROTECT_GOAL_ID,
-    category: "Backup Protection",
+    type: "approval",
+    category: "Auto-Protect",
     title: "New source found",
     timestamp: "Just now",
     description:
@@ -196,9 +241,36 @@ export const NEEDS_ATTENTION_ITEMS = [
     primaryActionKey: "approve",
   },
   {
+    id: "suggestion-1",
+    goalId: PROTECTION_FITNESS_CHECK_GOAL_ID,
+    type: "suggestion",
+    // Identifies *what kind* of change is being suggested, independent of
+    // the specific plan names involved — lets isDismissed() recognize "the
+    // same suggestion" again even if the proposed plan changes next time.
+    changeType: "plan-frequency",
+    category: "Protection Health Check",
+    title: "Consider a more frequent plan for this source",
+    timestamp: "20 min ago",
+    description:
+      "Recovery points have been stale for 3 days on a tier that expects every 4 hours. ArcGenie is set to suggest only, so nothing changes unless you apply it.",
+    source: "sample_machine_05",
+    sourceType: "Windows (Agent) · SQL Server",
+    currentPlan: "Standard",
+    currentDetail: "daily · last RP 3d ago",
+    proposedPlan: "Business-Essential",
+    proposedDetail: "every 4h · 14d retention",
+    proposedColor: "secondary.main",
+    footerNote: "Suggest only · no action taken",
+    primaryActionLabel: "Apply in Plans",
+    primaryActionKey: "apply-in-plans",
+    primaryVariant: "outlined",
+    primaryColor: "secondary",
+  },
+  {
     id: "assignment-failed-1",
     goalId: AUTO_PROTECT_GOAL_ID,
-    category: "Backup Protection",
+    type: "exception",
+    category: "Auto-Protect",
     title: "No policy matches this source",
     timestamp: "1 hour ago",
     description:
@@ -211,6 +283,7 @@ export const NEEDS_ATTENTION_ITEMS = [
     proposedDetail: "agent cannot resolve this",
     proposedColor: red[500],
     footerNote: "Unprotected for 1h 12m",
+    footerNoteColor: "error.main",
     primaryActionLabel: "Assign Manually",
     primaryActionKey: "assign",
     secondaryActionLabel: "Review",
@@ -221,6 +294,85 @@ export const NEEDS_ATTENTION_ITEMS = [
 export const WAITING_ON_YOU_OLDEST_SINCE_LABEL = "1 hour ago";
 
 export const ACTIVITY_LOG_ITEMS = [
+  {
+    id: "activity-17",
+    actor: "agent",
+    workflowLabel: "Act and report",
+    message: "Protection Health Check made 12 changes in its 9:00 AM run.",
+    date: "Sep-23-2026 09:04 AM",
+  },
+  {
+    id: "activity-16",
+    actor: "agent",
+    workflowLabel: "Auto-Protect request",
+    message: "Couldn't re-tier sample_machine_02: no intent rule covers Oracle DB in Dev/Test.",
+    date: "Sep-23-2026 09:03 AM",
+    flagged: true,
+    flagLabel: "Sent to Waiting on You",
+    resolveHref: "/arcgenie/overview/waiting-on-you",
+  },
+  {
+    id: "activity-15",
+    message: "sample_machine_10 was assigned to the Mission-Critical plan.",
+    approvedBy: "Taylor",
+    date: "Sep-20-2026 09:15 AM",
+  },
+  {
+    id: "activity-14",
+    message:
+      "sample_machine_09 was reassigned from Standard to Business-Essential after a retention policy update.",
+    approvedBy: "Priya",
+    attributionVerb: "Applied",
+    date: "Sep-18-2026 04:30 PM",
+  },
+  {
+    id: "activity-13",
+    message: "Disaster recovery test completed successfully for sample_machine_07.",
+    approvedBy: "Sam",
+    date: "Sep-15-2026 01:00 PM",
+  },
+  {
+    id: "activity-12",
+    message: "New alert rule \"Backup Failure - Critical\" was created for the Mission-Critical plan.",
+    approvedBy: "Elena",
+    date: "Sep-10-2026 10:45 AM",
+  },
+  {
+    id: "activity-11",
+    message: "sample_machine_08 was assigned to the Standard plan.",
+    approvedBy: "Jordan",
+    date: "Sep-05-2026 03:20 PM",
+  },
+  {
+    id: "activity-10",
+    message: "Messaging channel Slack was connected for ArcGenie notifications.",
+    approvedBy: "Alexey",
+    date: "Sep-01-2026 09:00 AM",
+  },
+  {
+    id: "activity-9",
+    message: "sample_machine_06 was reclassified as Oracle DB and matched to the Business-Essential plan.",
+    approvedBy: "Priya",
+    date: "Aug-28-2026 02:10 PM",
+  },
+  {
+    id: "activity-8",
+    message: "Agent deployed and first backup started for sample_machine_07.",
+    approvedBy: "Taylor",
+    date: "Aug-24-2026 11:30 AM",
+  },
+  {
+    id: "activity-7",
+    message: "Retention policy for the Standard plan was updated from 14d to 30d.",
+    approvedBy: "Sam",
+    date: "Aug-21-2026 05:00 PM",
+  },
+  {
+    id: "activity-6",
+    message: "sample_machine_04 was reassigned from Standard to Mission-Critical after a criticality re-check.",
+    approvedBy: "Elena",
+    date: "Aug-18-2026 08:45 AM",
+  },
   {
     id: "activity-5",
     message: "sample_machine_05 was assigned to the Mission-Critical plan.",

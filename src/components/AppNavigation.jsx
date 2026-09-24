@@ -23,6 +23,7 @@ import { useColorScheme } from "@mui/material/styles";
 
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
 import { useArcGenieActivation } from "../hooks/useArcGenieActivation";
+import { CURRENT_USER } from "../data/currentUser";
 
 import {
   UnfoldMore,
@@ -150,16 +151,7 @@ function AppNavigation({
     : "220ms cubic-bezier(0.2, 0, 0, 1)";
 
   // --- Profile menu ---
-  const user = React.useMemo(
-    () => ({
-      name: "Erron Sevilla",
-      organization: "Arcserve",
-      initials: "ES",
-      planLabel: "Pro",
-      version: "v1.5.69",
-    }),
-    [],
-  );
+  const user = CURRENT_USER;
 
   const [profileAnchorEl, setProfileAnchorEl] = React.useState(null);
   const profileMenuOpen = Boolean(profileAnchorEl);

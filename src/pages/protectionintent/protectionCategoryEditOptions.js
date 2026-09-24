@@ -31,10 +31,6 @@ export const STORAGE_TIER_OPTIONS = ["High-performance", "Standard", "Archive"];
 
 export const LOCK_PERIOD_OPTIONS = ["7 days minimum", "30 days minimum"];
 
-export const EXTENDED_RETENTION_OPTIONS = ["1-3 years", "3-7+ years"];
-
-export const LEGAL_HOLD_OPTIONS = ["Optional", "Required", "Not applicable"];
-
 export const BACKUP_DESTINATION_OPTIONS = [
   "Recovery Point Server",
   "Cloud Object Storage",
@@ -71,20 +67,48 @@ export const DESTINATION_SETTINGS_FIELDS = {
 
 export const COMPLIANCE_SELECT_FIELDS = [
   { field: "lockPeriod", label: "Lock Period", options: LOCK_PERIOD_OPTIONS },
-  { field: "extendedRetention", label: "Extended Retention", options: EXTENDED_RETENTION_OPTIONS },
 ];
 
-export const COMPLIANCE_LEGAL_HOLD_FIELD = {
-  field: "legalHold",
-  label: "Legal Hold Support",
-  options: LEGAL_HOLD_OPTIONS,
+// Capabilities that show up under more than one extension in the ArcGenie
+// protection-category spec (see the "Cyber Resilient"/"Compliance" overlap
+// in the source design doc) share the same field here instead of each
+// extension tracking its own copy, so checking one from either panel is
+// reflected in the other.
+export const IMMUTABLE_SNAPSHOTS_FIELD = { field: "immutability", label: "Immutable Snapshots" };
+export const OFFSITE_REPLICATION_FIELD = {
+  field: "offsiteReplication",
+  label: "Offsite Replication (3-2-1-1-0)",
 };
 
 export const COMPLIANCE_CHECKBOX_FIELDS = [
-  { field: "immutability", label: "Immutability" },
+  IMMUTABLE_SNAPSHOTS_FIELD,
+  OFFSITE_REPLICATION_FIELD,
   { field: "auditLogging", label: "Audit Logging" },
-  { field: "chainOfCustody", label: "Chain-of-Custody Tracking" },
 ];
+
+// Generic capability labels rather than internal product feature names
+// (e.g. "Anomaly Scanning" instead of "Assured Security Tests - Anomaly
+// Scanning") per the design review's note to keep this screen product-agnostic.
+export const CYBER_RESILIENT_CHECKBOX_FIELDS = [
+  IMMUTABLE_SNAPSHOTS_FIELD,
+  OFFSITE_REPLICATION_FIELD,
+  { field: "anomalyScanning", label: "Anomaly Scanning" },
+  { field: "malwareScanning", label: "Malware Scanning" },
+];
+
+export const DR_ENABLED_CHECKBOX_FIELDS = [
+  { field: "failoverTesting", label: "Failover Testing" },
+  { field: "recoveryVerificationAgent", label: "Recovery Verification (Agent-Based & Agentless)" },
+  { field: "recoveryVerificationShares", label: "Recovery Verification (Network Shares)" },
+  { field: "drRunbooks", label: "DR Runbooks (Cloud Workloads)" },
+];
+
+// Every extension's checkbox fields default to unchecked — same reasoning as
+// the pre-existing Compliance fields below, kept in one place so adding a
+// checkbox to any extension can't drift out of sync with its default value.
+function buildCheckboxDefaults(...fieldGroups) {
+  return Object.fromEntries(fieldGroups.flat().map((fieldSpec) => [fieldSpec.field, false]));
+}
 
 export function buildCategoryEditFormDefaults(category, generalSettings, destinationSettings) {
   const findGeneral = (label) => generalSettings.find((row) => row.label === label)?.value ?? "";
@@ -101,11 +125,11 @@ export function buildCategoryEditFormDefaults(category, generalSettings, destina
     recoveryValidation: findGeneral("Recovery Validation"),
     storageTier: findGeneral("Default Storage Tier"),
     lockPeriod: LOCK_PERIOD_OPTIONS[1],
-    extendedRetention: EXTENDED_RETENTION_OPTIONS[1],
-    legalHold: LEGAL_HOLD_OPTIONS[0],
-    immutability: false,
-    auditLogging: false,
-    chainOfCustody: false,
+    ...buildCheckboxDefaults(
+      COMPLIANCE_CHECKBOX_FIELDS,
+      CYBER_RESILIENT_CHECKBOX_FIELDS,
+      DR_ENABLED_CHECKBOX_FIELDS,
+    ),
     backupDestination: findDestination("Backup Destination"),
     recoveryPointServer: findDestination("Recovery Point Server"),
     dataStore: findDestination("Data Store"),
@@ -127,11 +151,11 @@ export function buildDefaultCategoryFormValues(categoryName) {
     recoveryValidation: RECOVERY_VALIDATION_OPTIONS[2],
     storageTier: STORAGE_TIER_OPTIONS[2],
     lockPeriod: LOCK_PERIOD_OPTIONS[0],
-    extendedRetention: EXTENDED_RETENTION_OPTIONS[0],
-    legalHold: LEGAL_HOLD_OPTIONS[2],
-    immutability: false,
-    auditLogging: false,
-    chainOfCustody: false,
+    ...buildCheckboxDefaults(
+      COMPLIANCE_CHECKBOX_FIELDS,
+      CYBER_RESILIENT_CHECKBOX_FIELDS,
+      DR_ENABLED_CHECKBOX_FIELDS,
+    ),
     backupDestination: BACKUP_DESTINATION_OPTIONS[0],
     recoveryPointServer: RECOVERY_POINT_SERVER_OPTIONS[0],
     dataStore: DATA_STORE_OPTIONS[0],

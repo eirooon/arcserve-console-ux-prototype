@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { Box, Button, Divider, Menu, MenuItem, Stack, Typography } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
 import { green, blueGrey } from "@mui/material/colors";
 import DataTable from "../../../../components/DataTable";
 import StatusPill from "../../../../components/StatusPill";
@@ -22,18 +21,7 @@ const FILE_SYSTEM_STATUS_META = {
 function useFileSystemColumns() {
   return useMemo(
     () => [
-      {
-        field: "name",
-        headerName: "Name",
-        flex: 1,
-        minWidth: 160,
-        renderCell: ({ value }) => (
-          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ height: "100%" }}>
-            <FolderCopyOutlinedIcon fontSize="small" sx={{ color: "action.active" }} />
-            <Typography variant="body2">{value}</Typography>
-          </Stack>
-        ),
-      },
+      { field: "name", headerName: "Name", flex: 1, minWidth: 160 },
       { field: "pool", headerName: "Pool", flex: 1, minWidth: 120 },
       {
         field: "status",

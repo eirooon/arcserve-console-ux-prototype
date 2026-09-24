@@ -1,27 +1,5 @@
-import { Box, CircularProgress, Stack, Typography } from "@mui/material";
-
-function CheckRingIcon() {
-  return (
-    <Box
-      component="svg"
-      viewBox="0 0 20 20"
-      width={20}
-      height={20}
-      sx={{ flexShrink: 0 }}
-      aria-hidden="true"
-    >
-      <circle cx="10" cy="10" r="9" fill="none" stroke="#E6E3EE" strokeWidth="1.5" />
-      <path
-        d="M6 10.4 L8.8 13.2 L14 7.2"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Box>
-  );
-}
+import { CircularProgress, Stack, Typography } from "@mui/material";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
 export default function DiscoveryPhaseRow({ label, status, count, isLast }) {
   const done = status === "done";
@@ -45,9 +23,10 @@ export default function DiscoveryPhaseRow({ label, status, count, isLast }) {
       }}
     >
       {done ? (
-        <Box sx={{ color: "success.main", display: "flex" }}>
-          <CheckRingIcon />
-        </Box>
+        <CheckCircleRoundedIcon
+          aria-label={`${label}, complete`}
+          sx={{ color: "success.main", fontSize: 20, flexShrink: 0 }}
+        />
       ) : (
         <CircularProgress size={20} thickness={4} sx={{ flexShrink: 0 }} aria-label={`${label}, in progress`} />
       )}

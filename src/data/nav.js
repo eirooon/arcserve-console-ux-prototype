@@ -5,6 +5,7 @@ import {
   EventNote,
   FmdGood,
   Gavel,
+  History,
   LibraryBooks,
   Message,
   Monitor,
@@ -24,6 +25,7 @@ export const navSections = [
       { label: "Overview", to: "/arcgenie/overview", icon: SpaceDashboard },
       { label: "Protection Intent", to: "/arcgenie/protection-intent", icon: Gavel },
       { label: "Messaging", to: "/arcgenie/messaging", icon: Message },
+      { label: "Activity Log", to: "/arcgenie/activity-log", icon: History },
     ],
   },
   {

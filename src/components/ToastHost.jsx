@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { Alert, Box, IconButton } from "@mui/material";
+import { Alert, Box, Button, IconButton, Stack } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toastStore } from "../api/toastStore";
 
@@ -133,14 +133,29 @@ export default function ToastHost({ topOffset }) {
               severity={entry.severity}
               variant="standard"
               action={
-                <IconButton
-                  size="small"
-                  color="inherit"
-                  aria-label="Close"
-                  onClick={() => toastStore.dismissToast(entry.id)}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  {entry.action && (
+                    <Button
+                      size="small"
+                      color="inherit"
+                      sx={{ fontWeight: 600, minHeight: 44 }}
+                      onClick={() => {
+                        entry.action.onClick();
+                        toastStore.dismissToast(entry.id);
+                      }}
+                    >
+                      {entry.action.label}
+                    </Button>
+                  )}
+                  <IconButton
+                    size="small"
+                    color="inherit"
+                    aria-label="Close"
+                    onClick={() => toastStore.dismissToast(entry.id)}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
               }
               sx={{
                 width: "100%",

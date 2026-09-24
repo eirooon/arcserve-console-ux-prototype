@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { DEFAULT_APPLY_SCOPE } from "../protectionIntentData";
 
 function buildInitialExpandedState(categories) {
   return categories.reduce((acc, category) => {
@@ -12,7 +11,6 @@ export function useReviewApply(categories) {
   const [expandedCategories, setExpandedCategories] = useState(() =>
     buildInitialExpandedState(categories),
   );
-  const [applyScope, setApplyScope] = useState(DEFAULT_APPLY_SCOPE);
 
   const toggleCategoryExpanded = useCallback((categoryId) => {
     setExpandedCategories((current) => ({
@@ -21,5 +19,5 @@ export function useReviewApply(categories) {
     }));
   }, []);
 
-  return { expandedCategories, toggleCategoryExpanded, applyScope, setApplyScope };
+  return { expandedCategories, toggleCategoryExpanded };
 }

@@ -10,7 +10,7 @@ export default function ConfigureMessagingChannelsStep({
   nextStepLabel,
 }) {
   const messagingChannels = useMessagingChannels();
-  const canProceed = Boolean(messagingChannels.selectedChannel?.connected);
+  const canProceed = messagingChannels.channels.some((channel) => channel.connected);
 
   return (
     <Stack spacing={3}>

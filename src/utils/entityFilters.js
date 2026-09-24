@@ -6,12 +6,17 @@
 // implementation before this became shared.
 //
 // A field descriptor is one of:
-//   { key, label, type: "select", field, options: [{value,label}] | (rows) => [...] }
-//   { key, label, type: "multiselect", field, options: [...] | (rows) => [...] }
+//   { key, label, type: "select" | "multiselect", field, options: [{value,label}] | (rows) => [...] }
 //   { key, label, type: "dateRange", field, timestampUnit?: "seconds" | "ms" }
 // `key` is the property name inside the filters object; `field` is the row
 // property matched against (for dateRange, a timestamp in `timestampUnit`,
-// default "ms").
+// default "ms"). Every field except dateRange is multi-valued in the Filters
+// modal — its value in the filters object is an array of option values, and a
+// row matches when it satisfies ANY selected value (so "select" and
+// "multiselect" behave identically; "select" is kept only so existing
+// descriptors needn't change). A dateRange's value is a single preset string
+// ("" when unset), since its presets are nested windows and picking several
+// would just mean the widest one.
 
 export const DATE_RANGE_FILTER_OPTIONS = [
   { value: "24h", label: "Last 24 hours" },
@@ -25,8 +30,12 @@ const DATE_RANGE_MS = {
   "30d": 30 * 24 * 60 * 60 * 1000,
 };
 
+export function getEmptyFilterValue(field) {
+  return field.type === "dateRange" ? "" : [];
+}
+
 export function buildEmptyFilters(fields) {
-  return Object.fromEntries(fields.map((field) => [field.key, field.type === "multiselect" ? [] : ""]));
+  return Object.fromEntries(fields.map((field) => [field.key, getEmptyFilterValue(field)]));
 }
 
 // Options are either a static list or derived from the currently loaded rows
@@ -38,29 +47,23 @@ export function resolveFieldOptions(field, rows) {
 }
 
 export function hasActiveEntityFilters(filters, fields) {
-  return fields.some((field) => {
-    const value = filters[field.key];
-    return field.type === "multiselect" ? value?.length > 0 : Boolean(value);
-  });
+  return fields.some((field) => filters[field.key]?.length > 0);
 }
 
-// Select/multiselect option values are always strings (that's all an HTML
-// select can produce), but the row property being matched isn't necessarily
-// one (e.g. a boolean `enabled` field) — comparing as strings on both sides
-// keeps a field descriptor's `options` free to describe any row value type
-// without every page having to stringify its own data first.
+// Option values are always strings (that's all an HTML select can produce),
+// but the row property being matched isn't necessarily one (e.g. a boolean
+// `enabled` field) — comparing as strings on both sides keeps a field
+// descriptor's `options` free to describe any row value type without every
+// page having to stringify its own data first.
 function matchesField(row, field, value) {
-  if (field.type === "multiselect") {
-    return !value?.length || value.includes(String(row[field.field]));
-  }
+  if (!value?.length) return true;
   if (field.type === "dateRange") {
-    if (!value) return true;
     const raw = row[field.field];
     if (raw == null) return false;
     const ms = field.timestampUnit === "seconds" ? raw * 1000 : new Date(raw).getTime();
     return ms >= Date.now() - DATE_RANGE_MS[value];
   }
-  return !value || String(row[field.field]) === value;
+  return value.includes(String(row[field.field]));
 }
 
 export function applyEntityFilters(rows, filters, fields) {
@@ -85,15 +88,14 @@ export function getEntityFilterChips(filters, fields, rows) {
   const chips = [];
   fields.forEach((field) => {
     const value = filters[field.key];
-    const isEmpty = field.type === "multiselect" ? !value?.length : !value;
-    if (isEmpty) return;
+    if (!value?.length) return;
     const options = resolveFieldOptions(field, rows);
     const display =
-      field.type === "multiselect"
-        ? value.length === 1
+      field.type === "dateRange"
+        ? (options.find((option) => option.value === value)?.label ?? value)
+        : value.length === 1
           ? (options.find((option) => option.value === value[0])?.label ?? value[0])
-          : `${value.length} selected`
-        : (options.find((option) => option.value === value)?.label ?? value);
+          : `${value.length} selected`;
     chips.push({ key: field.key, label: `${field.label}: ${display}` });
   });
   return chips;

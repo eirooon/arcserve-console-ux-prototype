@@ -109,7 +109,7 @@ export default function EnvironmentDiscoveryStep({ onDiscoveryComplete, onCancel
             ))}
           </Stack>
 
-          <Alert severity="info" sx={{ width: "100%", mt: 3.25, borderRadius: "12px" }}>
+          <Alert severity="info" sx={{ width: "100%", mt: 3.25 }}>
             We&rsquo;re categorizing your infrastructure into protection tiers. You&rsquo;ll
             review these next.
           </Alert>

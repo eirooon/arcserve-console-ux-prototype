@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import { alpha } from "@mui/material/styles";
+import GlowingCheckIcon from "../../../components/GlowingCheckIcon";
 import { usePrefersReducedMotion } from "../../../hooks/usePrefersReducedMotion";
 
 const RING_SCALES = [1, 0.72, 0.44];
@@ -16,6 +17,7 @@ const RADAR_BLIPS = [
 export default function EnvironmentRadarVisual({ size = 280, active = true }) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const animate = active && !prefersReducedMotion;
+  const isComplete = !active;
 
   return (
     <Box
@@ -82,19 +84,32 @@ export default function EnvironmentRadarVisual({ size = 280, active = true }) {
         </Box>
       )}
 
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: 12,
-          height: 12,
-          borderRadius: "50%",
-          bgcolor: "primary.main",
-          transform: "translate(-50%, -50%)",
-          boxShadow: (theme) => `0 0 16px ${alpha(theme.palette.primary.main, 0.45)}`,
-        }}
-      />
+      {isComplete ? (
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <GlowingCheckIcon size={40} iconSize={22} />
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: 12,
+            height: 12,
+            borderRadius: "50%",
+            bgcolor: "primary.main",
+            transform: "translate(-50%, -50%)",
+            boxShadow: (theme) => `0 0 16px ${alpha(theme.palette.primary.main, 0.45)}`,
+          }}
+        />
+      )}
 
       {animate &&
         RADAR_BLIPS.map((blip, index) => (
@@ -118,6 +133,23 @@ export default function EnvironmentRadarVisual({ size = 280, active = true }) {
                 "88%": { transform: "scale(1)", opacity: 0.95 },
                 "100%": { opacity: 0 },
               },
+            }}
+          />
+        ))}
+
+      {isComplete &&
+        RADAR_BLIPS.map((blip, index) => (
+          <Box
+            key={index}
+            sx={{
+              position: "absolute",
+              top: blip.top,
+              left: blip.left,
+              width: blip.size,
+              height: blip.size,
+              borderRadius: "50%",
+              bgcolor: blip.color,
+              opacity: 0.95,
             }}
           />
         ))}

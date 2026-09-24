@@ -1,4 +1,4 @@
-import { buildEmptyFilters } from "./entityFilters";
+import { buildEmptyFilters, getEmptyFilterValue } from "./entityFilters";
 
 /**
  * A tiny external store (same shape/reasoning as createResourceStore.js) that
@@ -40,7 +40,7 @@ export function createEntityFilterStore({ fields, searchFields }) {
     removeFilter(key) {
       const field = fields.find((candidate) => candidate.key === key);
       setState({
-        filters: { ...state.filters, [key]: field?.type === "multiselect" ? [] : "" },
+        filters: { ...state.filters, [key]: field ? getEmptyFilterValue(field) : [] },
         activeSavedSearchId: null,
       });
     },

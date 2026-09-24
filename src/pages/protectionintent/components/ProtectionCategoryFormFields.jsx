@@ -13,12 +13,49 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FormField from "../../../components/FormField";
 import {
   COMPLIANCE_CHECKBOX_FIELDS,
-  COMPLIANCE_LEGAL_HOLD_FIELD,
   COMPLIANCE_SELECT_FIELDS,
+  CYBER_RESILIENT_CHECKBOX_FIELDS,
   DESTINATION_SETTINGS_FIELDS,
+  DR_ENABLED_CHECKBOX_FIELDS,
   GENERAL_SETTINGS_FIELDS,
 } from "../protectionCategoryEditOptions";
 import { EXTENSION_ROWS } from "../protectionIntentRecommendationData";
+
+// One extension's capability checklist (Compliance, Cyber Resilient, DR
+// Enabled) — a two-column wrap of checkboxes so a longer list (Cyber
+// Resilient has six) doesn't force a single cramped row.
+function ExtensionCheckboxFields({ fields, formValues, setField }) {
+  return (
+    <Stack direction="row" flexWrap="wrap" columnGap={3} rowGap={1}>
+      {fields.map((checkboxSpec) => (
+        <FormControlLabel
+          key={checkboxSpec.field}
+          sx={{ flex: "1 1 260px", mr: 0 }}
+          control={
+            <Checkbox
+              size="small"
+              checked={formValues[checkboxSpec.field]}
+              onChange={(event) => setField(checkboxSpec.field, event.target.checked)}
+            />
+          }
+          label={
+            <Typography variant="body2" color="text.primary">
+              {checkboxSpec.label}
+            </Typography>
+          }
+        />
+      ))}
+    </Stack>
+  );
+}
+
+// Which checklist backs each extension's expanded content in the dialog
+// below — anything not listed here (e.g. a future extension) falls back to
+// its static summary detail instead of an empty checklist.
+const EXTENSION_CHECKBOX_FIELDS_BY_LABEL = {
+  "Cyber Resilient": CYBER_RESILIENT_CHECKBOX_FIELDS,
+  "DR Enabled": DR_ENABLED_CHECKBOX_FIELDS,
+};
 
 function FieldSelect({ field, label, options, value, onChange }) {
   return (
@@ -145,35 +182,18 @@ export default function ProtectionCategoryFormFields({
                       />
                     ))}
                   </Stack>
-                  <FieldSelect
-                    field={COMPLIANCE_LEGAL_HOLD_FIELD.field}
-                    label={COMPLIANCE_LEGAL_HOLD_FIELD.label}
-                    options={COMPLIANCE_LEGAL_HOLD_FIELD.options}
-                    value={formValues[COMPLIANCE_LEGAL_HOLD_FIELD.field]}
-                    onChange={setField}
+                  <ExtensionCheckboxFields
+                    fields={COMPLIANCE_CHECKBOX_FIELDS}
+                    formValues={formValues}
+                    setField={setField}
                   />
-                  <Stack direction="row" spacing={2}>
-                    {COMPLIANCE_CHECKBOX_FIELDS.map((checkboxSpec) => (
-                      <FormControlLabel
-                        key={checkboxSpec.field}
-                        control={
-                          <Checkbox
-                            size="small"
-                            checked={formValues[checkboxSpec.field]}
-                            onChange={(event) =>
-                              setField(checkboxSpec.field, event.target.checked)
-                            }
-                          />
-                        }
-                        label={
-                          <Typography variant="body2" color="text.primary">
-                            {checkboxSpec.label}
-                          </Typography>
-                        }
-                      />
-                    ))}
-                  </Stack>
                 </Stack>
+              ) : EXTENSION_CHECKBOX_FIELDS_BY_LABEL[extension.label] ? (
+                <ExtensionCheckboxFields
+                  fields={EXTENSION_CHECKBOX_FIELDS_BY_LABEL[extension.label]}
+                  formValues={formValues}
+                  setField={setField}
+                />
               ) : (
                 <Typography variant="body2" color="text.secondary">
                   {extension.values[categoryId]?.detail ??

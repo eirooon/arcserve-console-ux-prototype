@@ -4,7 +4,10 @@ import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ErrorRoundedIcon from "@mui/icons-material/ErrorRounded";
 import { ENDPOINTS } from "../../../api/endpoints";
-import { createResourceStore, useResourceStore } from "../../../api/createResourceStore";
+import {
+  createResourceStore,
+  useResourceStore,
+} from "../../../api/createResourceStore";
 
 const STATUS_META = {
   Pending: { icon: AccessTimeFilledIcon, color: "warning.main" },
@@ -13,7 +16,8 @@ const STATUS_META = {
 };
 
 function formatStorage(usedGb, totalGb) {
-  const format = (gb) => (gb >= 1000 ? `${(gb / 1000).toFixed(2)} TB` : `${gb} GB`);
+  const format = (gb) =>
+    gb >= 1000 ? `${(gb / 1000).toFixed(2)} TB` : `${gb} GB`;
   return `${format(usedGb)} / ${format(totalGb)}`;
 }
 
@@ -48,7 +52,11 @@ export function useAcrsServersColumns(navigate) {
               variant="body2"
               color="secondary"
               underline="hover"
-              onClick={() => navigate(`/infrastructures/arcserve-cyber-resilient-servers/${row.id}`)}
+              onClick={() =>
+                navigate(
+                  `/infrastructures/arcserve-cyber-resilient-servers/${row.id}`,
+                )
+              }
             >
               {value}
             </Link>
@@ -80,14 +88,20 @@ export function useAcrsServersColumns(navigate) {
           );
         },
       },
-      { field: "hostnameIp", headerName: "Hostname/IP Address", flex: 1, minWidth: 160 },
+      {
+        field: "hostnameIp",
+        headerName: "Hostname/IP Address",
+        flex: 1,
+        minWidth: 160,
+      },
       { field: "site", headerName: "Site", flex: 1, minWidth: 120 },
       {
         field: "storage",
         headerName: "Storage (Used/Total)",
         flex: 1,
         minWidth: 160,
-        valueGetter: (_value, row) => formatStorage(row.storageUsedGb, row.storageTotalGb),
+        valueGetter: (_value, row) =>
+          formatStorage(row.storageUsedGb, row.storageTotalGb),
       },
       {
         field: "createdDate",
@@ -110,16 +124,22 @@ export function useAcrsServersRowActions(navigate, { onModify, onDelete }) {
           {
             label: "Manage File Systems",
             onClick: () =>
-              navigate(`/infrastructures/arcserve-cyber-resilient-servers/${row.id}`, {
-                state: { tab: "file-systems" },
-              }),
+              navigate(
+                `/infrastructures/arcserve-cyber-resilient-servers/${row.id}`,
+                {
+                  state: { tab: "file-systems" },
+                },
+              ),
           },
           {
             label: "Manage Networks",
             onClick: () =>
-              navigate(`/infrastructures/arcserve-cyber-resilient-servers/${row.id}`, {
-                state: { tab: "networks" },
-              }),
+              navigate(
+                `/infrastructures/arcserve-cyber-resilient-servers/${row.id}`,
+                {
+                  state: { tab: "networks" },
+                },
+              ),
           },
           { label: "Delete", onClick: () => onDelete(row) },
         ],

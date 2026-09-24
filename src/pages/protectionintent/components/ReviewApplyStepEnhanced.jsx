@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   Box,
   Button,
   Checkbox,
@@ -14,10 +15,10 @@ import {
   Typography,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import AccordionShell from "../../../components/AccordionShell";
 import ProtectionCategoryAccordion from "./ProtectionCategoryAccordion";
 import ReviewGoalSummaryCard from "./ReviewGoalSummaryCard";
-import ApplyScopeSelector from "./ApplyScopeSelector";
 import { useReviewApply } from "../hooks/useReviewApply";
 import {
   getDestinationSettingsForCategory,
@@ -47,8 +48,7 @@ export default function ReviewApplyStepEnhanced({
     notifications: true,
     impact: true,
   });
-  const { expandedCategories, toggleCategoryExpanded, applyScope, setApplyScope } =
-    useReviewApply(categories);
+  const { expandedCategories, toggleCategoryExpanded } = useReviewApply(categories);
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -91,7 +91,7 @@ export default function ReviewApplyStepEnhanced({
           onToggleExpand={() => toggleSection("protection")}
           summary={
             <Typography variant="subtitle2" fontWeight={700} color="text.primary">
-              PROTECTION SUMMARY
+              Protection Summary
             </Typography>
           }
         >
@@ -131,7 +131,7 @@ export default function ReviewApplyStepEnhanced({
           onToggleExpand={() => toggleSection("automation")}
           summary={
             <Typography variant="subtitle2" fontWeight={700} color="text.primary">
-              AUTOMATION GOALS
+              Automation Goals
             </Typography>
           }
         >
@@ -157,15 +157,18 @@ export default function ReviewApplyStepEnhanced({
           onToggleExpand={() => toggleSection("notifications")}
           summary={
             <Typography variant="subtitle2" fontWeight={700} color="text.primary">
-              NOTIFICATION CHANNELS
+              Notification Channels
             </Typography>
           }
         >
           <Stack spacing={2}>
             <Box>
-              <Typography variant="body2" fontWeight={600} color="text.primary">
-                ✓ Email
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={0.75}>
+                <CheckCircleRoundedIcon sx={{ color: "success.main", fontSize: 18 }} />
+                <Typography variant="body2" fontWeight={600} color="text.primary">
+                  Email
+                </Typography>
+              </Stack>
               <Box sx={{ pl: 2, mt: 1 }}>
                 <Typography variant="caption" color="text.secondary">
                   Receive: Critical alerts, daily digest, weekly report
@@ -178,9 +181,12 @@ export default function ReviewApplyStepEnhanced({
             </Box>
             <Divider />
             <Box>
-              <Typography variant="body2" fontWeight={600} color="text.primary">
-                ✓ Slack
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={0.75}>
+                <CheckCircleRoundedIcon sx={{ color: "success.main", fontSize: 18 }} />
+                <Typography variant="body2" fontWeight={600} color="text.primary">
+                  Slack
+                </Typography>
+              </Stack>
               <Box sx={{ pl: 2, mt: 1 }}>
                 <Typography variant="caption" color="text.secondary">
                   Receive: Daily digest, approval requests
@@ -213,7 +219,7 @@ export default function ReviewApplyStepEnhanced({
           onToggleExpand={() => toggleSection("impact")}
           summary={
             <Typography variant="subtitle2" fontWeight={700} color="text.primary">
-              ESTIMATED IMPACT
+              Estimated Impact
             </Typography>
           }
         >
@@ -266,20 +272,10 @@ export default function ReviewApplyStepEnhanced({
                 ))}
               </Box>
             </Box>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 1.5,
-                bgcolor: "info.lighter",
-                border: "1px solid",
-                borderColor: "info.light",
-              }}
-            >
-              <Typography variant="caption" color="text.secondary">
-                ⓘ These estimates are based on your current inventory. Actual costs may vary
-                based on growth or policy changes.
-              </Typography>
-            </Paper>
+            <Alert severity="info">
+              These estimates are based on your current inventory. Actual costs may vary based on
+              growth or policy changes.
+            </Alert>
             <Button
               size="small"
               variant="outlined"
@@ -294,7 +290,9 @@ export default function ReviewApplyStepEnhanced({
       </Stack>
 
       {/* Apply Scope */}
-      <ApplyScopeSelector value={applyScope} onChange={setApplyScope} />
+      <Alert severity="info">
+        This protection intent will be applied to all sources, existing and new.
+      </Alert>
 
       {/* Confirmation Checkbox */}
       <Paper elevation={0} sx={{ p: 2, bgcolor: "grey.50", border: "1px solid", borderColor: "divider" }}>

@@ -19,8 +19,11 @@ const ArcGenieMessagingPage = lazy(() =>
 const ArcGenieGoalDetailPage = lazy(() =>
   import("./pages/protectionintent/ArcGenieGoalDetailPage"),
 );
-const ArcGenieNeedsAttentionPage = lazy(() =>
-  import("./pages/protectionintent/ArcGenieNeedsAttentionPage"),
+const ArcGenieWaitingOnYouPage = lazy(() =>
+  import("./pages/protectionintent/ArcGenieWaitingOnYouPage"),
+);
+const ArcGenieActivityLogPage = lazy(() =>
+  import("./pages/protectionintent/ArcGenieActivityLogPage"),
 );
 const JobsLayout = lazy(() => import("./pages/jobs/JobsLayout"));
 const Logs = lazy(() => import("./pages/logs/Logs"));
@@ -107,9 +110,10 @@ export default function App() {
             element={<ArcGenieProtectionIntentPage />}
           />
           <Route path="/arcgenie/messaging" element={<ArcGenieMessagingPage />} />
+          <Route path="/arcgenie/activity-log" element={<ArcGenieActivityLogPage />} />
           <Route
-            path="/arcgenie/overview/needs-attention"
-            element={<ArcGenieNeedsAttentionPage />}
+            path="/arcgenie/overview/waiting-on-you"
+            element={<ArcGenieWaitingOnYouPage />}
           />
           <Route path="/arcgenie/overview/:goalId" element={<ArcGenieGoalDetailPage />} />
           <Route path="/jobs" element={<JobsLayout />} />

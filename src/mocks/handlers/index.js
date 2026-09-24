@@ -11,8 +11,9 @@ import { disasterRecoveryRunbooks } from "../data/disasterRecovery";
 import { auditLogs } from "../data/auditLogs";
 import { reports } from "../data/reports";
 import { settings } from "../data/settings";
-import { needsAttentionItems } from "../data/needsAttention";
+import { waitingOnYouItems } from "../data/waitingOnYou";
 import { activityLogItems } from "../data/activityLog";
+import { dismissals } from "../data/dismissals";
 
 export const handlers = [
   ...createCrudHandlers(ENDPOINTS.SOURCES, sources),
@@ -26,6 +27,7 @@ export const handlers = [
   ...createCrudHandlers(ENDPOINTS.AUDIT_LOGS, auditLogs),
   ...createCrudHandlers(ENDPOINTS.REPORTS, reports),
   ...createCrudHandlers(ENDPOINTS.SETTINGS, settings),
-  ...createCrudHandlers(ENDPOINTS.NEEDS_ATTENTION, needsAttentionItems),
+  ...createCrudHandlers(ENDPOINTS.WAITING_ON_YOU, waitingOnYouItems),
   ...createCrudHandlers(ENDPOINTS.ARCGENIE_ACTIVITY_LOG, activityLogItems),
+  ...createCrudHandlers(ENDPOINTS.ARCGENIE_DISMISSALS, dismissals),
 ];

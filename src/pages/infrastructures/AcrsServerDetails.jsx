@@ -11,12 +11,15 @@ const TABS = [
   { id: "networks", label: "Networks" },
 ];
 
-const selectRowsState = (state) => ({ rows: state.rows, loading: state.loading });
+const selectRowsState = (state) => ({
+  rows: state.rows,
+  loading: state.loading,
+});
 
 /**
  * "ACRS Device Details" (Figma nodes 7283:9445 File Systems tab / 7284:17735
  * Networks tab): reached from the servers list's Display Name link or its
- * row menu's Manage File Systems/Manage Networks items, which pass which
+ * row menu's Manage File Systems/s items, which pass which
  * tab to open initially via route state.
  */
 export default function AcrsServerDetails() {
@@ -25,7 +28,10 @@ export default function AcrsServerDetails() {
   const navigate = useNavigate();
   const { rows, loading } = useAcrsServersData(selectRowsState);
 
-  const server = useMemo(() => rows.find((row) => row.id === serverId), [rows, serverId]);
+  const server = useMemo(
+    () => rows.find((row) => row.id === serverId),
+    [rows, serverId],
+  );
 
   // Registry-based breadcrumbs only know static routes, so this record's
   // name has to be published as its own trailing crumb (see AppBreadcrumbs)
@@ -49,7 +55,14 @@ export default function AcrsServerDetails() {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        minHeight: 0,
+      }}
+    >
       <Stack
         direction="row"
         alignItems="center"
@@ -62,14 +75,19 @@ export default function AcrsServerDetails() {
         <Button
           variant="outlined"
           color="secondary"
-          onClick={() => navigate("/infrastructures/arcserve-cyber-resilient-servers")}
+          onClick={() =>
+            navigate("/infrastructures/arcserve-cyber-resilient-servers")
+          }
         >
           Close
         </Button>
       </Stack>
 
       <Box sx={{ borderBottom: 1, borderColor: "divider", px: 2 }}>
-        <Tabs value={tabIndex} onChange={(_, index) => setTabId(TABS[index].id)}>
+        <Tabs
+          value={tabIndex}
+          onChange={(_, index) => setTabId(TABS[index].id)}
+        >
           {TABS.map((tab) => (
             <Tab key={tab.id} label={tab.label} />
           ))}

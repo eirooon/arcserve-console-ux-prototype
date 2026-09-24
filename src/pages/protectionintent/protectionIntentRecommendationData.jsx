@@ -238,7 +238,7 @@ export function getExtensionsForCategory(categoryId, extensionState, categoryFor
     label: row.label,
     detail:
       row.label === "Compliance"
-        ? `${data.lockPeriod}, ${data.extendedRetention}`
+        ? data.lockPeriod
         : (row.values[categoryId]?.detail ?? row.defaultDetail),
     enabled: extensionState[categoryId][row.label],
   }));

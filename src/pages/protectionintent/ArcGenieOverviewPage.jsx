@@ -1,22 +1,27 @@
 import { useNavigate } from "react-router-dom";
-import { green, blueGrey } from "@mui/material/colors";
+import { green } from "@mui/material/colors";
 import { Box, Chip, Stack, Typography } from "@mui/material";
-import NeedsAttentionCard from "./components/NeedsAttentionCard";
+import WaitingOnYouCard from "./components/WaitingOnYouCard";
 import GoalStatusCard from "./components/GoalStatusCard";
+import ActivityLogList from "./components/ActivityLogList";
 import StatusPill from "../../components/StatusPill";
-import { useNeedsAttention } from "./hooks/useNeedsAttention";
+import FilterTabs from "../../components/FilterTabs";
+import { useWaitingOnYou } from "./hooks/useWaitingOnYou";
+import { useWaitingOnYouFilter } from "./hooks/useWaitingOnYouFilter";
+import { useActivityLogRestore } from "./hooks/useActivityLogRestore";
+import { useExclusiveDisclosure } from "../../hooks/useExclusiveDisclosure";
 import {
   INITIAL_AGENTIC_GOALS,
   getAutonomyLevelLabel,
   getAssessmentFrequencyLabel,
 } from "./configureGoalsAutonomyData";
 import {
-  AUTO_PROTECT_GOAL_ID,
   ASSESSMENT_TIME_LABEL,
   GOAL_OVERVIEW_SEGMENTS_BY_ID,
   OVERVIEW_SUMMARY,
   WAITING_ON_YOU_OLDEST_SINCE_LABEL,
   getGoalStatusChip,
+  getSuggestionChip,
   getWaitingCount,
 } from "./arcGenieOverviewData";
 import { useApiResource } from "../../api/useApiResource";
@@ -26,6 +31,10 @@ import { ENDPOINTS } from "../../api/endpoints";
 const TRACKED_GOALS = INITIAL_AGENTIC_GOALS.filter(
   (goal) => GOAL_OVERVIEW_SEGMENTS_BY_ID[goal.id],
 );
+
+// The overview's Activity Log is a preview, not the full feed — "View All"
+// (ArcGenieActivityLogPage) is where the rest lives.
+const ACTIVITY_LOG_PREVIEW_COUNT = 3;
 
 function ViewAllLink({ children, onClick, disabled }) {
   return (
@@ -54,7 +63,13 @@ function ViewAllLink({ children, onClick, disabled }) {
 
 function SectionHeading({ children, badge, action }) {
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center">
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      flexWrap="wrap"
+      rowGap={0.5}
+    >
       <Stack direction="row" alignItems="center" spacing={1}>
         <Typography variant="body1" fontWeight={700} color="text.primary">
           {children}
@@ -68,12 +83,17 @@ function SectionHeading({ children, badge, action }) {
 
 export default function ArcGenieOverviewPage() {
   const navigate = useNavigate();
-  const { items, handleAction, handleDismiss } = useNeedsAttention();
+  const { items, handleAction, handleDismiss, dismissSuggestion } = useWaitingOnYou();
+  const { activeType, setActiveType, visibleItems, filterOptions } = useWaitingOnYouFilter(items);
+  const dismissPanel = useExclusiveDisclosure();
   const { rows: activityLogItems } = useApiResource(
     ENDPOINTS.ARCGENIE_ACTIVITY_LOG,
   );
+  const { withOverlay, restoreSuggestion, isRestored } = useActivityLogRestore();
 
-  const totalWaiting = getWaitingCount(AUTO_PROTECT_GOAL_ID);
+  // Live count, not a static per-goal snapshot, so approving/dismissing/
+  // undoing a Waiting on You item updates this line immediately.
+  const totalWaiting = items.length;
 
   const goToGoals = () =>
     navigate("/arcgenie/protection-intent", { state: { initialTab: "goals" } });
@@ -83,12 +103,12 @@ export default function ArcGenieOverviewPage() {
       sx={{
         bgcolor: "background.paper",
         minHeight: "calc(100vh - 64px)",
-        py: 6,
+        py: { xs: 3, sm: 4, md: 6 },
       }}
     >
-      <Stack spacing={3} sx={{ width: "100%", px: 6 }}>
+      <Stack spacing={3} sx={{ width: "100%", px: { xs: 2, sm: 4, md: 6 } }}>
         <Stack spacing={0.5}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" rowGap={1}>
             <Typography variant="h6" color="text.primary">
               Your Protection Overview
             </Typography>
@@ -104,7 +124,11 @@ export default function ArcGenieOverviewPage() {
           </Typography>
         </Stack>
 
-        <Stack direction="row" spacing={4} alignItems="flex-start">
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={4}
+          alignItems={{ xs: "stretch", md: "flex-start" }}
+        >
           <Stack spacing={2} sx={{ flex: 1, minWidth: 0 }}>
             <SectionHeading
               badge={
@@ -115,7 +139,7 @@ export default function ArcGenieOverviewPage() {
               action={
                 <ViewAllLink
                   disabled={items.length === 0}
-                  onClick={() => navigate("/arcgenie/overview/needs-attention")}
+                  onClick={() => navigate("/arcgenie/overview/waiting-on-you")}
                 >
                   View All
                 </ViewAllLink>
@@ -131,16 +155,38 @@ export default function ArcGenieOverviewPage() {
                 section as they happen.
               </Typography>
             ) : (
-              <Stack spacing={2}>
-                {items.map((item) => (
-                  <NeedsAttentionCard
-                    key={item.id}
-                    item={item}
-                    onAction={handleAction}
-                    onDismiss={handleDismiss}
-                  />
-                ))}
-              </Stack>
+              <>
+                <FilterTabs
+                  value={activeType}
+                  onChange={setActiveType}
+                  options={filterOptions}
+                  ariaLabel="Filter Waiting on You by request type"
+                />
+
+                {visibleItems.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    No items match this filter.
+                  </Typography>
+                ) : (
+                  <Stack spacing={2}>
+                    {visibleItems.map((item) => (
+                      <WaitingOnYouCard
+                        key={item.id}
+                        item={item}
+                        onAction={handleAction}
+                        onDismiss={handleDismiss}
+                        isDismissPanelOpen={dismissPanel.isOpen(item.id)}
+                        onOpenDismissPanel={() => dismissPanel.open(item.id)}
+                        onCloseDismissPanel={dismissPanel.close}
+                        onConfirmDismiss={(dismissedItem, { reason, note }) => {
+                          dismissPanel.close();
+                          dismissSuggestion(dismissedItem, { reason, note });
+                        }}
+                      />
+                    ))}
+                  </Stack>
+                )}
+              </>
             )}
           </Stack>
 
@@ -156,7 +202,11 @@ export default function ArcGenieOverviewPage() {
                     key={goal.id}
                     title={goal.shortTitle}
                     description={goal.shortDescription}
-                    statusChip={getWaitingCount(goal.id) > 0 ? getGoalStatusChip(goal.id) : null}
+                    statusChip={
+                      getWaitingCount(goal.id) > 0
+                        ? getGoalStatusChip(goal.id)
+                        : getSuggestionChip(items, goal.id)
+                    }
                     segments={GOAL_OVERVIEW_SEGMENTS_BY_ID[goal.id]}
                     autonomyLabel={getAutonomyLevelLabel(goal.autonomyLevel)}
                     frequencyLabel={`${getAssessmentFrequencyLabel(goal.assessmentFrequency)} · ${ASSESSMENT_TIME_LABEL}`}
@@ -167,37 +217,21 @@ export default function ArcGenieOverviewPage() {
             </Stack>
 
             <Stack spacing={2}>
-              <Typography variant="body1" fontWeight={700} color="text.primary">
+              <SectionHeading
+                action={
+                  <ViewAllLink onClick={() => navigate("/arcgenie/activity-log")}>
+                    View All
+                  </ViewAllLink>
+                }
+              >
                 Activity Log
-              </Typography>
+              </SectionHeading>
 
-              {activityLogItems.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">
-                  No recent activities. ArcGenie will log automated policy
-                  checks and optimizations here as they occur.
-                </Typography>
-              ) : (
-                <Stack>
-                  {activityLogItems.map((activity) => (
-                    <Stack
-                      key={activity.id}
-                      spacing={0.5}
-                      sx={{
-                        py: 2,
-                        borderBottom: 1,
-                        borderColor: "divider",
-                      }}
-                    >
-                      <Typography variant="body2" color="text.primary">
-                        {activity.message}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: blueGrey[500] }}>
-                        Approved by {activity.approvedBy} on {activity.date}
-                      </Typography>
-                    </Stack>
-                  ))}
-                </Stack>
-              )}
+              <ActivityLogList
+                items={withOverlay(activityLogItems).slice(0, ACTIVITY_LOG_PREVIEW_COUNT)}
+                onRestoreSuggestion={restoreSuggestion}
+                isRestored={isRestored}
+              />
             </Stack>
           </Stack>
         </Stack>

@@ -3,7 +3,11 @@ import { Box, Button, Chip, Divider, Typography } from "@mui/material";
 
 function ResultsLine({ count, children }) {
   return (
-    <Typography variant="body2" color="text.primary" sx={{ whiteSpace: "nowrap" }}>
+    <Typography
+      variant="body2"
+      color="text.primary"
+      sx={{ whiteSpace: "nowrap" }}
+    >
       Showing{" "}
       <Box component="span" sx={{ fontWeight: 700 }}>
         {count}
@@ -40,26 +44,49 @@ export default function EntityFilterBar({
   searchText,
   onClearSearch,
 }) {
-  const activeSavedSearch = savedSearches.find((search) => search.id === activeSavedSearchId);
+  const activeSavedSearch = savedSearches.find(
+    (search) => search.id === activeSavedSearchId,
+  );
   const showAdHocRow = filterChips.length > 0 && !activeSavedSearch;
   const showSavedSearchesRow = savedSearches.length > 0;
   const showSearchRow = searchText.trim().length > 0;
 
-  if (!showSavedSearchesRow && !showAdHocRow && !activeSavedSearch && !showSearchRow) return null;
+  if (
+    !showSavedSearchesRow &&
+    !showAdHocRow &&
+    !activeSavedSearch &&
+    !showSearchRow
+  )
+    return null;
 
   return (
     <Box sx={{ borderBottom: "1px solid", borderColor: "divider" }}>
       {showSavedSearchesRow && (
         <>
-          <Box sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-            <Typography variant="body2" color="text.primary" sx={{ mr: 0.5, whiteSpace: "nowrap" }}>
+          <Box
+            sx={{
+              px: 2,
+              py: 1.5,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              flexWrap: "wrap",
+            }}
+          >
+            <Typography
+              variant="body2"
+              color="text.primary"
+              sx={{ mr: 0.5, whiteSpace: "nowrap" }}
+            >
               Saved Searches:
             </Typography>
             {savedSearches.map((search) => (
               <Chip
                 key={search.id}
                 label={search.name}
-                color={search.id === activeSavedSearchId ? "primary" : "default"}
+                color={
+                  search.id === activeSavedSearchId ? "primary" : "default"
+                }
                 onClick={() => onSelectSavedSearch(search.id)}
               />
             ))}
@@ -69,7 +96,16 @@ export default function EntityFilterBar({
       )}
 
       {activeSavedSearch && (
-        <Box sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            px: 2,
+            py: 1.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
           <ResultsLine count={resultCount}>
             results for saved search &quot;{activeSavedSearch.name}&quot;
           </ResultsLine>
@@ -78,12 +114,27 @@ export default function EntityFilterBar({
           </Button>
         </Box>
       )}
+      {activeSavedSearch && showSearchRow && <Divider />}
 
       {showAdHocRow && (
-        <Box sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            px: 2,
+            py: 1.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
           <ResultsLine count={resultCount}>results for:</ResultsLine>
           {filterChips.map((chip) => (
-            <Chip key={chip.key} label={chip.label} size="small" onDelete={() => onRemoveFilter(chip.key)} />
+            <Chip
+              key={chip.key}
+              label={chip.label}
+              size="small"
+              onDelete={() => onRemoveFilter(chip.key)}
+            />
           ))}
           <Button size="small" color="secondary" onClick={onClearAll}>
             Clear All
@@ -93,9 +144,19 @@ export default function EntityFilterBar({
           </Button>
         </Box>
       )}
+      {showAdHocRow && showSearchRow && <Divider />}
 
       {showSearchRow && (
-        <Box sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            px: 2,
+            py: 1.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
           <ResultsLine count={resultCount}>
             results for{" "}
             <Box component="span" sx={{ fontWeight: 700 }}>
@@ -114,12 +175,16 @@ export default function EntityFilterBar({
 EntityFilterBar.propTypes = {
   resultCount: PropTypes.number,
   savedSearches: PropTypes.arrayOf(
-    PropTypes.shape({ id: PropTypes.string.isRequired, name: PropTypes.string.isRequired }),
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }),
   ).isRequired,
   activeSavedSearchId: PropTypes.string,
   onSelectSavedSearch: PropTypes.func.isRequired,
-  filterChips: PropTypes.arrayOf(PropTypes.shape({ key: PropTypes.string, label: PropTypes.string }))
-    .isRequired,
+  filterChips: PropTypes.arrayOf(
+    PropTypes.shape({ key: PropTypes.string, label: PropTypes.string }),
+  ).isRequired,
   onRemoveFilter: PropTypes.func.isRequired,
   onClearAll: PropTypes.func.isRequired,
   onSaveSearch: PropTypes.func.isRequired,

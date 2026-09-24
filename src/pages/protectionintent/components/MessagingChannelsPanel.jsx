@@ -1,40 +1,57 @@
 import { Stack } from "@mui/material";
+import ConfirmDialog from "../../../components/ConfirmDialog";
 import MessagingChannelCard from "./MessagingChannelCard";
-import MessagingChannelRoutingPanel from "./MessagingChannelRoutingPanel";
+import ConfigureMessagingChannelDialog from "./ConfigureMessagingChannelDialog";
+import { MESSAGING_CHANNELS } from "../messagingChannelsData";
+import { DISCONNECT_DESCRIPTION } from "../messagingChannelConfig";
 
 export default function MessagingChannelsPanel({
   channels,
-  selectedChannelId,
-  selectChannel,
-  selectedChannel,
-  connectChannel,
-  disconnectChannel,
-  setChannelField,
+  busyIds,
+  pendingDisconnect,
+  configuring,
+  saving,
+  openConfigure,
+  closeConfigure,
+  toggleConnection,
+  confirmDisconnect,
+  cancelDisconnect,
+  saveConfig,
 }) {
+  const pendingName = pendingDisconnect
+    ? MESSAGING_CHANNELS.find((entry) => entry.id === pendingDisconnect.id)?.name
+    : null;
+
   return (
-    <Stack direction="row" spacing={4} alignItems="flex-start">
-      <Stack
-        spacing={2}
-        role="radiogroup"
-        aria-label="Messaging channel"
-        sx={{ flex: 1, minWidth: 0 }}
-      >
+    <>
+      <Stack spacing={2} sx={{ width: "100%" }}>
         {channels.map((channel) => (
           <MessagingChannelCard
             key={channel.id}
             channel={channel}
-            selected={channel.id === selectedChannelId}
-            onSelect={selectChannel}
-            onConnect={connectChannel}
-            onDisconnect={disconnectChannel}
+            connecting={busyIds.has(channel.id)}
+            onConfigure={openConfigure}
+            onToggleConnection={toggleConnection}
           />
         ))}
       </Stack>
 
-      <MessagingChannelRoutingPanel
-        channel={selectedChannel}
-        onFieldChange={(field, value) => setChannelField(selectedChannelId, field, value)}
+      <ConfigureMessagingChannelDialog
+        channel={configuring?.channel ?? null}
+        entryPoint={configuring?.entryPoint}
+        saving={saving}
+        onClose={closeConfigure}
+        onSave={saveConfig}
       />
-    </Stack>
+
+      <ConfirmDialog
+        open={Boolean(pendingDisconnect)}
+        title={pendingName ? `Disconnect ${pendingName}?` : "Disconnect channel?"}
+        description={DISCONNECT_DESCRIPTION}
+        confirmLabel="Disconnect"
+        onClose={cancelDisconnect}
+        onConfirm={confirmDisconnect}
+      />
+    </>
   );
 }
