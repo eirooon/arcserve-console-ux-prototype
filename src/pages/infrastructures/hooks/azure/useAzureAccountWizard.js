@@ -51,18 +51,53 @@ const TENANT_DISPLAY_NAME = `Azure - ${TENANT.name.replace(/\.$/, "")}`;
 // (a backup operator may be able to finish with an existing app and role).
 // `run` is bumped whenever a check restarts or is invalidated, so a result
 // that lands late for an old account or subscription is ignored.
-const CHECK_KEYS = ["registerApps", "appOwner", "secret", "createRoles", "assignRoles", "roleFit"];
+// The account's Azure rights (register apps, own an app, create / assign
+// roles) aren't pre-checked: a missing right surfaces as an error when the
+// step that needs it creates something. Only user input is validated ahead:
+// a pasted client secret and an existing role's permissions.
+const CHECK_KEYS = ["secret", "roleFit"];
 const IDLE_CHECK = { status: "idle", run: 0 };
 
 // Steps that create something in Azure when their primary button is pressed.
 export const CREATION_STEPS = ["app", "permissions", "storage"];
-const IDLE_CREATION = { status: "idle", tasks: [] }; // status: "idle" | "running" | "done" | "failed"
+const IDLE_CREATION = { status: "idle", tasks: [], failure: null }; // status: "idle" | "running" | "done" | "failed"
 
 const FAILURE_MESSAGES = {
   app: "Azure didn’t finish creating the client secret in time. This is usually temporary — retrying normally fixes it.",
   permissions:
     "Azure didn’t finish applying the role assignment in time. This is usually temporary — retrying normally fixes it.",
   storage: "Azure didn’t finish setting up the storage account in time. This is usually temporary — retrying normally fixes it.",
+};
+
+// Changing a step's choices after it failed, before it created anything,
+// starts that step's creation fresh (e.g. switching to an existing role after
+// "can't create custom roles").
+function resetFailedCreation(creation, stepId) {
+  const step = creation[stepId];
+  if (step.status !== "failed" || step.tasks.some((task) => task.status === "done")) return creation;
+  return { ...creation, [stepId]: IDLE_CREATION };
+}
+
+// A right the signed-in account lacks for a creation task, found when the
+// task runs (not pre-checked). Retrying with the same account can't fix it.
+function missingRightFor(taskId, state) {
+  const access = state.signIn.account?.access;
+  if (!access) return null;
+  if (taskId === "registerApp" && !access.registerApps) return "registerApps";
+  if (taskId === "createSecret" && state.app.mode === "existing") {
+    const existingApp = EXISTING_APPS.find((candidate) => candidate.id === state.app.existingAppId);
+    if (!existingApp?.owners.includes(state.signIn.account.email)) return "appOwner";
+  }
+  if (taskId === "createRole" && !access.createRoles[state.subscriptionId]) return "createRoles";
+  if (taskId === "assignRole" && !access.assignRoles[state.subscriptionId]) return "assignRoles";
+  return null;
+}
+
+const RIGHT_FAILURE_MESSAGES = {
+  registerApps: "This account can’t register apps in Microsoft Entra ID.",
+  appOwner: "Only owners of this app can create a client secret for it.",
+  createRoles: "This account can’t create custom roles in this subscription.",
+  assignRoles: "This account can’t assign roles in this subscription. It needs Owner or User Access Administrator.",
 };
 
 function resetChecks(checks, keys) {
@@ -84,12 +119,15 @@ const initialState = {
   goals: { backupVms: true, virtualStandby: true, rpsCopy: true },
   app: {
     mode: "new", // "new" | "existing"
+    // The new app's name: prefilled, editable.
+    newName: APP_REGISTRATION_NAME,
     existingAppId: "",
     secretMode: "new", // existing app: "new" | "existing"
     secretValue: "",
     secretExpiryMonths: 12,
   },
-  role: { mode: "create", existingRoleId: "" }, // mode: "create" | "existing"
+  // mode: "create" | "existing"; newName is the custom role's name — prefilled, editable.
+  role: { mode: "create", newName: CUSTOM_ROLE_NAME, existingRoleId: "" },
   location: LOCATION_DEFAULTS,
   checks: Object.fromEntries(CHECK_KEYS.map((key) => [key, IDLE_CHECK])),
   creation: Object.fromEntries(CREATION_STEPS.map((stepId) => [stepId, IDLE_CREATION])),
@@ -123,7 +161,8 @@ function reducer(state, action) {
         ...state,
         subscriptionId: action.value,
         role: { ...state.role, existingRoleId: "" },
-        checks: resetChecks(state.checks, ["createRoles", "assignRoles", "roleFit"]),
+        checks: resetChecks(state.checks, ["roleFit"]),
+        creation: resetFailedCreation(state.creation, "permissions"),
       };
     case "setConnectionChoice":
       return { ...state, connectionChoice: action.value };
@@ -132,12 +171,22 @@ function reducer(state, action) {
     case "setAppField": {
       const app = { ...state.app, [action.field]: action.value };
       // A different app or secret needs checking again.
-      const stale = { existingAppId: ["appOwner", "secret"], secretValue: ["secret"] }[action.field] ?? [];
-      return { ...state, app, checks: resetChecks(state.checks, stale) };
+      const stale = { existingAppId: ["secret"], secretValue: ["secret"] }[action.field] ?? [];
+      return {
+        ...state,
+        app,
+        checks: resetChecks(state.checks, stale),
+        creation: resetFailedCreation(state.creation, "app"),
+      };
     }
     case "setRoleField": {
       const stale = action.field === "existingRoleId" ? ["roleFit"] : [];
-      return { ...state, role: { ...state.role, [action.field]: action.value }, checks: resetChecks(state.checks, stale) };
+      return {
+        ...state,
+        role: { ...state.role, [action.field]: action.value },
+        checks: resetChecks(state.checks, stale),
+        creation: resetFailedCreation(state.creation, "permissions"),
+      };
     }
     case "restart":
       return {
@@ -160,12 +209,19 @@ function reducer(state, action) {
       if (action.run !== state.creationRun) return state;
       return {
         ...state,
-        creation: { ...state.creation, [action.stepId]: { ...state.creation[action.stepId], status: action.status } },
+        creation: {
+          ...state.creation,
+          [action.stepId]: { ...state.creation[action.stepId], status: action.status, failure: action.failure ?? null },
+        },
       };
     case "failureUsed":
       return { ...state, failureUsed: true };
     case "setLocationField":
-      return { ...state, location: { ...state.location, [action.field]: action.value } };
+      return {
+        ...state,
+        location: { ...state.location, [action.field]: action.value },
+        creation: resetFailedCreation(state.creation, "storage"),
+      };
     case "checkStarted":
       return {
         ...state,
@@ -193,14 +249,8 @@ function reducer(state, action) {
 function pendingChecks(state) {
   if (state.signIn.status !== "done") return [];
   const keys = [];
-  if (state.stepId === "app") {
-    if (state.app.mode === "new") keys.push("registerApps");
-    if (state.app.mode === "existing" && state.app.existingAppId && state.app.secretMode === "new") keys.push("appOwner");
-  }
-  if (state.stepId === "permissions") {
-    keys.push("assignRoles");
-    if (state.role.mode === "create") keys.push("createRoles");
-    if (state.role.mode === "existing" && state.role.existingRoleId) keys.push("roleFit");
+  if (state.stepId === "permissions" && state.role.mode === "existing" && state.role.existingRoleId) {
+    keys.push("roleFit");
   }
   return keys.filter((key) => state.checks[key].status === "idle");
 }
@@ -216,6 +266,28 @@ export function isValidEmail(value) {
 export function isAcceptedSecret(value) {
   const trimmed = value.trim();
   return trimmed.length >= MIN_SECRET_LENGTH && !/\s/.test(trimmed);
+}
+
+const MAX_APP_NAME_LENGTH = 120;
+const MAX_ROLE_NAME_LENGTH = 128;
+const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+export function getNewAppNameError(name) {
+  if (!name.trim()) return "Enter a name for the app.";
+  if (name.trim().length > MAX_APP_NAME_LENGTH) return `Use ${MAX_APP_NAME_LENGTH} characters or fewer.`;
+  if (EXISTING_APPS.some((existing) => sameName(existing.name, name))) {
+    return "An app with this name already exists. Use it as an existing app, or choose another name.";
+  }
+  return null;
+}
+
+export function getNewRoleNameError(name) {
+  if (!name.trim()) return "Enter a name for the role.";
+  if (name.trim().length > MAX_ROLE_NAME_LENGTH) return `Use ${MAX_ROLE_NAME_LENGTH} characters or fewer.`;
+  if (EXISTING_ROLES.some((existing) => sameName(existing.name, name))) {
+    return "A role with this name already exists. Use it as an existing role, or choose another name.";
+  }
+  return null;
 }
 
 export function getLocationErrors(location) {
@@ -324,13 +396,8 @@ export function useAzureAccountWizard(cloudAccounts) {
     if (checks[key].status === "idle") return "idle";
     return allowed ? "allowed" : "denied";
   };
-  const access = account?.access;
   const results = {
-    registerApps: checkResult("registerApps", access?.registerApps),
-    appOwner: checkResult("appOwner", Boolean(selectedApp?.owners.includes(account?.email))),
     secret: checkResult("secret", isAcceptedSecret(app.secretValue)),
-    createRoles: checkResult("createRoles", access?.createRoles[subscriptionId]),
-    assignRoles: checkResult("assignRoles", access?.assignRoles[subscriptionId]),
     roleFit: checkResult("roleFit", missingRoleActions.length === 0),
   };
 
@@ -351,6 +418,8 @@ export function useAzureAccountWizard(cloudAccounts) {
   }, [cloudAccounts, displayName, updatingExisting]);
 
   const locationErrors = useMemo(() => getLocationErrors(location), [location]);
+  const appNameError = getNewAppNameError(app.newName);
+  const roleNameError = getNewRoleNameError(role.newName);
 
   // Everything the Review step, the provisioning run and the "Connected"
   // screen need, derived once so they can never disagree.
@@ -374,7 +443,7 @@ export function useAzureAccountWizard(cloudAccounts) {
       app: needs.needsApp
         ? {
             isNew: appIsNew,
-            name: appIsNew ? APP_REGISTRATION_NAME : selectedApp?.name ?? "",
+            name: appIsNew ? app.newName.trim() : selectedApp?.name ?? "",
             clientId: appIsNew ? GENERATED_CLIENT_ID : selectedApp?.clientId ?? "",
             secretIsNew,
             secretExpiryMonths: secretIsNew ? app.secretExpiryMonths : null,
@@ -384,7 +453,7 @@ export function useAzureAccountWizard(cloudAccounts) {
       role: needs.needsApp
         ? {
             isNew: roleIsNew,
-            name: roleIsNew ? CUSTOM_ROLE_NAME : selectedRole?.name ?? "",
+            name: roleIsNew ? role.newName.trim() : selectedRole?.name ?? "",
             builtIn: !roleIsNew && Boolean(selectedRole?.builtIn),
             services: appServices,
             requiredActions,
@@ -431,11 +500,9 @@ export function useAzureAccountWizard(cloudAccounts) {
     goal: GOAL_OPTIONS.some((goal) => goals[goal.key]),
     app:
       app.mode === "new"
-        ? results.registerApps === "allowed"
-        : Boolean(selectedApp) && (app.secretMode === "new" ? results.appOwner === "allowed" : results.secret === "allowed"),
-    permissions:
-      results.assignRoles === "allowed" &&
-      (role.mode === "create" ? results.createRoles === "allowed" : results.roleFit === "allowed"),
+        ? appNameError === null
+        : Boolean(selectedApp) && (app.secretMode === "new" || results.secret === "allowed"),
+    permissions: role.mode === "create" ? roleNameError === null : results.roleFit === "allowed",
     storage: Object.keys(locationErrors).length === 0,
     review: displayNameError === null,
   };
@@ -477,11 +544,18 @@ export function useAzureAccountWizard(cloudAccounts) {
         send({ type: "taskUpdated", stepId, index, patch: { status: "active" }, run });
         await wait(tasks[index].durationMs);
         if (!stillRunning()) return;
+        const missingRight = missingRightFor(tasks[index].id, stateRef.current);
+        if (missingRight) {
+          const patch = { status: "failed", description: RIGHT_FAILURE_MESSAGES[missingRight] };
+          send({ type: "taskUpdated", stepId, index, patch, run });
+          send({ type: "creationFinished", stepId, status: "failed", failure: { reason: missingRight }, run });
+          return;
+        }
         const { simulateFailure, failureUsed } = stateRef.current;
         if (simulateFailure && !failureUsed && index === tasks.length - 1) {
           send({ type: "failureUsed" });
           send({ type: "taskUpdated", stepId, index, patch: { status: "failed", description: FAILURE_MESSAGES[stepId] }, run });
-          send({ type: "creationFinished", stepId, status: "failed", run });
+          send({ type: "creationFinished", stepId, status: "failed", failure: { reason: "timeout" }, run });
           return;
         }
         send({ type: "taskUpdated", stepId, index, patch: { status: "done" }, run });
@@ -531,10 +605,12 @@ export function useAzureAccountWizard(cloudAccounts) {
   } else if (stepCreation.status === "running") {
     primary = { kind: "running", label: "Creating…", enabled: false };
   } else {
+    // A missing right can't be fixed by retrying with the same account.
+    const retryable = !RIGHT_FAILURE_MESSAGES[stepCreation.failure?.reason];
     primary = {
       kind: "create",
       label: stepCreation.status === "failed" ? "Retry" : getCreateLabel(currentStepId, summary),
-      enabled: stepValid,
+      enabled: stepValid && (stepCreation.status !== "failed" || retryable),
     };
   }
 
@@ -573,6 +649,8 @@ export function useAzureAccountWizard(cloudAccounts) {
       results,
       displayName,
       displayNameError,
+      appNameError,
+      roleNameError,
       canProceed: canProceedByStep[steps[stepIndex].id],
       canSendAdminLink: isValidEmail(state.adminEmail),
       locationErrors,

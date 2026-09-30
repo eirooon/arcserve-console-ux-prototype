@@ -176,7 +176,6 @@ function AzureWizardBody({ onClose, closeGuardRef }) {
         onSubscriptionChange={actions.setSubscription}
         creation={state.creation.storage}
         locked={derived.locked.storage}
-        onStartOver={requestStartOver}
       />
     );
   } else {

@@ -11,20 +11,21 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
+import FormField from "../../components/FormField";
 import TonePill from "../../components/TonePill";
+import { useDirtyState } from "../../hooks/useDirtyState";
 import { usePageBreadcrumb } from "../../hooks/usePageBreadcrumb";
-import { useAzureAccountDetails } from "./hooks/azure/useAzureAccountDetails";
+import { getAccountNameError, useAzureAccountDetails } from "./hooks/azure/useAzureAccountDetails";
 import { DetailsRow, DetailsSection } from "./components/azure/details/DetailsSection";
-import EditGoalsDialog from "./components/azure/details/EditGoalsDialog";
-import ChangeStorageDialog from "./components/azure/details/ChangeStorageDialog";
 import PermissionsDialog from "./components/azure/details/PermissionsDialog";
 import DisconnectDialog from "./components/azure/details/DisconnectDialog";
 import ReplaceSecretDialog from "./components/azure/details/ReplaceSecretDialog";
-import ChangeRoleDialog from "./components/azure/details/ChangeRoleDialog";
-import { describeScopes } from "./hooks/azure/azureMockData";
+import ChangeClientIdDialog from "./components/azure/details/ChangeClientIdDialog";
+import ShortActionList from "./components/azure/ShortActionList";
 
 const LIST_PATH = "/infrastructures/cloud-accounts";
 const MINUTE_MS = 60 * 1000;
@@ -138,15 +139,22 @@ ClientSecretRow.propTypes = {
 
 /**
  * Modify page for a Microsoft Azure cloud account (Figma 10378:18489),
- * reached from the Cloud Accounts row menu's "Modify".
+ * reached from the Cloud Accounts row menu's "Modify". Only the name, the
+ * Client ID and the client secret can be changed here; everything else was
+ * set during setup and is shown read-only.
  */
 export default function AzureCloudAccountDetails() {
   const { accountId } = useParams();
   const navigate = useNavigate();
   const { account, loading, derived, checking, busy, simulatedIssue, actions } = useAzureAccountDetails(accountId);
-  // "goals" | "secret" | "role" | "storage" | "permissions" | "disconnect" | null
+  // "clientId" | "secret" | "permissions" | "disconnect" | null
   const [dialog, setDialog] = useState(null);
   const closeDialog = () => setDialog(null);
+
+  // The name is edited inline and saved with the header's Save; null means
+  // "not edited", so the field shows the saved name.
+  const { dirty, track, markClean } = useDirtyState();
+  const [nameDraft, setNameDraft] = useState(null);
 
   usePageBreadcrumb(account?.name ?? null);
 
@@ -170,6 +178,17 @@ export default function AzureCloudAccountDetails() {
     if (await save(value)) closeDialog();
   };
 
+  const name = nameDraft ?? account.name;
+  const nameError = getAccountNameError(name, derived.otherNames);
+  const canSave = dirty && name.trim() !== account.name && !nameError && !busy;
+  const handleSave = async () => {
+    if (!canSave) return;
+    if (await actions.rename(name)) {
+      setNameDraft(null);
+      markClean();
+    }
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
       <Stack
@@ -187,7 +206,7 @@ export default function AzureCloudAccountDetails() {
       >
         <Stack spacing={1} sx={{ minWidth: 0 }}>
           <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-            <Typography component="h1" variant="body1" noWrap sx={{ fontWeight: 500 }}>
+            <Typography component="h2" variant="body1" noWrap sx={{ fontWeight: 500 }}>
               {account.name}
             </Typography>
             {checking === "connection" ? (
@@ -219,6 +238,9 @@ export default function AzureCloudAccountDetails() {
           <Button variant="outlined" color="secondary" onClick={actions.checkConnection} disabled={Boolean(checking)}>
             Check Connection
           </Button>
+          <Button variant="contained" onClick={handleSave} disabled={!canSave}>
+            {busy && dirty ? "Saving…" : "Save"}
+          </Button>
         </Stack>
       </Stack>
 
@@ -243,30 +265,36 @@ export default function AzureCloudAccountDetails() {
                   </Stack>
                 )}
                 {health.missingActions.length > 0 && (
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    sx={{ alignItems: "center", justifyContent: "space-between" }}
-                  >
+                  <div>
                     <Typography variant="body2" color="inherit">
                       {azure.role.name} is missing {plural(health.missingActions.length, "permission")} Arcserve needs.
+                      Ask your Azure admin to add them back, then select Recheck.
                     </Typography>
-                    <Button variant="outlined" color="secondary" size="small" onClick={() => setDialog("role")}>
-                      Fix Permissions
-                    </Button>
-                  </Stack>
+                    <ShortActionList
+                      actions={health.missingActions}
+                      dialogTitle={`Missing from ${azure.role.name} (${health.missingActions.length})`}
+                      dialogDescription="Permissions someone removed from the role in Azure. Copy them to send to your Azure admin."
+                    />
+                  </div>
                 )}
               </Stack>
             </Alert>
           )}
+          <FormField label="Cloud Account Display Name">
+            <TextField
+              size="small"
+              fullWidth
+              value={name}
+              onChange={(event) => track(setNameDraft)(event.target.value)}
+              error={Boolean(nameError)}
+              helperText={nameError ?? "How this account appears in Cloud Accounts. Nothing changes in Azure."}
+              sx={{ "& .MuiInputBase-root": { bgcolor: "background.paper" } }}
+            />
+          </FormField>
+
           <DetailsSection
             title="Using Azure for"
-            subtitle="Changing this can add or remove Azure permissions."
-            action={
-              <Button variant="outlined" color="secondary" onClick={() => setDialog("goals")} aria-label="Edit what Azure is used for">
-                Edit
-              </Button>
-            }
+            subtitle="Set during setup. To use Azure for something else, add another cloud account."
           >
             {derived.goalRows.map((goal) => (
               <DetailsRow key={goal.key} label={goal.label} muted={!goal.active}>
@@ -289,9 +317,14 @@ export default function AzureCloudAccountDetails() {
               <DetailsRow
                 label="Client ID"
                 action={
-                  <RowButton onClick={actions.copyClientId} aria-label="Copy Client ID">
-                    Copy
-                  </RowButton>
+                  <Stack direction="row" spacing={0.5}>
+                    <RowButton onClick={actions.copyClientId} aria-label="Copy Client ID">
+                      Copy
+                    </RowButton>
+                    <RowButton onClick={() => setDialog("clientId")} aria-label="Change Client ID">
+                      Change
+                    </RowButton>
+                  </Stack>
                 }
               >
                 <Box component="span" sx={{ wordBreak: "break-all" }}>
@@ -317,14 +350,7 @@ export default function AzureCloudAccountDetails() {
             >
               <DetailsRow
                 label={azure.role.isNew ? "Custom role" : "Role"}
-                action={
-                  <Stack direction="row" spacing={0.5}>
-                    <RowButton onClick={() => setDialog("permissions")}>View Permissions</RowButton>
-                    <RowButton onClick={() => setDialog("role")} aria-label="Change role">
-                      Change
-                    </RowButton>
-                  </Stack>
-                }
+                action={<RowButton onClick={() => setDialog("permissions")}>View Permissions</RowButton>}
               >
                 {azure.role.name}
               </DetailsRow>
@@ -363,7 +389,7 @@ export default function AzureCloudAccountDetails() {
 
           <DetailsSection
             title="Location"
-            subtitle="Subscription and storage resource group are fixed after setup because your existing backups depend on them."
+            subtitle="Set during setup. Your existing backups depend on these, so they can’t be changed."
           >
             <DetailsRow label="Subscription">{azure.subscriptionName}</DetailsRow>
             {derived.showStorage && (
@@ -374,16 +400,8 @@ export default function AzureCloudAccountDetails() {
             {derived.showStorage && (
               <DetailsRow
                 label="Storage Account"
-                action={
-                  <RowButton onClick={() => setDialog("storage")} aria-label="Change storage account">
-                    Change
-                  </RowButton>
-                }
               >
-                <div>{azure.storage.account}</div>
-                <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
-                  New backups go to the storage account you choose. Existing backups stay where they are.
-                </Typography>
+                {azure.storage.account}
               </DetailsRow>
             )}
           </DetailsSection>
@@ -428,27 +446,6 @@ export default function AzureCloudAccountDetails() {
         </Stack>
       </Box>
 
-      <EditGoalsDialog
-        open={dialog === "goals"}
-        busy={busy}
-        goals={azure.goals}
-        appName={azure.app?.name}
-        storageAccount={azure.storage?.account}
-        role={azure.role}
-        subscriptionId={azure.subscriptionId}
-        onClose={closeDialog}
-        onSave={saveAndClose(actions.saveGoals)}
-      />
-      {derived.showStorage && (
-        <ChangeStorageDialog
-          open={dialog === "storage"}
-          busy={busy}
-          current={azure.storage.account}
-          resourceGroup={azure.storage.resourceGroup}
-          onClose={closeDialog}
-          onSave={saveAndClose(actions.changeStorageAccount)}
-        />
-      )}
       {derived.showApp && azure.role && (
         <PermissionsDialog
           open={dialog === "permissions"}
@@ -469,17 +466,13 @@ export default function AzureCloudAccountDetails() {
           onSave={saveAndClose(actions.replaceSecret)}
         />
       )}
-      {derived.showApp && azure.role && (
-        <ChangeRoleDialog
-          open={dialog === "role"}
+      {derived.showApp && (
+        <ChangeClientIdDialog
+          open={dialog === "clientId"}
           busy={busy}
-          role={azure.role}
-          requiredActions={derived.roleActions}
-          missingActions={health.missingActions}
-          scopeText={describeScopes(azure.role.scopes)}
-          subscriptionId={azure.subscriptionId}
+          current={azure.app.clientId}
           onClose={closeDialog}
-          onSave={saveAndClose(actions.changeRole)}
+          onSave={saveAndClose(actions.changeClientId)}
         />
       )}
       <DisconnectDialog

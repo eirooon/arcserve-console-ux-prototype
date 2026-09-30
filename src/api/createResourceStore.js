@@ -84,6 +84,13 @@ export function createResourceStore(endpoint) {
     closeDialog() {
       setState({ dialog: null });
     },
+    // Merges `patch` into one cached row without a refetch — for frequent
+    // background updates (e.g. a simulated deploy's progress ticks) where a
+    // refetch would flash the grid's loading overlay on every update.
+    patchRow(id, patch) {
+      if (!state.rows.some((row) => row.id === id)) return;
+      setState({ rows: state.rows.map((row) => (row.id === id ? { ...row, ...patch } : row)) });
+    },
     // Pushes a one-off status message (e.g. from a column's renderCell
     // reacting to a click, or after a create/update) onto the app-wide toast
     // stack (see toastStore/ToastHost) — any column definition or caller can

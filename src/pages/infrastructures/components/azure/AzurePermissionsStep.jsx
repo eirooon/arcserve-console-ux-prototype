@@ -1,9 +1,20 @@
 import { forwardRef, useState } from "react";
 import PropTypes from "prop-types";
-import { Alert, AlertTitle, Box, Button, Divider, MenuItem, RadioGroup, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Button,
+  Divider,
+  MenuItem,
+  RadioGroup,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import FormField from "../../../../components/FormField";
 import PlaceholderSelect from "../../../../components/PlaceholderSelect";
-import { CUSTOM_ROLE_NAME, EXISTING_ROLES } from "../../hooks/azure/azureMockData";
+import { EXISTING_ROLES } from "../../hooks/azure/azureMockData";
 import AdminHandoffForm from "./AdminHandoffForm";
 import PermissionListDialog from "./PermissionListDialog";
 import ShortActionList from "./ShortActionList";
@@ -16,9 +27,10 @@ const plural = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
 
 /**
  * Permissions step: the subscription the app's role is assigned on, and a
- * custom role or an existing one — validated against the permissions the
- * chosen goals need. Assigning a role is checked here, where it's needed,
- * and created from this step's own button.
+ * custom role (named here) or an existing one — validated against the
+ * permissions the chosen goals need. Rights to create or assign roles aren't
+ * pre-checked: a missing one surfaces when this step's button runs, with
+ * the way out right there.
  */
 const AzurePermissionsStep = forwardRef(function AzurePermissionsStep(
   { wizard, adminHandoff, onStartOver },
@@ -26,7 +38,8 @@ const AzurePermissionsStep = forwardRef(function AzurePermissionsStep(
 ) {
   const { state, derived, actions } = wizard;
   const { role } = state;
-  const { results, selectedRole, missingRoleActions, requiredActions, subscriptionName, locked } = derived;
+  const { results, selectedRole, missingRoleActions, requiredActions, subscriptionName, locked, roleNameError } =
+    derived;
   const email = state.signIn.account?.email ?? "This account";
   const [requiredOpen, setRequiredOpen] = useState(false);
   const setRoleField = actions.setRoleField;
@@ -37,6 +50,42 @@ const AzurePermissionsStep = forwardRef(function AzurePermissionsStep(
     </Button>
   );
 
+  // What a failed Create / Assign offers, by what went wrong.
+  const failureReason = derived.stepCreation.failure?.reason;
+  let failureContent;
+  if (failureReason === "createRoles") {
+    failureContent = (
+      <Alert severity="error" role="alert">
+        <AlertTitle>
+          {email} can’t create custom roles in {subscriptionName}
+        </AlertTitle>
+        Use a role your Azure admin created for backups, or start over with an account that can create roles.
+        <Stack direction="row" spacing={1} sx={{ mt: 1.5, flexWrap: "wrap" }}>
+          <Button variant="outlined" color="secondary" size="small" onClick={() => setRoleField("mode", "existing")}>
+            Use an Existing Role
+          </Button>
+          {startOverButton}
+        </Stack>
+      </Alert>
+    );
+  } else if (failureReason === "assignRoles") {
+    failureContent = (
+      <Alert severity="error" role="alert">
+        <AlertTitle>
+          {email} can’t assign roles in {subscriptionName}
+        </AlertTitle>
+        <Stack spacing={1.5}>
+          <Typography variant="body2">
+            Assigning a role needs Owner or User Access Administrator. Choose another subscription, send the setup to
+            your Azure admin, or start over with an account that has it.
+          </Typography>
+          <AdminHandoffForm {...adminHandoff} />
+          <Box>{startOverButton}</Box>
+        </Stack>
+      </Alert>
+    );
+  }
+
   return (
     <Stack spacing={3}>
       <StepHeading
@@ -44,11 +93,7 @@ const AzurePermissionsStep = forwardRef(function AzurePermissionsStep(
         title="Permissions"
         subtitle="The app gets a role with only the permissions your goals need, assigned on the subscription you choose."
       />
-      <StepCreationStatus
-        creation={derived.stepCreation}
-        doneMessage={`${role.mode === "create" ? CUSTOM_ROLE_NAME : (selectedRole?.name ?? "The role")} is assigned on ${subscriptionName}.`}
-        onStartOver={onStartOver}
-      />
+      <StepCreationStatus creation={derived.stepCreation} failureContent={failureContent} />
 
       <Box inert={locked.permissions} sx={{ opacity: locked.permissions ? 0.6 : 1 }}>
         <Stack spacing={3}>
@@ -57,27 +102,6 @@ const AzurePermissionsStep = forwardRef(function AzurePermissionsStep(
             onChange={actions.setSubscription}
             disabled={locked.subscription}
             helperText="Arcserve assigns the app’s role on this subscription"
-          />
-
-          <AccessCheck
-            result={results.assignRoles}
-            checkingLabel={`Checking that ${email} can assign roles in ${subscriptionName}…`}
-            allowedLabel={`${email} can assign roles in ${subscriptionName}.`}
-            denied={
-              <Alert severity="error" role="alert">
-                <AlertTitle>
-                  {email} can’t assign roles in {subscriptionName}
-                </AlertTitle>
-                <Stack spacing={1.5}>
-                  <Typography variant="body2">
-                    Assigning a role needs Owner or User Access Administrator. Choose another subscription, send the
-                    setup to your Azure admin, or start over with an account that has it.
-                  </Typography>
-                  <AdminHandoffForm {...adminHandoff} />
-                  <Box>{startOverButton}</Box>
-                </Stack>
-              </Alert>
-            }
           />
 
           <Divider />
@@ -102,34 +126,19 @@ const AzurePermissionsStep = forwardRef(function AzurePermissionsStep(
                 selected={role.mode === "create"}
                 onSelect={(value) => setRoleField("mode", value)}
                 title="Create a custom role"
-                description={`Arcserve creates “${CUSTOM_ROLE_NAME}” with exactly the ${plural(requiredActions.length, "permission")} needed.`}
+                description={`Arcserve creates a role with exactly the ${plural(requiredActions.length, "permission")} needed.`}
               >
                 <Box sx={{ pt: 1 }}>
-                  <AccessCheck
-                    result={results.createRoles}
-                    checkingLabel={`Checking that ${email} can create roles in ${subscriptionName}…`}
-                    allowedLabel={`${email} can create custom roles in ${subscriptionName}.`}
-                    denied={
-                      <Alert severity="error" role="alert">
-                        <AlertTitle>
-                          {email} can’t create custom roles in {subscriptionName}
-                        </AlertTitle>
-                        Use a role your Azure admin created for backups, or start over with an account that can create
-                        roles.
-                        <Stack direction="row" spacing={1} sx={{ mt: 1.5, flexWrap: "wrap" }}>
-                          <Button
-                            variant="outlined"
-                            color="secondary"
-                            size="small"
-                            onClick={() => setRoleField("mode", "existing")}
-                          >
-                            Use an Existing Role
-                          </Button>
-                          {startOverButton}
-                        </Stack>
-                      </Alert>
-                    }
-                  />
+                  <FormField label="Custom Role Name">
+                    <TextField
+                      size="small"
+                      fullWidth
+                      value={role.newName}
+                      onChange={(event) => setRoleField("newName", event.target.value)}
+                      error={Boolean(roleNameError)}
+                      helperText={roleNameError ?? `How the role appears in ${subscriptionName}.`}
+                    />
+                  </FormField>
                 </Box>
               </OptionCard>
 

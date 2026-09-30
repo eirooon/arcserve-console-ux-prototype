@@ -9,12 +9,13 @@ import {
   MenuItem,
   RadioGroup,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import FormField from "../../../../components/FormField";
 import PasswordField from "../../../../components/PasswordField";
 import PlaceholderSelect from "../../../../components/PlaceholderSelect";
-import { APP_REGISTRATION_NAME, EXISTING_APPS, TENANT } from "../../hooks/azure/azureMockData";
+import { EXISTING_APPS, TENANT } from "../../hooks/azure/azureMockData";
 import SecretExpiryField from "./SecretExpiryField";
 import StepCreationStatus from "./StepCreationStatus";
 import { AccessCheck, OptionCard, StepHeading } from "./AzureWizardParts";
@@ -33,8 +34,9 @@ RecoveryActions.propTypes = { children: PropTypes.node.isRequired };
 /**
  * App Identity step (engineering feedback #1 and #3): create a new app, or
  * use one an Azure admin already created — then create a client secret for
- * it or enter an existing one to validate. Registering apps is only checked
- * when "Create a new app" is chosen.
+ * it or enter an existing one to validate. The account's rights (register
+ * apps, own the app) aren't pre-checked: a missing one surfaces when this
+ * step's button runs, with the way out right there.
  */
 const AzureAppStep = forwardRef(function AzureAppStep({ wizard, onStartOver }, headingRef) {
   const { state, derived, actions } = wizard;
@@ -52,6 +54,36 @@ const AzureAppStep = forwardRef(function AzureAppStep({ wizard, onStartOver }, h
   );
   const locked = derived.locked.app;
 
+  // What a failed Create App / Create Secret offers, by what went wrong.
+  const failureReason = derived.stepCreation.failure?.reason;
+  let failureContent;
+  if (failureReason === "registerApps") {
+    failureContent = (
+      <Alert severity="error" role="alert">
+        <AlertTitle>{email} can’t register apps in Microsoft Entra ID</AlertTitle>
+        Use an app your Azure admin already created, or start over and sign in with an account that can register apps.
+        <RecoveryActions>
+          <Button variant="outlined" color="secondary" size="small" onClick={() => setField("mode", "existing")}>
+            Use an Existing App
+          </Button>
+          {startOverButton}
+        </RecoveryActions>
+      </Alert>
+    );
+  } else if (failureReason === "appOwner" && selectedApp) {
+    failureContent = (
+      <Alert severity="error" role="alert">
+        <AlertTitle>Only owners of {selectedApp.name} can create secrets</AlertTitle>
+        Enter a client secret your Azure admin gave you, or ask them to add you as an owner.
+        <RecoveryActions>
+          <Button variant="outlined" color="secondary" size="small" onClick={() => setField("secretMode", "existing")}>
+            Enter Existing Secret
+          </Button>
+        </RecoveryActions>
+      </Alert>
+    );
+  }
+
   return (
     <Stack spacing={3}>
       <StepHeading
@@ -59,13 +91,7 @@ const AzureAppStep = forwardRef(function AzureAppStep({ wizard, onStartOver }, h
         title="App Identity"
         subtitle="Arcserve signs in to Azure as this app to back up and restore. Create a new one, or use one your Azure admin already set up."
       />
-      <StepCreationStatus
-        creation={derived.stepCreation}
-        doneMessage={
-          app.mode === "new" ? "The app and its client secret are created." : "The app is ready for Arcserve to use."
-        }
-        onStartOver={onStartOver}
-      />
+      <StepCreationStatus creation={derived.stepCreation} failureContent={failureContent} />
       <Box inert={locked} sx={{ opacity: locked ? 0.6 : 1 }}>
         <RadioGroup
           aria-label="App identity"
@@ -78,38 +104,23 @@ const AzureAppStep = forwardRef(function AzureAppStep({ wizard, onStartOver }, h
             selected={app.mode === "new"}
             onSelect={(value) => setField("mode", value)}
             title="Create a new app"
-            description={`Arcserve registers “${APP_REGISTRATION_NAME}” in Microsoft Entra ID and creates its client secret.`}
+            description="Arcserve registers a new app in Microsoft Entra ID and creates its client secret."
           >
             <Stack spacing={2} sx={{ pt: 1 }}>
-              <AccessCheck
-                result={results.registerApps}
-                checkingLabel={`Checking that ${email} can register apps…`}
-                allowedLabel={`${email} can register apps in Microsoft Entra ID.`}
-                denied={
-                  <Alert severity="error" role="alert">
-                    <AlertTitle>{email} can’t register apps in Microsoft Entra ID</AlertTitle>
-                    Use an app your Azure admin already created, or start over and sign in with an account that can
-                    register apps.
-                    <RecoveryActions>
-                      <Button
-                        variant="outlined"
-                        color="secondary"
-                        size="small"
-                        onClick={() => setField("mode", "existing")}
-                      >
-                        Use an Existing App
-                      </Button>
-                      {startOverButton}
-                    </RecoveryActions>
-                  </Alert>
-                }
-              />
-              {results.registerApps === "allowed" && (
-                <SecretExpiryField
-                  value={app.secretExpiryMonths}
-                  onChange={(value) => setField("secretExpiryMonths", value)}
+              <FormField label="App Registration Name">
+                <TextField
+                  size="small"
+                  fullWidth
+                  value={app.newName}
+                  onChange={(event) => setField("newName", event.target.value)}
+                  error={Boolean(derived.appNameError)}
+                  helperText={derived.appNameError ?? "How the app appears in Microsoft Entra ID."}
                 />
-              )}
+              </FormField>
+              <SecretExpiryField
+                value={app.secretExpiryMonths}
+                onChange={(value) => setField("secretExpiryMonths", value)}
+              />
             </Stack>
           </OptionCard>
 
@@ -162,33 +173,10 @@ const AzureAppStep = forwardRef(function AzureAppStep({ wizard, onStartOver }, h
                       description={`Arcserve adds a secret to ${selectedApp.name}. Needs you to be one of its owners.`}
                     >
                       <Stack spacing={2} sx={{ pt: 1 }}>
-                        <AccessCheck
-                          result={results.appOwner}
-                          checkingLabel={`Checking that you’re an owner of ${selectedApp.name}…`}
-                          allowedLabel={`You’re an owner of ${selectedApp.name}.`}
-                          denied={
-                            <Alert severity="warning" role="alert">
-                              <AlertTitle>Only owners of {selectedApp.name} can create secrets</AlertTitle>
-                              Enter a client secret your Azure admin gave you, or ask them to add you as an owner.
-                              <RecoveryActions>
-                                <Button
-                                  variant="outlined"
-                                  color="secondary"
-                                  size="small"
-                                  onClick={() => setField("secretMode", "existing")}
-                                >
-                                  Enter Existing Secret
-                                </Button>
-                              </RecoveryActions>
-                            </Alert>
-                          }
+                        <SecretExpiryField
+                          value={app.secretExpiryMonths}
+                          onChange={(value) => setField("secretExpiryMonths", value)}
                         />
-                        {results.appOwner === "allowed" && (
-                          <SecretExpiryField
-                            value={app.secretExpiryMonths}
-                            onChange={(value) => setField("secretExpiryMonths", value)}
-                          />
-                        )}
                       </Stack>
                     </OptionCard>
                     <OptionCard

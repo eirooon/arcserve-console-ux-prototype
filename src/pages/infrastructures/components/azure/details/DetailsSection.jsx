@@ -16,7 +16,7 @@ export function DetailsSection({ title, subtitle, action, children }) {
         sx={{ alignItems: "center", px: 2, py: 1.5, borderBottom: children ? 1 : 0, borderColor: "divider" }}
       >
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography id={titleId} component="h2" variant="body1" sx={{ fontWeight: 500 }}>
+          <Typography id={titleId} component="h3" variant="body1" sx={{ fontWeight: 500 }}>
             {title}
           </Typography>
           <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>

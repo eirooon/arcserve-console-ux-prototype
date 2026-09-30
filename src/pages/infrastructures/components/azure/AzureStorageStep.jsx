@@ -26,7 +26,6 @@ const AzureStorageStep = forwardRef(function AzureStorageStep(
     onSubscriptionChange,
     creation,
     locked,
-    onStartOver,
   },
   headingRef,
 ) {
@@ -37,11 +36,7 @@ const AzureStorageStep = forwardRef(function AzureStorageStep(
         title="Where should backups be stored?"
         subtitle="A storage account for backup data, in its own resource group. We've picked sensible defaults. Change anything you need."
       />
-      <StepCreationStatus
-        creation={creation}
-        doneMessage="The storage account is ready for backups."
-        onStartOver={onStartOver}
-      />
+      <StepCreationStatus creation={creation} />
       <Box inert={locked} sx={{ opacity: locked ? 0.6 : 1 }}>
         <Stack spacing={3}>
           {/* With no app (RPS storage only) there's no Permissions step, so the
@@ -125,7 +120,6 @@ AzureStorageStep.propTypes = {
   onSubscriptionChange: PropTypes.func.isRequired,
   creation: PropTypes.object.isRequired,
   locked: PropTypes.bool.isRequired,
-  onStartOver: PropTypes.func.isRequired,
 };
 
 export default AzureStorageStep;

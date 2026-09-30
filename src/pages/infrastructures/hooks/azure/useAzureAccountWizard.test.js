@@ -45,7 +45,7 @@ describe("Sign In", () => {
     const { result } = renderWizard();
     await signInAs(result, noRoleRights);
     expect(result.current.derived.canProceed).toBe(true);
-    expect(result.current.state.checks.assignRoles.status).toBe("idle");
+    expect(Object.values(result.current.state.checks).every((check) => check.status === "idle")).toBe(true);
   });
 });
 
@@ -91,32 +91,45 @@ describe("steps follow the chosen goals", () => {
 });
 
 describe("App Identity", () => {
-  it("checks app registration rights only on this step", async () => {
+  it("names a new app from the editable field, prefilled with a suggestion", () => {
     const { result } = renderWizard();
-    await signInAs(result, itAdmin);
-    expect(result.current.state.checks.registerApps.status).toBe("idle");
-    act(() => result.current.actions.goToStep("app"));
-    expect(result.current.derived.results.registerApps).toBe("checking");
-    await flushTimers();
-    expect(result.current.derived.results.registerApps).toBe("allowed");
-    expect(result.current.derived.canProceed).toBe(true);
+    expect(result.current.state.app.newName).toBe("Arcserve Backup – Contoso");
+    act(() => result.current.actions.setAppField("newName", "Contoso VM Backups"));
+    expect(result.current.derived.summary.app.name).toBe("Contoso VM Backups");
+    act(() => result.current.actions.setAppField("newName", "Arcserve-Backup-App"));
+    expect(result.current.derived.appNameError).toMatch(/already exists/);
   });
 
-  it("blocks creating an app without the right, then allows an existing app with a validated secret", async () => {
+  it("doesn't pre-check app rights; a new app only needs a valid name", async () => {
     const { result } = renderWizard();
     await signInAs(result, backupOperator);
     await goTo(result, "app");
-    expect(result.current.derived.results.registerApps).toBe("denied");
-    expect(result.current.derived.canProceed).toBe(false);
+    expect(result.current.state.checks).not.toHaveProperty("registerApps");
+    expect(result.current.derived.primary).toMatchObject({ label: "Create App", enabled: true });
+  });
+
+  it("reports a missing right when creating the app, then continues with an existing app", async () => {
+    const { result } = renderWizard();
+    await signInAs(result, backupOperator);
+    await goTo(result, "app");
+    act(() => {
+      result.current.actions.createForStep("app", result.current.derived.summary);
+    });
+    await flushTimers();
+    expect(result.current.state.creation.app.failure).toEqual({ reason: "registerApps" });
+    expect(result.current.derived.primary).toMatchObject({ label: "Retry", enabled: false });
 
     act(() => {
       result.current.actions.setAppField("mode", "existing");
       result.current.actions.setAppField("existingAppId", "app-1");
     });
+    expect(result.current.state.creation.app.status).toBe("idle");
+    // Not an owner of app-1: creating a secret fails when it runs.
+    act(() => {
+      result.current.actions.createForStep("app", result.current.derived.summary);
+    });
     await flushTimers();
-    // Not an owner of app-1, so it can't create a secret for it.
-    expect(result.current.derived.results.appOwner).toBe("denied");
-    expect(result.current.derived.canProceed).toBe(false);
+    expect(result.current.state.creation.app.failure).toEqual({ reason: "appOwner" });
 
     act(() => {
       result.current.actions.setAppField("secretMode", "existing");
@@ -129,13 +142,12 @@ describe("App Identity", () => {
     expect(result.current.derived.results.secret).toBe("denied");
 
     act(() => result.current.actions.setAppField("secretValue", "Qm8Q~vT3kZp.9xLr2W"));
-    expect(result.current.derived.results.secret).toBe("idle");
     act(() => {
       result.current.actions.validateSecret();
     });
     await flushTimers();
     expect(result.current.derived.results.secret).toBe("allowed");
-    expect(result.current.derived.canProceed).toBe(true);
+    expect(result.current.derived.primary).toMatchObject({ kind: "next", enabled: true });
     expect(result.current.derived.summary.app).toMatchObject({ isNew: false, name: "Arcserve-Backup-App", secretIsNew: false });
   });
 
@@ -147,28 +159,70 @@ describe("App Identity", () => {
       result.current.actions.setAppField("mode", "existing");
       result.current.actions.setAppField("existingAppId", "app-2");
     });
+    act(() => {
+      result.current.actions.createForStep("app", result.current.derived.summary);
+    });
     await flushTimers();
-    expect(result.current.derived.results.appOwner).toBe("allowed");
-    expect(result.current.derived.canProceed).toBe(true);
+    expect(result.current.state.creation.app.status).toBe("done");
   });
 });
 
+const createPermissions = async (result) => {
+  act(() => {
+    result.current.actions.createForStep("permissions", result.current.derived.summary);
+  });
+  await flushTimers();
+};
+
 describe("Permissions", () => {
-  it("allows creating a custom role with the rights to create and assign it", async () => {
+  it("doesn't pre-check role rights; a custom role only needs a valid name", async () => {
+    const { result } = renderWizard();
+    await signInAs(result, noRoleRights);
+    await goTo(result, "permissions");
+    expect(result.current.derived.canProceed).toBe(true);
+    act(() => result.current.actions.setRoleField("newName", "  "));
+    expect(result.current.derived.roleNameError).toMatch(/Enter/);
+    act(() => result.current.actions.setRoleField("newName", "Contributor"));
+    expect(result.current.derived.roleNameError).toMatch(/already exists/);
+    expect(result.current.derived.canProceed).toBe(false);
+  });
+
+  it("names the custom role from the editable field", async () => {
+    const { result } = renderWizard();
+    act(() => result.current.actions.setRoleField("newName", "Contoso Backup Role"));
+    expect(result.current.derived.summary.role.name).toBe("Contoso Backup Role");
+  });
+
+  it("creates and assigns the role when the account has the rights", async () => {
     const { result } = renderWizard();
     await signInAs(result, itAdmin);
     await goTo(result, "permissions");
-    expect(result.current.derived.results.assignRoles).toBe("allowed");
-    expect(result.current.derived.results.createRoles).toBe("allowed");
-    expect(result.current.derived.canProceed).toBe(true);
+    await createPermissions(result);
+    expect(result.current.state.creation.permissions.status).toBe("done");
+  });
+
+  it("reports a missing right when creating, and moves on after switching to an existing role", async () => {
+    const { result } = renderWizard();
+    await signInAs(result, backupOperator);
+    await goTo(result, "permissions");
+    await createPermissions(result);
+    expect(result.current.state.creation.permissions).toMatchObject({ status: "failed", failure: { reason: "createRoles" } });
+    // Retrying with the same account can't fix a missing right.
+    expect(result.current.derived.primary).toMatchObject({ label: "Retry", enabled: false });
+
+    act(() => {
+      result.current.actions.setRoleField("mode", "existing");
+      result.current.actions.setRoleField("existingRoleId", "role-1");
+    });
+    await flushTimers();
+    expect(result.current.state.creation.permissions.status).toBe("idle");
+    expect(result.current.derived.primary).toMatchObject({ label: "Assign Role", enabled: true });
   });
 
   it("validates an existing role against the required permissions", async () => {
     const { result } = renderWizard();
     await signInAs(result, backupOperator);
     await goTo(result, "permissions");
-    expect(result.current.derived.results.createRoles).toBe("denied");
-
     act(() => {
       result.current.actions.setRoleField("mode", "existing");
       result.current.actions.setRoleField("existingRoleId", "role-2");
@@ -197,20 +251,26 @@ describe("Permissions", () => {
     expect(result.current.derived.missingRoleActions).toContain("Microsoft.Compute/snapshots/delete");
   });
 
-  it("blocks Next when the account can't assign roles", async () => {
+  it("reports that the account can't assign roles when assigning", async () => {
     const { result } = renderWizard();
     await signInAs(result, noRoleRights);
     await goTo(result, "permissions");
-    expect(result.current.derived.results.assignRoles).toBe("denied");
-    expect(result.current.derived.canProceed).toBe(false);
+    act(() => {
+      result.current.actions.setRoleField("mode", "existing");
+      result.current.actions.setRoleField("existingRoleId", "role-1");
+    });
+    await flushTimers();
+    await createPermissions(result);
+    expect(result.current.state.creation.permissions.failure).toEqual({ reason: "assignRoles" });
   });
 
-  it("re-checks role rights when the subscription changes", async () => {
+  it("checks rights on the subscription chosen here", async () => {
     const { result } = renderWizard();
     await signInAs(result, itAdmin);
-    act(() => result.current.actions.setSubscription(development.id));
     await goTo(result, "permissions");
-    expect(result.current.derived.results.assignRoles).toBe("denied");
+    act(() => result.current.actions.setSubscription(development.id));
+    await createPermissions(result);
+    expect(result.current.state.creation.permissions.failure).toEqual({ reason: "createRoles" });
   });
 
   it("assigns the role on the chosen subscription", () => {
