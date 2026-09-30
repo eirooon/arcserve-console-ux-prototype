@@ -84,11 +84,7 @@ export default function ProtectionIntentRecommendationPanelEnhanced({
       >
         <Stack spacing={3}>
           {/* Header with Try Another Option */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-          >
+          <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
             <Chip
               label={chipLabel}
               icon={
@@ -168,11 +164,11 @@ export default function ProtectionIntentRecommendationPanelEnhanced({
                   gap: "8px",
                 }}
               >
-                <Typography variant="body2" fontWeight={700} noWrap>
+                <Typography variant="body2" noWrap sx={{ fontWeight: 700 }}>
                   {categoryFormData[category.id].categoryName}
                 </Typography>
-                <Stack direction="row" spacing="8px" alignItems="flex-end">
-                  <Typography variant="h6" fontWeight={700} sx={{ letterSpacing: "0.15px" }}>
+                <Stack direction="row" spacing="8px" sx={{ alignItems: "flex-end" }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: "0.15px" }}>
                     {category.sourcesCount ?? 0}
                   </Typography>
                   <Typography variant="body2">sources</Typography>
@@ -192,16 +188,16 @@ export default function ProtectionIntentRecommendationPanelEnhanced({
       </Box>
 
       {/* Protection Categories Header with Info */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
+      <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
         <Box>
-          <Typography variant="h6" fontWeight={700} color="text.primary">
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "text.primary" }}>
             Protection Categories
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Open each category to review its settings
           </Typography>
         </Box>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
           <Button
             size="small"
             variant="text"
@@ -246,7 +242,7 @@ export default function ProtectionIntentRecommendationPanelEnhanced({
         </DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           <Stack spacing={2}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
               {CATEGORIZATION_EXPLANATION.description}
             </Typography>
             <Box component="ul" sx={{ pl: 2, m: 0 }}>
@@ -255,14 +251,13 @@ export default function ProtectionIntentRecommendationPanelEnhanced({
                   key={idx}
                   component="li"
                   variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 0.5 }}
+                  sx={{ color: "text.secondary", mb: 0.5 }}
                 >
                   {factor}
                 </Typography>
               ))}
             </Box>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
               <strong>Note:</strong> {CATEGORIZATION_EXPLANATION.note}
             </Typography>
           </Stack>
@@ -295,34 +290,18 @@ export default function ProtectionIntentRecommendationPanelEnhanced({
           {selectedExtension && (
             <Stack spacing={2}>
               <Box>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={600}
-                  color="text.primary"
-                >
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "text.primary" }}>
                   Description
                 </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 0.5 }}
-                >
+                <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
                   {EXTENSION_DETAILS[selectedExtension].description}
                 </Typography>
               </Box>
               <Box>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={600}
-                  color="text.primary"
-                >
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "text.primary" }}>
                   Impact
                 </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 0.5 }}
-                >
+                <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
                   {EXTENSION_DETAILS[selectedExtension].impact}
                 </Typography>
               </Box>

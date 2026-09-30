@@ -43,8 +43,8 @@ export default function ProtectionTypeCard({ label, description, selected, onSel
       <Tooltip title={description}>
         <Typography
           variant="body2"
-          color="text.secondary"
           sx={{
+            color: "text.secondary",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",

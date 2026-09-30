@@ -47,7 +47,7 @@ export default function AcrsServerDetails() {
   if (!server) {
     return (
       <Box sx={{ p: 4 }}>
-        <Typography color="text.secondary">
+        <Typography sx={{ color: "text.secondary" }}>
           {loading ? "Loading…" : "Server not found."}
         </Typography>
       </Box>
@@ -63,13 +63,8 @@ export default function AcrsServerDetails() {
         minHeight: 0,
       }}
     >
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{ px: 3, py: 2 }}
-      >
-        <Typography variant="h6" color="text.primary">
+      <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", px: 3, py: 2 }}>
+        <Typography variant="h6" sx={{ color: "text.primary" }}>
           {server.displayName}
         </Typography>
         <Button

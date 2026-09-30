@@ -22,7 +22,7 @@ export default function CustomPromptArchitecting({ promptText }) {
       heading={scenario.heading}
       subheading={scenario.subheading}
       footerNote={
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: "text.secondary" }}>
           {scenario.footerNote}
         </Typography>
       }
@@ -36,10 +36,10 @@ export default function CustomPromptArchitecting({ promptText }) {
             py: 0.5,
           }}
         >
-          <Typography variant="overline" color="text.secondary">
+          <Typography variant="overline" sx={{ color: "text.secondary" }}>
             Your Prompt
           </Typography>
-          <Typography variant="body2" fontStyle="italic" color="text.primary">
+          <Typography variant="body2" sx={{ fontStyle: "italic", color: "text.primary" }}>
             “{promptText || CUSTOM_PROMPT_COPY.placeholder}”
           </Typography>
         </Box>
@@ -57,7 +57,7 @@ export default function CustomPromptArchitecting({ promptText }) {
         />
 
         <Stack spacing={1}>
-          <Typography variant="overline" color="text.secondary">
+          <Typography variant="overline" sx={{ color: "text.secondary" }}>
             Understood As
           </Typography>
           <ArchitectingChecklist

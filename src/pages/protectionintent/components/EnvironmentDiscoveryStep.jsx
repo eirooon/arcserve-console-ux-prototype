@@ -13,7 +13,7 @@ export default function EnvironmentDiscoveryStep({ onDiscoveryComplete, onCancel
   const percent = Math.round(progress * 100);
 
   return (
-    <Stack spacing={3} alignItems="center">
+    <Stack spacing={3} sx={{ alignItems: "center" }}>
       <Box
         sx={{
           position: "relative",
@@ -27,24 +27,27 @@ export default function EnvironmentDiscoveryStep({ onDiscoveryComplete, onCancel
           pb: { xs: 4, sm: 5 },
         }}
       >
-        <Stack alignItems="center" spacing={0}>
+        <Stack spacing={0} sx={{ alignItems: "center" }}>
           <Box sx={{ mb: 3.25 }}>
             <EnvironmentRadarVisual active={!isComplete} />
           </Box>
 
           <Typography
             variant="h5"
-            fontWeight={600}
-            color="text.primary"
-            sx={{ fontSize: "20px", lineHeight: 1.3, letterSpacing: "-0.005em" }}
+            sx={{
+              fontWeight: 600,
+              color: "text.primary",
+              fontSize: "20px",
+              lineHeight: 1.3,
+              letterSpacing: "-0.005em",
+            }}
           >
             {isComplete ? "Environment scan complete" : "Scanning your environment"}
           </Typography>
           <Typography
             variant="body2"
-            color="text.secondary"
             align="center"
-            sx={{ mt: 1.25, lineHeight: 1.55, maxWidth: 400 }}
+            sx={{ color: "text.secondary", mt: 1.25, lineHeight: 1.55, maxWidth: 400 }}
           >
             {isComplete
               ? "We've finished discovering your infrastructure."
@@ -59,7 +62,7 @@ export default function EnvironmentDiscoveryStep({ onDiscoveryComplete, onCancel
             {isComplete ? "Discovery complete" : ""}
           </Box>
 
-          <Stack direction="row" alignItems="center" spacing={2} sx={{ width: "100%", mt: 3.75 }}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: "center", width: "100%", mt: 3.75 }}>
             <LinearProgress
               variant="determinate"
               value={percent}
@@ -76,9 +79,14 @@ export default function EnvironmentDiscoveryStep({ onDiscoveryComplete, onCancel
             />
             <Typography
               variant="caption"
-              fontWeight={500}
-              color="text.primary"
-              sx={{ width: 42, textAlign: "right", flexShrink: 0, fontVariantNumeric: "tabular-nums" }}
+              sx={{
+                fontWeight: 500,
+                color: "text.primary",
+                width: 42,
+                textAlign: "right",
+                flexShrink: 0,
+                fontVariantNumeric: "tabular-nums",
+              }}
             >
               {percent}%
             </Typography>
@@ -116,7 +124,7 @@ export default function EnvironmentDiscoveryStep({ onDiscoveryComplete, onCancel
         </Stack>
       </Box>
 
-      <Stack direction="row" justifyContent="space-between" sx={{ width: "100%" }}>
+      <Stack direction="row" sx={{ justifyContent: "space-between", width: "100%" }}>
         <Button variant="text" color="secondary" onClick={onCancel}>
           Cancel
         </Button>

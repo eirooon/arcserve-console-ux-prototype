@@ -47,12 +47,8 @@ export default function ArcGenieProtectionIntentPage() {
       }}
     >
       <Stack spacing={3} sx={{ width: "100%", px: 6 }}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Typography variant="h6" color="text.primary">
+        <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
+          <Typography variant="h6" sx={{ color: "text.primary" }}>
             Protection Intent
           </Typography>
           <Stack direction="row" spacing={1}>

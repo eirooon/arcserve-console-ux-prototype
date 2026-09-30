@@ -8,6 +8,8 @@ export const CURRENT_USER = {
   name: "Erron Sevilla",
   organization: "Arcserve",
   initials: "ES",
+  // Recorded as a new site's "Registered Email Address".
+  email: "erron.sevilla@arcserve.com",
   planLabel: "Pro",
   version: "v1.5.69",
 };

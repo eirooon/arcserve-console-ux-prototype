@@ -5,10 +5,10 @@ import AccordionShell from "../../../components/AccordionShell";
 export function DetailRow({ label, value }) {
   return (
     <Stack direction="row" spacing={1} sx={{ width: "100%" }}>
-      <Typography variant="body2" color="text.secondary" sx={{ width: 200, flexShrink: 0 }}>
+      <Typography variant="body2" sx={{ color: "text.secondary", width: 200, flexShrink: 0 }}>
         {label}
       </Typography>
-      <Typography variant="body2" color="text.primary" noWrap>
+      <Typography variant="body2" noWrap sx={{ color: "text.primary" }}>
         {value}
       </Typography>
     </Stack>
@@ -46,16 +46,16 @@ export default function ProtectionCategoryAccordion({
       summary={
         <>
           <Stack sx={{ width: 400, flexShrink: 0 }}>
-            <Typography variant="body1" fontWeight={700} color="text.primary">
+            <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
               {category.label}
             </Typography>
-            <Typography variant="body2" color="text.secondary" noWrap>
+            <Typography variant="body2" noWrap sx={{ color: "text.secondary" }}>
               {category.description}
             </Typography>
           </Stack>
           <Stack direction="row" spacing={3} sx={{ flex: 1, minWidth: 0 }}>
             {quickStats.map((stat) => (
-              <Typography key={stat} variant="body2" color="text.secondary" noWrap>
+              <Typography key={stat} variant="body2" noWrap sx={{ color: "text.secondary" }}>
                 {stat}
               </Typography>
             ))}
@@ -67,7 +67,7 @@ export default function ProtectionCategoryAccordion({
       <Stack direction="row" spacing={4}>
         <Stack spacing={4} sx={{ flex: 1, minWidth: 0 }}>
           <Stack spacing={2}>
-            <Typography variant="subtitle2" fontWeight={500} color="text.primary">
+            <Typography variant="subtitle2" sx={{ fontWeight: 500, color: "text.primary" }}>
               General Settings
             </Typography>
             <Stack spacing={0.5}>
@@ -77,7 +77,7 @@ export default function ProtectionCategoryAccordion({
             </Stack>
           </Stack>
           <Stack spacing={2}>
-            <Typography variant="subtitle2" fontWeight={500} color="text.primary">
+            <Typography variant="subtitle2" sx={{ fontWeight: 500, color: "text.primary" }}>
               Default Destination Settings
             </Typography>
             <Stack spacing={0.5}>
@@ -99,12 +99,12 @@ export default function ProtectionCategoryAccordion({
           )}
         </Stack>
         <Stack spacing={2} sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="subtitle2" fontWeight={500} color="text.primary">
+          <Typography variant="subtitle2" sx={{ fontWeight: 500, color: "text.primary" }}>
             Extensions
           </Typography>
           {readOnly ? (
             visibleExtensions.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 No extensions selected.
               </Typography>
             ) : (
@@ -119,8 +119,8 @@ export default function ProtectionCategoryAccordion({
                       borderColor: "divider",
                     }}
                   >
-                    <Stack direction="row" spacing={0.5} alignItems="center">
-                      <Typography variant="body2" fontWeight={700} color="text.primary">
+                    <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
                         {extension.label}
                       </Typography>
                       {onExtensionInfo && (
@@ -136,7 +136,7 @@ export default function ProtectionCategoryAccordion({
                       )}
                     </Stack>
                     {extension.detail && (
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{ color: "text.secondary" }}>
                         {extension.detail}
                       </Typography>
                     )}
@@ -160,8 +160,8 @@ export default function ProtectionCategoryAccordion({
                     aria-label={`Toggle ${extension.label}`}
                   />
                   <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-                    <Stack direction="row" spacing={0.5} alignItems="center">
-                      <Typography variant="body2" color="text.primary">
+                    <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+                      <Typography variant="body2" sx={{ color: "text.primary" }}>
                         {extension.label}
                       </Typography>
                       {onExtensionInfo && (
@@ -177,7 +177,7 @@ export default function ProtectionCategoryAccordion({
                       )}
                     </Stack>
                     {extension.detail && (
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{ color: "text.secondary" }}>
                         {extension.detail}
                       </Typography>
                     )}

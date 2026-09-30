@@ -24,7 +24,7 @@ export default function StatusPill({ label, bgcolor, color, dot = false, fontWei
           sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: color, flexShrink: 0 }}
         />
       )}
-      <Typography variant="caption" fontWeight={fontWeight}>
+      <Typography variant="caption" sx={{ fontWeight: fontWeight }}>
         {label}
       </Typography>
     </Box>

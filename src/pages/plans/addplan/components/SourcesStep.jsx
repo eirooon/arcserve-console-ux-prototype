@@ -93,7 +93,7 @@ export default function SourcesStep({ selectedSourceIds, onSelectionChange }) {
             }}
           >
             <InventoryOutlinedIcon sx={{ fontSize: 96, color: "action.disabled" }} />
-            <Typography variant="body2" color="text.disabled">
+            <Typography variant="body2" sx={{ color: "text.disabled" }}>
               You have not selected any source(s) so far. Click on Select Source(s) to get started!
             </Typography>
           </Box>

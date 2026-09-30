@@ -9,16 +9,14 @@ function SourceColumn({ label, primary, secondary, color }) {
     <Stack spacing={0.25} sx={{ flex: 1, minWidth: 0 }}>
       <Typography
         variant="caption"
-        color="text.secondary"
-        fontWeight={600}
-        sx={{ textTransform: "uppercase", letterSpacing: "0.05em", fontSize: 11 }}
+        sx={{ color: "text.secondary", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", fontSize: 11 }}
       >
         {label}
       </Typography>
-      <Typography variant="body2" fontWeight={500} color={color ?? "text.primary"} noWrap>
+      <Typography variant="body2" noWrap sx={{ fontWeight: 500, color: color ?? "text.primary" }}>
         {primary}
       </Typography>
-      <Typography variant="caption" color="text.secondary" noWrap>
+      <Typography variant="caption" noWrap sx={{ color: "text.secondary" }}>
         {secondary}
       </Typography>
     </Stack>
@@ -33,8 +31,8 @@ function RequestTypeBadge({ type }) {
     <Stack
       direction="row"
       spacing={0.5}
-      alignItems="center"
       sx={{
+        alignItems: "center",
         bgcolor: meta.bgcolor,
         color: meta.color,
         borderRadius: "12px",
@@ -44,7 +42,7 @@ function RequestTypeBadge({ type }) {
       }}
     >
       <Icon sx={{ fontSize: 14 }} aria-hidden="true" />
-      <Typography variant="caption" fontWeight={600}>
+      <Typography variant="caption" sx={{ fontWeight: 600 }}>
         {meta.label}
       </Typography>
     </Stack>
@@ -92,25 +90,24 @@ export default function WaitingOnYouCard({
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={1.5}
-        alignItems={{ xs: "flex-start", sm: "center" }}
-        justifyContent="space-between"
+        sx={{ alignItems: { xs: "flex-start", sm: "center" }, justifyContent: "space-between" }}
       >
-        <Stack direction="row" spacing={1.25} alignItems="center" flexWrap="wrap" rowGap={0.5}>
+        <Stack direction="row" spacing={1.25} sx={{ alignItems: "center", flexWrap: "wrap", rowGap: 0.5 }}>
           <RequestTypeBadge type={item.type} />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             {item.category}
           </Typography>
         </Stack>
-        <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: "text.secondary", flexShrink: 0 }}>
           {item.timestamp}
         </Typography>
       </Stack>
 
       <Stack spacing={0.5}>
-        <Typography variant="body1" fontWeight={500} color={typeMeta.titleColor}>
+        <Typography variant="body1" sx={{ fontWeight: 500, color: typeMeta.titleColor }}>
           {item.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {item.description}
         </Typography>
       </Stack>
@@ -118,8 +115,8 @@ export default function WaitingOnYouCard({
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={{ xs: 1.5, sm: 2 }}
-        alignItems={{ xs: "stretch", sm: "center" }}
         sx={{
+          alignItems: { xs: "stretch", sm: "center" },
           bgcolor: "action.hover",
           borderRadius: "8px",
           px: 2,
@@ -165,7 +162,7 @@ export default function WaitingOnYouCard({
       )}
 
       {!(isSuggestion && isDismissPanelOpen) && (
-        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: "center", flexWrap: "wrap" }}>
           <Button
             variant={item.primaryVariant ?? "contained"}
             color={item.primaryColor ?? "primary"}
@@ -196,8 +193,7 @@ export default function WaitingOnYouCard({
           </Button>
           <Typography
             variant="caption"
-            color={item.footerNoteColor ?? "text.secondary"}
-            sx={{ ml: "auto" }}
+            sx={{ color: item.footerNoteColor ?? "text.secondary", ml: "auto" }}
           >
             {item.footerNote}
           </Typography>

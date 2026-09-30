@@ -24,7 +24,7 @@ export default function ProtectionCategoryAddDialog({ open, onClose, onSave }) {
           py: 2,
         }}
       >
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Add Protection Category
         </Typography>
         <IconButton onClick={onClose} aria-label="Close dialog" size="small">

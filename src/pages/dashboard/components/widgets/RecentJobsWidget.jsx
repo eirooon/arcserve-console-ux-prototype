@@ -82,7 +82,7 @@ function RecentJobsWidget({
         {pageItems.length === 0 ? (
           <Box sx={{ p: 3 }}>
             {emptyState ?? (
-              <Typography color="text.secondary">
+              <Typography sx={{ color: "text.secondary" }}>
                 No priority items right now.
               </Typography>
             )}
@@ -143,13 +143,7 @@ function RecentJobsWidget({
       </Box>
 
       {/* Pagination row */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="center"
-        spacing={1}
-        sx={{ mt: 2 }}
-      >
+      <Stack direction="row" spacing={1} sx={{ alignItems: "center", justifyContent: "center", mt: 2 }}>
         <IconButton
           aria-label="previous page"
           onClick={handlePrev}

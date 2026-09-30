@@ -57,7 +57,7 @@ function ConfigureMessagingChannelForm({ channel, entryPoint, onClose, onSave, s
   return (
     <>
       <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", py: 2 }}>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Configure {definition.name}
         </Typography>
         <IconButton onClick={onClose} aria-label="Close dialog" size="small">
@@ -85,12 +85,12 @@ function ConfigureMessagingChannelForm({ channel, entryPoint, onClose, onSave, s
         <Divider />
 
         <Stack spacing={2}>
-          <Typography variant="subtitle2" fontWeight={600} color="text.primary">
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "text.primary" }}>
             Route to this channel
           </Typography>
           <Stack spacing={1}>
             {NOTIFICATION_TYPES.map((notification) => (
-              <Stack key={notification.key} direction="row" spacing={1} alignItems="center">
+              <Stack key={notification.key} direction="row" spacing={1} sx={{ alignItems: "center" }}>
                 <Switch
                   size="small"
                   checked={notifications[notification.key]}
@@ -102,7 +102,7 @@ function ConfigureMessagingChannelForm({ channel, entryPoint, onClose, onSave, s
                   }
                   aria-label={`Toggle ${notification.label}`}
                 />
-                <Typography variant="body2" color="text.primary">
+                <Typography variant="body2" sx={{ color: "text.primary" }}>
                   {notification.label}
                 </Typography>
               </Stack>
@@ -113,7 +113,7 @@ function ConfigureMessagingChannelForm({ channel, entryPoint, onClose, onSave, s
         <Divider />
 
         <Stack spacing={2}>
-          <Typography variant="subtitle2" fontWeight={600} color="text.primary">
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "text.primary" }}>
             Preview
           </Typography>
           <MessagingPreviewCard />

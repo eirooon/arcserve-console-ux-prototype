@@ -38,7 +38,7 @@ function StorageMiniCard({
         width: "100%",
       }}
     >
-      <Stack direction="row" spacing={1.5} alignItems="center">
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
         <Box
           sx={{
             width: 44,
@@ -98,7 +98,7 @@ function StorageMiniCard({
       )}
 
       {isExcess && (
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center", mt: 1 }}>
           <Typography
             variant="body2"
             sx={{ color: "error.main", fontWeight: 600, lineHeight: "30px" }}
@@ -139,10 +139,10 @@ function UdpDataStoresRow({ valueText, ldsIcon }) {
         p: 2,
       }}
     >
-      <Grid container alignItems="center" justifyContent="space-between">
-        <Grid item>
-          <Grid container spacing={1.5} alignItems="center" wrap="nowrap">
-            <Grid item>
+      <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
+        <Grid>
+          <Grid container spacing={1.5} wrap="nowrap" sx={{ alignItems: "center" }}>
+            <Grid>
               <Box
                 sx={{
                   width: 44,
@@ -158,14 +158,14 @@ function UdpDataStoresRow({ valueText, ldsIcon }) {
               </Box>
             </Grid>
 
-            <Grid item>
-              <Grid container spacing={2} alignItems="baseline" wrap="wrap">
-                <Grid item>
+            <Grid>
+              <Grid container spacing={2} wrap="wrap" sx={{ alignItems: "baseline" }}>
+                <Grid>
                   <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                     UDP Data Stores
                   </Typography>
                 </Grid>
-                <Grid item>
+                <Grid>
                   <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     Protected Data
                   </Typography>
@@ -175,7 +175,7 @@ function UdpDataStoresRow({ valueText, ldsIcon }) {
           </Grid>
         </Grid>
 
-        <Grid item>
+        <Grid>
           <Typography variant="h5" sx={{ fontWeight: 700 }}>
             {valueText}
           </Typography>

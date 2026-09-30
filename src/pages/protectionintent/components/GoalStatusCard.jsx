@@ -23,7 +23,7 @@ function HealthRing({ segments }) {
   const scoreAngle = (score / 100) * 360;
 
   return (
-    <Stack spacing={1.5} alignItems="center" sx={{ flexShrink: 0 }}>
+    <Stack spacing={1.5} sx={{ alignItems: "center", flexShrink: 0 }}>
       <Box
         sx={{
           width: RING_SIZE,
@@ -36,22 +36,21 @@ function HealthRing({ segments }) {
         }}
       >
         <Stack
-          alignItems="center"
-          justifyContent="center"
           sx={{
+            alignItems: "center",
+            justifyContent: "center",
             width: RING_SIZE - RING_THICKNESS * 2,
             height: RING_SIZE - RING_THICKNESS * 2,
             borderRadius: "50%",
             bgcolor: "background.paper",
           }}
         >
-          <Typography variant="h6" fontWeight={700} color="text.primary" lineHeight={1.2}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "text.primary", lineHeight: 1.2 }}>
             {score}
           </Typography>
           <Typography
             variant="caption"
-            color="text.secondary"
-            sx={{ fontSize: "0.5625rem", letterSpacing: "1px" }}
+            sx={{ color: "text.secondary", fontSize: "0.5625rem", letterSpacing: "1px" }}
           >
             HEALTH
           </Typography>
@@ -66,9 +65,9 @@ function SegmentLegendList({ segments }) {
   return (
     <Stack spacing={0.5}>
       {segments.map((segment) => (
-        <Stack key={segment.key} direction="row" spacing={0.75} alignItems="center">
+        <Stack key={segment.key} direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
           <Box sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: segment.color, flexShrink: 0 }} />
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: "text.secondary" }}>
             {segment.value.toLocaleString()} {segment.label}
           </Typography>
         </Stack>
@@ -115,8 +114,12 @@ export default function GoalStatusCard({
 
         <Stack spacing={2} sx={{ flex: 1, minWidth: 0 }}>
           <Stack spacing={1}>
-            <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
-              <Typography variant="body1" color="secondary.main">
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={{ justifyContent: "space-between", alignItems: "flex-start" }}
+            >
+              <Typography variant="body1" sx={{ color: "secondary.main" }}>
                 {title}
               </Typography>
               {statusChip && (
@@ -124,7 +127,7 @@ export default function GoalStatusCard({
               )}
             </Stack>
 
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
               {description}
             </Typography>
           </Stack>
@@ -132,7 +135,7 @@ export default function GoalStatusCard({
           <SegmentLegendList segments={segments} />
 
           <Stack sx={{ pt: 0.5, borderTop: 1, borderColor: "divider" }}>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
               {autonomyLabel} · {frequencyLabel}
             </Typography>
           </Stack>

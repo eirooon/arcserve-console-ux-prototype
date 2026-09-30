@@ -56,6 +56,7 @@ const OracleHosts = lazy(() => import("./pages/infrastructures/OracleHosts"));
 const CloudAccounts = lazy(() => import("./pages/infrastructures/CloudAccounts"));
 const AcrsServers = lazy(() => import("./pages/infrastructures/AcrsServers"));
 const AcrsServerDetails = lazy(() => import("./pages/infrastructures/AcrsServerDetails"));
+const AzureCloudAccountDetails = lazy(() => import("./pages/infrastructures/AzureCloudAccountDetails"));
 
 //Plans
 const PlansLayout = lazy(() => import("./pages/plans/PlansLayout"));
@@ -162,6 +163,7 @@ export default function App() {
             <Route path="proxies" element={<Proxies />} />
             <Route path="oracle-hosts" element={<OracleHosts />} />
             <Route path="cloud-accounts" element={<CloudAccounts />} />
+            <Route path="cloud-accounts/:accountId" element={<AzureCloudAccountDetails />} />
             <Route path="arcserve-cyber-resilient-servers" element={<AcrsServers />} />
             <Route
               path="arcserve-cyber-resilient-servers/:serverId"

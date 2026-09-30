@@ -29,13 +29,17 @@ function toInputValue(field, rawValue) {
 
 function buildInitialValues(fields, initialValues) {
   return Object.fromEntries(
-    fields.map((field) => [field.field, toInputValue(field, initialValues?.[field.field])]),
+    fields.map((field) => [
+      field.field,
+      toInputValue(field, initialValues?.[field.field]),
+    ]),
   );
 }
 
 function toSubmitValue(field, rawValue) {
   if (field.type === "number") return rawValue === "" ? null : Number(rawValue);
-  if (field.type === "datetime") return rawValue === "" ? null : new Date(rawValue).toISOString();
+  if (field.type === "datetime")
+    return rawValue === "" ? null : new Date(rawValue).toISOString();
   return rawValue;
 }
 
@@ -43,8 +47,19 @@ function toSubmitValue(field, rawValue) {
 // fresh — with correct initial values — every time Add/Edit is invoked.
 // (The outer EntityFormDialog component never unmounts, since the parent
 // keeps it in the tree and just toggles `open`, so state can't live there.)
-function EntityFormBody({ mode, entityLabel, fields, initialValues, saving, onClose, onSubmit, titleId }) {
-  const [values, setValues] = useState(() => buildInitialValues(fields, initialValues));
+function EntityFormBody({
+  mode,
+  entityLabel,
+  fields,
+  initialValues,
+  saving,
+  onClose,
+  onSubmit,
+  titleId,
+}) {
+  const [values, setValues] = useState(() =>
+    buildInitialValues(fields, initialValues),
+  );
 
   const handleChange = (field, rawValue) => {
     setValues((current) => ({ ...current, [field.field]: rawValue }));
@@ -52,7 +67,10 @@ function EntityFormBody({ mode, entityLabel, fields, initialValues, saving, onCl
 
   const handleSubmit = () => {
     const payload = Object.fromEntries(
-      fields.map((field) => [field.field, toSubmitValue(field, values[field.field])]),
+      fields.map((field) => [
+        field.field,
+        toSubmitValue(field, values[field.field]),
+      ]),
     );
     onSubmit(payload);
   };
@@ -61,16 +79,29 @@ function EntityFormBody({ mode, entityLabel, fields, initialValues, saving, onCl
     <>
       <DialogTitle
         id={titleId}
-        sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", py: 2 }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          py: 2,
+        }}
       >
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 600, color: "text.primary" }}>
           {mode === "edit" ? `Edit ${entityLabel}` : `Add ${entityLabel}`}
         </Typography>
-        <IconButton onClick={onClose} aria-label="Close dialog" size="small" disabled={saving}>
+        <IconButton
+          onClick={onClose}
+          aria-label="Close dialog"
+          size="small"
+          disabled={saving}
+        >
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <DialogContent
+        dividers
+        sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+      >
         <Stack spacing={2}>
           {fields.map((field) => {
             if (field.type === "boolean") {
@@ -80,7 +111,9 @@ function EntityFormBody({ mode, entityLabel, fields, initialValues, saving, onCl
                   control={
                     <Checkbox
                       checked={Boolean(values[field.field])}
-                      onChange={(event) => handleChange(field, event.target.checked)}
+                      onChange={(event) =>
+                        handleChange(field, event.target.checked)
+                      }
                     />
                   }
                   label={field.label}
@@ -96,7 +129,9 @@ function EntityFormBody({ mode, entityLabel, fields, initialValues, saving, onCl
                     fullWidth
                     size="small"
                     value={values[field.field] ?? ""}
-                    onChange={(event) => handleChange(field, event.target.value)}
+                    onChange={(event) =>
+                      handleChange(field, event.target.value)
+                    }
                   >
                     {field.options.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -113,11 +148,23 @@ function EntityFormBody({ mode, entityLabel, fields, initialValues, saving, onCl
                 <TextField
                   fullWidth
                   size="small"
-                  placeholder={field.type === "text" || !field.type ? `Enter ${field.label}` : undefined}
-                  type={
-                    field.type === "number" ? "number" : field.type === "datetime" ? "datetime-local" : "text"
+                  placeholder={
+                    field.type === "text" || !field.type
+                      ? `Enter ${field.label}`
+                      : undefined
                   }
-                  slotProps={field.type === "datetime" ? { inputLabel: { shrink: true } } : undefined}
+                  type={
+                    field.type === "number"
+                      ? "number"
+                      : field.type === "datetime"
+                        ? "datetime-local"
+                        : "text"
+                  }
+                  slotProps={
+                    field.type === "datetime"
+                      ? { inputLabel: { shrink: true } }
+                      : undefined
+                  }
                   value={values[field.field] ?? ""}
                   onChange={(event) => handleChange(field, event.target.value)}
                 />
@@ -127,7 +174,12 @@ function EntityFormBody({ mode, entityLabel, fields, initialValues, saving, onCl
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button variant="outlined" color="secondary" onClick={onClose} disabled={saving}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={onClose}
+          disabled={saving}
+        >
           Cancel
         </Button>
         <Button variant="contained" onClick={handleSubmit} disabled={saving}>
@@ -155,7 +207,13 @@ export default function EntityFormDialog({
   const titleId = useId();
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby={titleId}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby={titleId}
+    >
       {open && (
         <EntityFormBody
           mode={mode}
@@ -180,7 +238,13 @@ EntityFormDialog.propTypes = {
     PropTypes.shape({
       field: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-      type: PropTypes.oneOf(["text", "number", "boolean", "datetime", "select"]),
+      type: PropTypes.oneOf([
+        "text",
+        "number",
+        "boolean",
+        "datetime",
+        "select",
+      ]),
       options: PropTypes.arrayOf(
         PropTypes.shape({ value: PropTypes.string, label: PropTypes.string }),
       ),

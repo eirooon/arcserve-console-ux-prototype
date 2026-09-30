@@ -22,7 +22,7 @@ function SaveSearchFormBody({ onClose, onSave, titleId }) {
         id={titleId}
         sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", py: 2 }}
       >
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Save Search
         </Typography>
         <IconButton onClick={onClose} aria-label="Close dialog" size="small">
@@ -30,7 +30,7 @@ function SaveSearchFormBody({ onClose, onSave, titleId }) {
         </IconButton>
       </DialogTitle>
       <DialogContent dividers sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ color: "text.secondary" }}>
           Enter a name to save this search criteria. A shortcut with this name will be created under
           Saved Searches to quickly choose from.
         </Typography>

@@ -66,6 +66,22 @@ export const theme = createTheme({
       },
     },
 
+    // App-wide dialog title size: 16px (MUI's default is the 20px h6).
+    // Titles that wrap their text in a <Typography> should use body1 so the
+    // variant doesn't override this.
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: ({ theme }) => ({ ...theme.typography.body1, fontWeight: 700 }),
+      },
+    },
+
+    // App-wide alert title size: 14px (MUI's default is the 16px body1).
+    MuiAlertTitle: {
+      styleOverrides: {
+        root: ({ theme }) => ({ ...theme.typography.body2, fontWeight: 500 }),
+      },
+    },
+
     MuiAppBar: {
       styleOverrides: {
         root: {

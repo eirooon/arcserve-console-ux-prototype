@@ -26,11 +26,22 @@ import { buildEmptyFilters, resolveFieldOptions } from "../utils/entityFilters";
 // self-reference wins over `htmlFor` *and* over a plain `aria-label`,
 // silently discarding the visible label text unless `labelId` is folded
 // into that same `aria-labelledby` chain.
-function FilterSelectField({ id, label, selectProps, children, ...selectFieldProps }) {
+function FilterSelectField({
+  id,
+  label,
+  selectProps,
+  children,
+  ...selectFieldProps
+}) {
   const labelId = `${id}-label`;
   return (
     <Stack spacing={1} sx={{ minWidth: 0 }}>
-      <Typography id={labelId} variant="body2" color="text.primary" component="label">
+      <Typography
+        id={labelId}
+        variant="body2"
+        component="label"
+        sx={{ color: "text.primary" }}
+      >
         {label}
       </Typography>
       <PlaceholderSelect
@@ -51,20 +62,37 @@ function FilterSelectField({ id, label, selectProps, children, ...selectFieldPro
 // it mounts fresh — with the currently-applied filters as its starting
 // point — every time the "Filters" button is clicked, matching
 // EntityFormDialog's same reasoning for its form body.
-function FiltersFormBody({ title, fields, rows, initialFilters, onClose, onSearch, titleId }) {
+function FiltersFormBody({
+  title,
+  fields,
+  rows,
+  initialFilters,
+  onClose,
+  onSearch,
+  titleId,
+}) {
   const emptyFilters = useMemo(() => buildEmptyFilters(fields), [fields]);
-  const [filters, setFilters] = useState({ ...emptyFilters, ...initialFilters });
+  const [filters, setFilters] = useState({
+    ...emptyFilters,
+    ...initialFilters,
+  });
   const baseId = useId();
 
-  const setField = (key, value) => setFilters((current) => ({ ...current, [key]: value }));
+  const setField = (key, value) =>
+    setFilters((current) => ({ ...current, [key]: value }));
 
   return (
     <>
       <DialogTitle
         id={titleId}
-        sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", py: 2 }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          py: 2,
+        }}
       >
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 600, color: "text.primary" }}>
           {title}
         </Typography>
         <IconButton onClick={onClose} aria-label="Close dialog" size="small">
@@ -109,13 +137,19 @@ function FiltersFormBody({ title, fields, rows, initialFilters, onClose, onSearc
                   renderValue: (selected) => {
                     if (!selected.length) {
                       return (
-                        <Typography component="span" variant="body2" color="text.secondary">
-                          Select
-                        </Typography>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ color: "text.secondary" }}
+                        >Select
+                                                  </Typography>
                       );
                     }
                     if (selected.length === 1) {
-                      return options.find((option) => option.value === selected[0])?.label ?? selected[0];
+                      return (
+                        options.find((option) => option.value === selected[0])
+                          ?.label ?? selected[0]
+                      );
                     }
                     return `${selected.length} selected`;
                   },
@@ -123,7 +157,10 @@ function FiltersFormBody({ title, fields, rows, initialFilters, onClose, onSearc
               >
                 {options.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
-                    <Checkbox size="small" checked={value.includes(option.value)} />
+                    <Checkbox
+                      size="small"
+                      checked={value.includes(option.value)}
+                    />
                     <ListItemText primary={option.label} />
                   </MenuItem>
                 ))}
@@ -136,7 +173,11 @@ function FiltersFormBody({ title, fields, rows, initialFilters, onClose, onSearc
         <Button variant="outlined" color="secondary" onClick={onClose}>
           Cancel
         </Button>
-        <Button variant="outlined" color="secondary" onClick={() => setFilters(emptyFilters)}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => setFilters(emptyFilters)}
+        >
           Clear
         </Button>
         <Button variant="contained" onClick={() => onSearch(filters)}>
@@ -157,11 +198,25 @@ function FiltersFormBody({ title, fields, rows, initialFilters, onClose, onSearc
  * effect. "Clear" only resets the form's own fields — nothing is applied
  * until "Search" is pressed.
  */
-export default function EntityFiltersDialog({ open, title = "Filters", fields, rows, initialFilters, onClose, onSearch }) {
+export default function EntityFiltersDialog({
+  open,
+  title = "Filters",
+  fields,
+  rows,
+  initialFilters,
+  onClose,
+  onSearch,
+}) {
   const titleId = useId();
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby={titleId}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby={titleId}
+    >
       {open && (
         <FiltersFormBody
           title={title}

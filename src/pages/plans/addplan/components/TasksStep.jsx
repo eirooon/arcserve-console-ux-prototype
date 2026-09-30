@@ -41,7 +41,7 @@ export default function TasksStep({
     <Box sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflowY: "auto" }}>
       <Box sx={{ p: 3, display: "flex", flexDirection: "column", gap: 1.5 }}>
         <Box>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Sources (Optional)
           </Typography>
           <Typography variant="body2">
@@ -49,7 +49,7 @@ export default function TasksStep({
           </Typography>
         </Box>
         {selectedSources.length > 0 && (
-          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
             {selectedSources.map((source) => (
               <Chip
                 key={source.id}

@@ -48,14 +48,9 @@ function AIAnomalyDetectionJobsSummaryWidget({
       title={title}
       description={description}
       action={
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="center"
-          sx={{ mt: 1, mr: 1 }}
-        >
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="body2" color="text.secondary">
+        <Stack direction="row" spacing={2} sx={{ alignItems: "center", mt: 1, mr: 1 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
               Show results from
             </Typography>
             <FormControl>

@@ -5,10 +5,7 @@ function ResultsLine({ count, children }) {
   return (
     <Typography
       variant="body2"
-      color="text.primary"
-      sx={{ whiteSpace: "nowrap" }}
-    >
-      Showing{" "}
+      sx={{ color: "text.primary", whiteSpace: "nowrap" }}>Showing{" "}
       <Box component="span" sx={{ fontWeight: 700 }}>
         {count}
       </Box>{" "}
@@ -73,11 +70,7 @@ export default function EntityFilterBar({
               flexWrap: "wrap",
             }}
           >
-            <Typography
-              variant="body2"
-              color="text.primary"
-              sx={{ mr: 0.5, whiteSpace: "nowrap" }}
-            >
+            <Typography variant="body2" sx={{ color: "text.primary", mr: 0.5, whiteSpace: "nowrap" }}>
               Saved Searches:
             </Typography>
             {savedSearches.map((search) => (

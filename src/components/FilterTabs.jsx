@@ -26,7 +26,7 @@ export default function FilterTabs({ value, onChange, options, ariaLabel }) {
           sx={{ minHeight: 40, py: 0 }}
           label={
             typeof option.count === "number" ? (
-              <Stack direction="row" spacing={0.75} alignItems="center">
+              <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
                 <span>{option.label}</span>
                 <Chip
                   label={option.count}

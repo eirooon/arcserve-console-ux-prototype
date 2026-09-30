@@ -335,9 +335,9 @@ function AppNavigation({
                   }}
                 >
                   <Typography
-                    fontSize={14}
-                    fontWeight={500}
                     sx={{
+                      fontSize: 14,
+                      fontWeight: 500,
                       color: "rgba(255,255,255,0.92)",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
@@ -379,14 +379,16 @@ function AppNavigation({
           onClose={closeProductMenu}
           anchorOrigin={{ vertical: "center", horizontal: "right" }}
           transformOrigin={{ vertical: "center", horizontal: "left" }}
-          PaperProps={{
-            sx: {
-              width: 380,
-              borderRadius: 3,
-              boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
-              overflow: "hidden",
-              p: 1.5,
-              border: "1px solid #eeeeee",
+          slotProps={{
+            paper: {
+              sx: {
+                width: 380,
+                borderRadius: 3,
+                boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
+                overflow: "hidden",
+                p: 1.5,
+                border: "1px solid #eeeeee",
+              },
             },
           }}
         >
@@ -433,10 +435,12 @@ function AppNavigation({
 
                   <ListItemText
                     primary={p.label}
-                    primaryTypographyProps={{
-                      fontSize: 14,
-                      fontWeight: 500,
-                      color: "rgba(0,0,0,0.70)",
+                    slotProps={{
+                      primary: {
+                        fontSize: 14,
+                        fontWeight: 500,
+                        color: "rgba(0,0,0,0.70)",
+                      },
                     }}
                   />
 
@@ -557,10 +561,12 @@ function AppNavigation({
                           {!collapsed && (
                             <ListItemText
                               primary={item.label}
-                              primaryTypographyProps={{
-                                fontSize: 14,
-                                fontWeight: 400,
-                                color: "rgba(255,255,255)",
+                              slotProps={{
+                                primary: {
+                                  fontSize: 14,
+                                  fontWeight: 400,
+                                  color: "rgba(255,255,255)",
+                                },
                               }}
                             />
                           )}
@@ -725,13 +731,15 @@ function AppNavigation({
           onClose={closeProfileMenu}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
           transformOrigin={{ vertical: "bottom", horizontal: "left" }}
-          PaperProps={{
-            sx: {
-              width: 300,
-              borderRadius: 3,
-              boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
-              overflow: "hidden",
-              border: "1px solid #eeeeee",
+          slotProps={{
+            paper: {
+              sx: {
+                width: 300,
+                borderRadius: 3,
+                boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
+                overflow: "hidden",
+                border: "1px solid #eeeeee",
+              },
             },
           }}
         >
@@ -782,10 +790,12 @@ function AppNavigation({
 
               <ListItemText
                 primary="Dark Mode"
-                primaryTypographyProps={{
-                  fontSize: 14,
-                  fontWeight: 400,
-                  color: "rgba(0,0,0,0.70)",
+                slotProps={{
+                  primary: {
+                    fontSize: 14,
+                    fontWeight: 400,
+                    color: "rgba(0,0,0,0.70)",
+                  },
                 }}
               />
 
@@ -812,11 +822,13 @@ function AppNavigation({
               </ListItemIcon>
               <ListItemText
                 primary="My Profile"
-                primaryTypographyProps={{
-                  fontSize: 14,
-                  fontWeight: 400,
-                  // NOTE: you had rgba(0,0,0,0) (invisible). Keeping your original would hide text.
-                  color: "rgba(0,0,0,0.70)",
+                slotProps={{
+                  primary: {
+                    fontSize: 14,
+                    fontWeight: 400,
+                    // NOTE: you had rgba(0,0,0,0) (invisible). Keeping your original would hide text.
+                    color: "rgba(0,0,0,0.70)",
+                  },
                 }}
               />
             </ListItemButton>
@@ -832,10 +844,12 @@ function AppNavigation({
               </ListItemIcon>
               <ListItemText
                 primary="Language"
-                primaryTypographyProps={{
-                  fontSize: 14,
-                  fontWeight: 400,
-                  color: "rgba(0,0,0,0.70)",
+                slotProps={{
+                  primary: {
+                    fontSize: 14,
+                    fontWeight: 400,
+                    color: "rgba(0,0,0,0.70)",
+                  },
                 }}
               />
             </ListItemButton>
@@ -853,10 +867,12 @@ function AppNavigation({
               </ListItemIcon>
               <ListItemText
                 primary="Log out"
-                primaryTypographyProps={{
-                  fontSize: 14,
-                  fontWeight: 400,
-                  color: "rgba(0,0,0,0.70)",
+                slotProps={{
+                  primary: {
+                    fontSize: 14,
+                    fontWeight: 400,
+                    color: "rgba(0,0,0,0.70)",
+                  },
                 }}
               />
             </ListItemButton>

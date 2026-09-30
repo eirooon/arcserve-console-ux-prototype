@@ -59,12 +59,14 @@ export default function SplitPageLayout({
                   <ListItemText
                     primary={item.label}
                     sx={{ m: 0, flex: 1, minWidth: 0, py: 0.5 }}
-                    primaryTypographyProps={{
-                      fontSize: 14,
-                      letterSpacing: "0.17px",
-                      lineHeight: 1.43,
-                      color: "text.primary",
-                      sx: { wordBreak: "break-word" },
+                    slotProps={{
+                      primary: {
+                        fontSize: 14,
+                        letterSpacing: "0.17px",
+                        lineHeight: 1.43,
+                        color: "text.primary",
+                        sx: { wordBreak: "break-word" },
+                      },
                     }}
                   />
 

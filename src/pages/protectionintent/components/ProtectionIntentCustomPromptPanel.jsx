@@ -9,7 +9,7 @@ export default function ProtectionIntentCustomPromptPanel({
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>
       <Stack spacing={1}>
-        <Typography variant="body2" color="text.primary">
+        <Typography variant="body2" sx={{ color: "text.primary" }}>
           {CUSTOM_PROMPT_COPY.instructions}
         </Typography>
         <TextField

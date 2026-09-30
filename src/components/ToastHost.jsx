@@ -133,7 +133,7 @@ export default function ToastHost({ topOffset }) {
               severity={entry.severity}
               variant="standard"
               action={
-                <Stack direction="row" alignItems="center" spacing={0.5}>
+                <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
                   {entry.action && (
                     <Button
                       size="small"

@@ -74,10 +74,10 @@ export default function ReviewApplyStepEnhanced({
   return (
     <Stack spacing={4}>
       <Box>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Review your protection intent before activation
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           Once activated, ArcGenie will begin applying policies and monitoring your
           infrastructure.
         </Typography>
@@ -90,7 +90,7 @@ export default function ReviewApplyStepEnhanced({
           expanded={expandedSections.protection}
           onToggleExpand={() => toggleSection("protection")}
           summary={
-            <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "text.primary" }}>
               Protection Summary
             </Typography>
           }
@@ -130,7 +130,7 @@ export default function ReviewApplyStepEnhanced({
           expanded={expandedSections.automation}
           onToggleExpand={() => toggleSection("automation")}
           summary={
-            <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "text.primary" }}>
               Automation Goals
             </Typography>
           }
@@ -156,47 +156,47 @@ export default function ReviewApplyStepEnhanced({
           expanded={expandedSections.notifications}
           onToggleExpand={() => toggleSection("notifications")}
           summary={
-            <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "text.primary" }}>
               Notification Channels
             </Typography>
           }
         >
           <Stack spacing={2}>
             <Box>
-              <Stack direction="row" alignItems="center" spacing={0.75}>
+              <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
                 <CheckCircleRoundedIcon sx={{ color: "success.main", fontSize: 18 }} />
-                <Typography variant="body2" fontWeight={600} color="text.primary">
+                <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
                   Email
                 </Typography>
               </Stack>
               <Box sx={{ pl: 2, mt: 1 }}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   Receive: Critical alerts, daily digest, weekly report
                 </Typography>
                 <br />
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   Recipient: erron.sevilla@arcserve.com
                 </Typography>
               </Box>
             </Box>
             <Divider />
             <Box>
-              <Stack direction="row" alignItems="center" spacing={0.75}>
+              <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
                 <CheckCircleRoundedIcon sx={{ color: "success.main", fontSize: 18 }} />
-                <Typography variant="body2" fontWeight={600} color="text.primary">
+                <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
                   Slack
                 </Typography>
               </Stack>
               <Box sx={{ pl: 2, mt: 1 }}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   Receive: Daily digest, approval requests
                 </Typography>
                 <br />
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   Workspace: Connected to your-workspace.slack.com
                 </Typography>
                 <br />
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   Channels: #arcgenie-daily, @arcgenie bot
                 </Typography>
               </Box>
@@ -218,45 +218,45 @@ export default function ReviewApplyStepEnhanced({
           expanded={expandedSections.impact}
           onToggleExpand={() => toggleSection("impact")}
           summary={
-            <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "text.primary" }}>
               Estimated Impact
             </Typography>
           }
         >
           <Stack spacing={2}>
             <Box>
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="caption" color="text.secondary">
+              <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   Resources to protect:
                 </Typography>
-                <Typography variant="caption" fontWeight={600} color="text.primary">
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "text.primary" }}>
                   {impactData.assets} assets
                 </Typography>
               </Stack>
             </Box>
             <Box>
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="caption" color="text.secondary">
+              <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   Estimated daily backup volume:
                 </Typography>
-                <Typography variant="caption" fontWeight={600} color="text.primary">
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "text.primary" }}>
                   {impactData.dailyVolume}
                 </Typography>
               </Stack>
             </Box>
             <Box>
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="caption" color="text.secondary">
+              <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   Estimated monthly cost:
                 </Typography>
-                <Typography variant="caption" fontWeight={600} color="text.primary">
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "text.primary" }}>
                   {impactData.monthlyCost}
                 </Typography>
               </Stack>
             </Box>
             <Divider />
             <Box>
-              <Typography variant="caption" fontWeight={600} color="text.secondary">
+              <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary" }}>
                 Storage targets:
               </Typography>
               <Box component="ul" sx={{ pl: 2, m: 0, mt: 1 }}>
@@ -265,7 +265,7 @@ export default function ReviewApplyStepEnhanced({
                     key={target.type}
                     component="li"
                     variant="caption"
-                    color="text.secondary"
+                    sx={{ color: "text.secondary" }}
                   >
                     <strong>{target.type}:</strong> {target.value}
                   </Typography>
@@ -304,7 +304,7 @@ export default function ReviewApplyStepEnhanced({
             />
           }
           label={
-            <Typography variant="body2" color="text.primary">
+            <Typography variant="body2" sx={{ color: "text.primary" }}>
               I have reviewed the protection intent and approve activation with the settings
               above.
             </Typography>
@@ -327,53 +327,53 @@ export default function ReviewApplyStepEnhanced({
         <DialogContent sx={{ pt: 2 }}>
           <Stack spacing={2}>
             <Box>
-              <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-                <Typography variant="body2" color="text.secondary">
+              <Stack direction="row" sx={{ justifyContent: "space-between", mb: 1 }}>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   Base Backup (Daily backups, 12-month retention)
                 </Typography>
-                <Typography variant="body2" fontWeight={600}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   $5,200/mo
                 </Typography>
               </Stack>
             </Box>
             <Divider />
             <Box>
-              <Typography variant="subtitle2" fontWeight={600} color="text.primary" sx={{ mb: 1 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "text.primary", mb: 1 }}>
                 Extensions:
               </Typography>
               <Stack spacing={1}>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body2" color="text.secondary">
+                <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     Compliance (3-7yr retention)
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     +$1,500/mo
                   </Typography>
                 </Stack>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body2" color="text.secondary">
+                <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     Cyber Resilient (isolated copies)
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     +$1,200/mo
                   </Typography>
                 </Stack>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body2" color="text.secondary">
+                <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     DR Enabled (failover ready)
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     +$600/mo
                   </Typography>
                 </Stack>
               </Stack>
             </Box>
             <Divider />
-            <Stack direction="row" justifyContent="space-between">
-              <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+            <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "text.primary" }}>
                 Total Estimated Cost
               </Typography>
-              <Typography variant="subtitle2" fontWeight={700} color="primary.main">
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "primary.main" }}>
                 ~$8,500/mo
               </Typography>
             </Stack>
@@ -382,7 +382,7 @@ export default function ReviewApplyStepEnhanced({
       </Dialog>
 
       {/* Action Buttons */}
-      <Stack direction="row" justifyContent="space-between">
+      <Stack direction="row" sx={{ justifyContent: "space-between" }}>
         <Button variant="outlined" color="secondary" onClick={onCancel}>
           Cancel
         </Button>

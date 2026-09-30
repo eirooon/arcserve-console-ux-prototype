@@ -13,9 +13,8 @@ const JOB_STATUS_DISPLAY = {
 export default function LatestJobCell({ job }) {
   if (!job) {
     return (
-      <Typography variant="body2" color="text.secondary">
-        -
-      </Typography>
+      <Typography variant="body2" sx={{ color: "text.secondary" }}>-
+              </Typography>
     );
   }
 
@@ -30,7 +29,7 @@ export default function LatestJobCell({ job }) {
       <Link href="#" variant="body2" color="secondary" underline="hover">
         {job.job_name}
       </Link>
-      <Typography variant="body2" color="text.secondary" noWrap>
+      <Typography variant="body2" noWrap sx={{ color: "text.secondary" }}>
         {statusLabel}- {preposition} {formatAbsoluteTimestamp(timestamp)}
       </Typography>
     </Stack>

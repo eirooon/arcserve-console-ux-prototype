@@ -48,7 +48,7 @@ export default function AcrsNetworksTab({ server }) {
     <Box sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
       <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto", p: 3 }}>
         {nics.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             No network interfaces available.
           </Typography>
         ) : (

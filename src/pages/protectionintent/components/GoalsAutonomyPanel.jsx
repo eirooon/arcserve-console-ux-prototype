@@ -4,7 +4,7 @@ import AgenticGoalCard from "./AgenticGoalCard";
 export default function GoalsAutonomyPanel({ goals, toggleGoalEnabled, setGoalField }) {
   return (
     <Stack spacing={2}>
-      <Typography variant="body1" fontWeight={700} color="text.primary">
+      <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
         Your Agentic Goals
       </Typography>
       <Stack spacing={2}>

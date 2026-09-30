@@ -25,7 +25,7 @@ function NetworkInterfaceCard({ nic, connecting, onConfigure, onToggleConnection
       }}
     >
       <Stack spacing={0.5} sx={{ flex: 1, minWidth: 0 }}>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
           <Box
             role="img"
             aria-label={nic.connected ? "Connected" : "Disconnected"}
@@ -37,16 +37,16 @@ function NetworkInterfaceCard({ nic, connecting, onConfigure, onToggleConnection
               bgcolor: nic.connected ? "success.main" : "error.main",
             }}
           />
-          <Typography variant="body2" fontWeight={600} color="text.primary">
+          <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
             {nic.name}
           </Typography>
         </Stack>
-        <Typography variant="body2" color="text.secondary" sx={{ pl: "16px" }}>
+        <Typography variant="body2" sx={{ color: "text.secondary", pl: "16px" }}>
           {nic.description}
         </Typography>
       </Stack>
 
-      <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ flexShrink: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end", flexShrink: 0 }}>
         <Button
           size="small"
           color="secondary"

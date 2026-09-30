@@ -11,11 +11,24 @@ import FormField from "./FormField";
  * by every password field in the app instead of each form re-implementing
  * its own visibility toggle.
  */
-export default function PasswordField({ label, value, onChange, placeholder, sx }) {
+export default function PasswordField({
+  label,
+  value,
+  onChange,
+  onBlur,
+  placeholder,
+  required,
+  error,
+  helperText,
+  autoComplete,
+  inputRef,
+  labelAdornment,
+  sx,
+}) {
   const [visible, setVisible] = useState(false);
 
   return (
-    <FormField label={label} sx={sx}>
+    <FormField label={label} required={required} labelAdornment={labelAdornment} sx={sx}>
       <TextField
         fullWidth
         size="small"
@@ -23,7 +36,13 @@ export default function PasswordField({ label, value, onChange, placeholder, sx 
         placeholder={placeholder}
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
+        error={error}
+        helperText={helperText}
+        autoComplete={autoComplete}
+        inputRef={inputRef}
         slotProps={{
+          htmlInput: { "aria-required": required || undefined },
           input: {
             endAdornment: (
               <InputAdornment position="end">
@@ -48,6 +67,13 @@ PasswordField.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  onBlur: PropTypes.func,
   placeholder: PropTypes.string,
+  required: PropTypes.bool,
+  error: PropTypes.bool,
+  helperText: PropTypes.node,
+  autoComplete: PropTypes.string,
+  inputRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+  labelAdornment: PropTypes.node,
   sx: PropTypes.object,
 };

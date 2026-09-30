@@ -14,10 +14,10 @@ export default function ReviewApplyStep({
   return (
     <Stack spacing={4}>
       <Box>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           {REVIEW_STEP_COPY.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {REVIEW_STEP_COPY.description}
         </Typography>
       </Box>
@@ -29,7 +29,7 @@ export default function ReviewApplyStep({
         globalSettings={globalSettings}
       />
 
-      <Stack direction="row" justifyContent="space-between">
+      <Stack direction="row" sx={{ justifyContent: "space-between" }}>
         <Button variant="outlined" color="secondary" onClick={onCancel}>
           Cancel
         </Button>

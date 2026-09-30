@@ -48,7 +48,7 @@ export default function ActivityLogList({
 }) {
   if (items.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: "text.secondary" }}>
         {emptyMessage}
       </Typography>
     );
@@ -71,8 +71,12 @@ export default function ActivityLogList({
             <ActivityAvatar isAgent={isAgent} initials={activity.initials ?? activity.approvedBy?.[0]} />
 
             <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
-              <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={2}>
-                <Typography variant="body2" color="text.primary">
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{ alignItems: "flex-start", justifyContent: "space-between" }}
+              >
+                <Typography variant="body2" sx={{ color: "text.primary" }}>
                   {activity.message}
                 </Typography>
                 {activity.flagged && (
@@ -87,19 +91,22 @@ export default function ActivityLogList({
               {hasInset && (
                 <Stack spacing={0.5} sx={{ bgcolor: "action.hover", borderRadius: "8px", px: 2, py: 1.25 }}>
                   {activity.reasonLabel && (
-                    <Typography variant="body2" color="text.primary">
+                    <Typography variant="body2" sx={{ color: "text.primary" }}>
                       Reason: {activity.reasonLabel}
                     </Typography>
                   )}
                   {activity.note && (
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
                       Note: {activity.note}
                     </Typography>
                   )}
                 </Stack>
               )}
 
-              <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" rowGap={0.5}>
+              <Stack
+                direction="row"
+                sx={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", rowGap: 0.5 }}
+              >
                 <Typography variant="caption" sx={{ color: blueGrey[500] }}>
                   {activity.attributionText ??
                     (isAgent ? (
@@ -116,7 +123,13 @@ export default function ActivityLogList({
 
                 <Stack direction="row" spacing={2}>
                   {activity.resolveHref && (
-                    <Link component={RouterLink} to={activity.resolveHref} variant="caption" fontWeight={500} underline="hover">
+                    <Link
+                      component={RouterLink}
+                      to={activity.resolveHref}
+                      variant="caption"
+                      underline="hover"
+                      sx={{ fontWeight: 500 }}
+                    >
                       Resolve
                     </Link>
                   )}
@@ -133,7 +146,13 @@ export default function ActivityLogList({
                     </Button>
                   )}
                   {activity.viewSourceHref && (
-                    <Link component={RouterLink} to={activity.viewSourceHref} variant="caption" fontWeight={500} underline="hover">
+                    <Link
+                      component={RouterLink}
+                      to={activity.viewSourceHref}
+                      variant="caption"
+                      underline="hover"
+                      sx={{ fontWeight: 500 }}
+                    >
                       View source
                     </Link>
                   )}

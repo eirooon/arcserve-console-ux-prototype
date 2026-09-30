@@ -76,13 +76,13 @@ export default function ProtectionIntentSetup() {
       ) : (
         <Stack spacing={4} sx={{ maxWidth: "1132px", mx: "auto", px: 6 }}>
           <Box>
-            <Typography variant="h6" color="text.primary">
+            <Typography variant="h6" sx={{ color: "text.primary" }}>
               Let’s Get Started!
             </Typography>
             <Typography
               variant="h4"
-              fontWeight={700}
               sx={{
+                fontWeight: 700,
                 width: "fit-content",
                 background: TITLE_GRADIENT,
                 backgroundClip: "text",
@@ -113,10 +113,10 @@ export default function ProtectionIntentSetup() {
               <Stack spacing={3}>
                 {(phase === "select" || phase === "customPrompt") && (
                   <Box>
-                    <Typography variant="body1" fontWeight={700} color="text.primary">
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
                       How would you like to define your protection intent?
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
                       Establish your organization&rsquo;s default protection intent.
                       ArcGenie will use this philosophy to automatically recommend and
                       apply policies to all sources.
@@ -173,7 +173,7 @@ export default function ProtectionIntentSetup() {
               </Stack>
 
               {phase !== "architecting" && (
-                <Stack direction="row" justifyContent="space-between">
+                <Stack direction="row" sx={{ justifyContent: "space-between" }}>
                   <Button variant="outlined" color="secondary" onClick={handleCancel}>
                     Cancel
                   </Button>
@@ -230,7 +230,7 @@ export default function ProtectionIntentSetup() {
 
           {activeStep > 4 && (
             <Box sx={{ py: 8, textAlign: "center" }}>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" sx={{ color: "text.secondary" }}>
                 {PROTECTION_INTENT_STEPS[activeStep]} is coming soon.
               </Typography>
               <Button variant="outlined" color="secondary" onClick={handlePrevious} sx={{ mt: 2 }}>

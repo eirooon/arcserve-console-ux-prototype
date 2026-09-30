@@ -44,7 +44,9 @@ export default function BasicStep({
             value={planName}
             onChange={(event) => onPlanNameChange(event.target.value)}
             placeholder="Enter plan name"
-            inputProps={{ "aria-required": true }}
+            slotProps={{
+              htmlInput: { "aria-required": true },
+            }}
           />
         </FormField>
 

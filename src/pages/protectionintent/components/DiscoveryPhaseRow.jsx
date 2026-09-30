@@ -7,10 +7,10 @@ export default function DiscoveryPhaseRow({ label, status, count, isLast }) {
   return (
     <Stack
       direction="row"
-      alignItems="center"
       spacing={1.75}
       component="li"
       sx={{
+        alignItems: "center",
         py: 1.6,
         borderBottom: isLast ? 0 : "1px solid",
         borderColor: "divider",
@@ -33,19 +33,14 @@ export default function DiscoveryPhaseRow({ label, status, count, isLast }) {
 
       <Typography
         variant="body2"
-        fontSize={15}
-        color={done ? "text.primary" : "text.secondary"}
-        sx={{ flex: 1 }}
+        sx={{ fontSize: 15, color: done ? "text.primary" : "text.secondary", flex: 1 }}
       >
         {label}
       </Typography>
 
       {done && count != null && (
         <Typography
-          fontWeight={600}
-          fontSize={17}
-          color="primary.dark"
-          sx={{ fontVariantNumeric: "tabular-nums" }}
+          sx={{ fontWeight: 600, fontSize: 17, color: "primary.dark", fontVariantNumeric: "tabular-nums" }}
         >
           {count}
         </Typography>

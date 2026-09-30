@@ -17,11 +17,13 @@ export default function ArcGenieWaitingOnYouPage() {
       <Stack spacing={3} sx={{ width: "100%", px: { xs: 2, sm: 4, md: 6 } }}>
         <Stack
           direction={{ xs: "column", sm: "row" }}
-          justifyContent="space-between"
-          alignItems={{ xs: "flex-start", sm: "center" }}
           spacing={{ xs: 1.5, sm: 0 }}
+          sx={{
+            justifyContent: "space-between",
+            alignItems: { xs: "flex-start", sm: "center" },
+          }}
         >
-          <Typography variant="h6" color="text.primary">
+          <Typography variant="h6" sx={{ color: "text.primary" }}>
             Waiting On You
           </Typography>
           <Button
@@ -43,12 +45,12 @@ export default function ArcGenieWaitingOnYouPage() {
         )}
 
         {items.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Currently, there are no activities to report. ArcGenie will automatically record
             policy checks and optimizations in this section as they happen.
           </Typography>
         ) : visibleItems.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             No items match this filter.
           </Typography>
         ) : (

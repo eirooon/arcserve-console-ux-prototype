@@ -14,7 +14,7 @@ export default function MessagingPreviewCard() {
         width: "100%",
       }}
     >
-      <Stack direction="row" spacing={1.5} alignItems="flex-start">
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: "flex-start" }}>
         <Avatar
           variant="rounded"
           sx={{ bgcolor: blue[50], color: blue[600], width: 36, height: 36 }}
@@ -22,25 +22,25 @@ export default function MessagingPreviewCard() {
           <AutoAwesomeIcon fontSize="small" />
         </Avatar>
         <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
-          <Stack direction="row" spacing={1} alignItems="baseline">
-            <Typography variant="body2" fontWeight={900} color="text.primary">
+          <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
+            <Typography variant="body2" sx={{ fontWeight: 900, color: "text.primary" }}>
               {MESSAGE_PREVIEW.sender}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
               {MESSAGE_PREVIEW.timestamp}
             </Typography>
           </Stack>
           <Stack spacing={0.5}>
-            <Typography variant="body2" fontWeight={700} color="text.primary">
+            <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
               {MESSAGE_PREVIEW.title}
             </Typography>
-            <Typography variant="body2" color="text.primary">
+            <Typography variant="body2" sx={{ color: "text.primary" }}>
               {MESSAGE_PREVIEW.summary}
             </Typography>
             <Stack sx={{ mt: 0.5 }}>
               {MESSAGE_PREVIEW.details.map((detail) => (
-                <Typography key={detail.label} variant="body2" color="text.primary">
-                  <Typography component="span" variant="body2" color="text.secondary">
+                <Typography key={detail.label} variant="body2" sx={{ color: "text.primary" }}>
+                  <Typography component="span" variant="body2" sx={{ color: "text.secondary" }}>
                     {detail.label}:{" "}
                   </Typography>
                   {detail.value}

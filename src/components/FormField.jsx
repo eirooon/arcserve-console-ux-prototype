@@ -8,22 +8,24 @@ import { Stack, Typography } from "@mui/material";
  * without its own `id`, the label is programmatically associated with it via
  * `htmlFor` for screen readers.
  */
-export default function FormField({ label, required, labelAdornment, children, sx }) {
+export default function FormField({ label, labelId, required, labelAdornment, children, sx }) {
   const fieldId = useId();
   const associable = isValidElement(children) && !children.props.id;
 
   return (
     <Stack spacing={1} sx={{ minWidth: 0, ...sx }}>
-      <Stack direction="row" alignItems="center" spacing={0.5}>
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
         <Typography
           variant="body2"
-          color="text.primary"
           component="label"
+          id={labelId}
           htmlFor={associable ? fieldId : undefined}
+          sx={{ color: "text.primary" }}
         >
           {label}
           {required && (
-            <Typography component="span" color="error.main" sx={{ ml: 0.5 }}>
+            // Visual only — pair `required` with aria-required on the control.
+            <Typography component="span" aria-hidden="true" sx={{ color: "error.main", ml: 0.5 }}>
               *
             </Typography>
           )}
@@ -37,6 +39,9 @@ export default function FormField({ label, required, labelAdornment, children, s
 
 FormField.propTypes = {
   label: PropTypes.string.isRequired,
+  // Lets a control that <label for> can't name (e.g. a Select's combobox)
+  // point at this label via aria-labelledby instead.
+  labelId: PropTypes.string,
   required: PropTypes.bool,
   labelAdornment: PropTypes.node,
   children: PropTypes.node.isRequired,

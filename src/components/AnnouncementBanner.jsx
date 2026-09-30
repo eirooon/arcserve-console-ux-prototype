@@ -23,7 +23,7 @@ export default function AnnouncementBanner({
       severity="info"
       icon={icon}
       action={
-        <Stack direction="row" spacing={3} alignItems="center">
+        <Stack direction="row" spacing={3} sx={{ alignItems: "center" }}>
           {actionLabel && (
             <Button variant="contained" size="small" onClick={onAction}>
               {actionLabel}
@@ -72,7 +72,7 @@ export default function AnnouncementBanner({
         </AlertTitle>
       )}
       {description && (
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ color: "text.secondary" }}>
           {description}
         </Typography>
       )}

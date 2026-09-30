@@ -213,7 +213,7 @@ export default function DraggableColumnsManagement({ getTogglableColumns, onReor
           );
         })}
         {visibleRows.length === 0 && (
-          <Typography variant="body2" color="text.secondary" sx={{ px: 2, py: 1 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary", px: 2, py: 1 }}>
             No columns found
           </Typography>
         )}

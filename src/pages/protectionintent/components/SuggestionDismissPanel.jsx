@@ -29,9 +29,9 @@ export default function SuggestionDismissPanel({ source, onCancel, onConfirm }) 
     <Box sx={{ bgcolor: "action.hover", borderRadius: "8px", p: 2.5 }}>
       <Stack spacing={2.5}>
         <Stack spacing={1}>
-          <Typography id={headingId} variant="subtitle2" fontWeight={700} color="text.primary">
+          <Typography id={headingId} variant="subtitle2" sx={{ fontWeight: 700, color: "text.primary" }}>
             {DISMISS_PANEL_COPY.radioGroupLabel}{" "}
-            <Typography component="span" variant="body2" color="text.secondary">
+            <Typography component="span" variant="body2" sx={{ color: "text.secondary" }}>
               {DISMISS_PANEL_COPY.radioGroupOptionalSuffix}
             </Typography>
           </Typography>
@@ -57,9 +57,13 @@ export default function SuggestionDismissPanel({ source, onCancel, onConfirm }) 
                     <FormControlLabel
                       value={option.value}
                       sx={{ m: 0, width: "100%", minHeight: 44, px: 1.5, py: 1 }}
-                      control={<Radio inputRef={index === 0 ? firstRadioRef : undefined} />}
+                      control={<Radio slotProps={{
+                        input: {
+                          ref: index === 0 ? firstRadioRef : undefined,
+                        },
+                      }} />}
                       label={
-                        <Typography variant="body2" color="text.primary">
+                        <Typography variant="body2" sx={{ color: "text.primary" }}>
                           {option.label}
                         </Typography>
                       }
@@ -83,11 +87,11 @@ export default function SuggestionDismissPanel({ source, onCancel, onConfirm }) 
           />
         </FormField>
 
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: "text.secondary" }}>
           {DISMISS_PANEL_COPY.helperText(source)}
         </Typography>
 
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
           <Button
             variant="contained"
             color="primary"

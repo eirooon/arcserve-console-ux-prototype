@@ -19,16 +19,16 @@ export default function ArchitectingChecklist({ steps, accentColor, accentBg }) 
           key={step.id}
           component="li"
           direction="row"
-          alignItems="center"
-          justifyContent="space-between"
           sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
             px: 1.5,
             py: 1.25,
             borderRadius: 1.5,
             bgcolor: step.status === "active" ? accentBg : "transparent",
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0 }}>
+          <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", minWidth: 0 }}>
             {step.status === "done" && (
               <CheckCircleRoundedIcon
                 aria-label="Complete"
@@ -51,17 +51,22 @@ export default function ArchitectingChecklist({ steps, accentColor, accentBg }) 
             )}
             <Typography
               variant="body2"
-              fontWeight={step.status === "pending" ? 400 : 600}
-              color={step.status === "pending" ? "text.disabled" : "text.primary"}
+              sx={{
+                fontWeight: step.status === "pending" ? 400 : 600,
+                color: step.status === "pending" ? "text.disabled" : "text.primary",
+              }}
             >
               {step.label}
             </Typography>
           </Stack>
           <Typography
             variant="caption"
-            color={step.status === "active" ? accentColor : "text.secondary"}
-            fontWeight={step.status === "active" ? 700 : 500}
-            sx={{ flexShrink: 0, pl: 2 }}
+            sx={{
+              color: step.status === "active" ? accentColor : "text.secondary",
+              fontWeight: step.status === "active" ? 700 : 500,
+              flexShrink: 0,
+              pl: 2,
+            }}
           >
             {getStepDetail(step)}
           </Typography>

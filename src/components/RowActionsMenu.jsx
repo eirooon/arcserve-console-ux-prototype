@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { Divider, IconButton, ListSubheader, Menu, MenuItem, Tooltip } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 // Horizontal inset shared by every section header and menu item, so the two
@@ -31,12 +32,14 @@ export default function RowActionsMenu({ groups, ariaLabel = "Actions" }) {
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
           onClick={(event) => setAnchorEl(event.currentTarget)}
-          sx={{
+          sx={(theme) => ({
             border: "1px solid",
             borderColor: "secondary.main",
             borderRadius: 1,
             color: "secondary.main",
-          }}
+            // Stays tinted while its menu is open so the row it acts on is clear.
+            ...(open && { bgcolor: alpha(theme.palette.secondary.main, 0.3) }),
+          })}
         >
           <ArrowDropDownIcon fontSize="small" />
         </IconButton>

@@ -28,6 +28,11 @@ export default function ListToolbar({
   addLabel,
   onAdd,
   addMenuItems,
+  // Add-menu presentation: `addMenuAlign="right"` lines the menu's right edge
+  // up with the button's (for buttons flush against the page edge);
+  // `showAddMenuIcon={false}` drops the trailing dropdown caret.
+  addMenuAlign = "left",
+  showAddMenuIcon = true,
   extraAction,
   showSearch = false,
   searchPlaceholder,
@@ -208,7 +213,7 @@ export default function ListToolbar({
               sx={{ display: "flex", gap: 1.5, alignItems: "center", flexWrap: "wrap" }}
             >
               {selectedCount !== undefined && (
-                <Typography fontSize={14} color="text.secondary">
+                <Typography sx={{ fontSize: 14, color: "text.secondary" }}>
                   {selectedCount} selected
                 </Typography>
               )}
@@ -221,7 +226,7 @@ export default function ListToolbar({
                     onClick={handleClick}
                     variant="outlined"
                     color="secondary"
-                    endIcon={<ArrowDropDown />}
+                    endIcon={showAddMenuIcon ? <ArrowDropDown /> : undefined}
                     disabled={!selectedCount}
                   >
                     Actions
@@ -297,7 +302,7 @@ export default function ListToolbar({
                   <Button
                     variant="contained"
                     startIcon={<AddOutlined />}
-                    endIcon={<ArrowDropDown />}
+                    endIcon={showAddMenuIcon ? <ArrowDropDown /> : undefined}
                     aria-haspopup="true"
                     aria-expanded={addMenuOpen ? "true" : undefined}
                     onClick={handleAddClick}
@@ -310,8 +315,8 @@ export default function ListToolbar({
                     anchorEl={addAnchorEl}
                     open={addMenuOpen}
                     onClose={handleAddClose}
-                    anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-                    transformOrigin={{ vertical: "top", horizontal: "left" }}
+                    anchorOrigin={{ vertical: "bottom", horizontal: addMenuAlign }}
+                    transformOrigin={{ vertical: "top", horizontal: addMenuAlign }}
                   >
                     {addMenuItems.map((item) => (
                       <MenuItem
@@ -352,6 +357,8 @@ ListToolbar.propTypes = {
       onClick: PropTypes.func,
     }),
   ),
+  addMenuAlign: PropTypes.oneOf(["left", "right"]),
+  showAddMenuIcon: PropTypes.bool,
   extraAction: PropTypes.shape({
     label: PropTypes.node.isRequired,
     icon: PropTypes.node,

@@ -26,11 +26,7 @@ export default function ProtectionIntentRecommendationPanel({
         }}
       >
         <Stack spacing={3}>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-          >
+          <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
             <Chip
               label={RECOMMENDATION_BANNER_COPY.chipLabel}
               icon={
@@ -100,12 +96,7 @@ export default function ProtectionIntentRecommendationPanel({
                   justifyContent: "center",
                 }}
               >
-                <Typography
-                  variant="h6"
-                  fontWeight={700}
-                  sx={{ letterSpacing: "0.15px" }}
-                  noWrap
-                >
+                <Typography variant="h6" noWrap sx={{ fontWeight: 700, letterSpacing: "0.15px" }}>
                   {stat.value}
                 </Typography>
                 <Typography variant="caption">{stat.label}</Typography>
@@ -115,15 +106,11 @@ export default function ProtectionIntentRecommendationPanel({
         </Stack>
       </Box>
 
-      <Stack
-        direction="row"
-        alignItems="baseline"
-        justifyContent="space-between"
-      >
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+      <Stack direction="row" sx={{ alignItems: "baseline", justifyContent: "space-between" }}>
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Protection Categories
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           Open a each category to review its settings
         </Typography>
       </Stack>

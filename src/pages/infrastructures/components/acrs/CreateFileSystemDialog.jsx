@@ -46,7 +46,7 @@ function CreateFileSystemForm({ saving, onClose, onSubmit }) {
       <DialogTitle
         sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", py: 2 }}
       >
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Create File System
         </Typography>
         <IconButton onClick={onClose} aria-label="Close dialog" size="small" disabled={saving}>

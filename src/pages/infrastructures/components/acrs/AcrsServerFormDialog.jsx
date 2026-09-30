@@ -49,7 +49,7 @@ function AcrsServerForm({ mode, initialValues, saving, onClose, onSubmit }) {
       <DialogTitle
         sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", py: 2 }}
       >
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           {mode === "edit" ? "Edit Arcserve Cyber Resilient Server" : "Add Arcserve Cyber Resilient Server"}
         </Typography>
         <IconButton onClick={onClose} aria-label="Close dialog" size="small" disabled={saving}>
@@ -58,7 +58,7 @@ function AcrsServerForm({ mode, initialValues, saving, onClose, onSubmit }) {
       </DialogTitle>
 
       <DialogContent dividers sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           Configure to access a new storage location.
         </Typography>
         <FormField label="Site">

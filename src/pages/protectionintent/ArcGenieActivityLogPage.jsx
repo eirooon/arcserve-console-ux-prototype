@@ -48,10 +48,10 @@ export default function ArcGenieActivityLogPage() {
     <Box sx={{ bgcolor: "background.paper", minHeight: "calc(100vh - 64px)", py: 6 }}>
       <Stack spacing={4} sx={{ width: "100%", px: 6 }}>
         <Box>
-          <Typography variant="h6" color="text.primary">
+          <Typography variant="h6" sx={{ color: "text.primary" }}>
             Activity Log
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Every action ArcGenie has taken or you&apos;ve approved, most recent first.
           </Typography>
         </Box>

@@ -35,7 +35,7 @@ export default function IconCell({ icon: Icon, label, color = "action.active", s
         <Box sx={{ display: "inline-flex", alignItems: "center", fontSize: "20px", color }}>
           {iconEl}
         </Box>
-        <Typography variant="body2" color="text.primary" noWrap>
+        <Typography variant="body2" noWrap sx={{ color: "text.primary" }}>
           {label}
         </Typography>
       </Box>

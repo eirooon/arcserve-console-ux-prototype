@@ -57,14 +57,14 @@ export default function ProtectionIntentActivationSuccess({ onViewDashboard }) {
         }}
       >
         <CardContent sx={{ p: 4 }}>
-          <Stack spacing={3} alignItems="center" textAlign="center">
+          <Stack spacing={3} sx={{ alignItems: "center", textAlign: "center" }}>
             <GlowingCheckIcon size={56} iconSize={28} />
 
             <Stack spacing={0.5}>
-              <Typography variant="h5" fontWeight={700} color="text.primary">
+              <Typography variant="h5" sx={{ fontWeight: 700, color: "text.primary" }}>
                 Your Protected
               </Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" sx={{ color: "text.secondary" }}>
                 31 sources are now under active protection.
               </Typography>
             </Stack>
@@ -89,33 +89,27 @@ export default function ProtectionIntentActivationSuccess({ onViewDashboard }) {
               elevation={0}
               sx={{ width: "100%", p: 2, bgcolor: grey[50], borderRadius: 2 }}
             >
-              <Stack spacing={1.5} alignItems="center">
-                <Typography variant="body2" color="text.secondary">
+              <Stack spacing={1.5} sx={{ alignItems: "center" }}>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   Takes 5-15 minutes depending on infrastructure size.
                 </Typography>
                 <Stack
                   direction="row"
                   spacing={0.5}
-                  alignItems="center"
-                  flexWrap="wrap"
-                  justifyContent="center"
+                  sx={{ alignItems: "center", flexWrap: "wrap", justifyContent: "center" }}
                 >
                   <MailOutline
                     fontSize="inherit"
                     sx={{ color: "text.secondary" }}
                   />
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     erron.sevilla@arcserve.com
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mx: 0.5 }}
-                  >
+                  <Typography variant="body2" sx={{ color: "text.secondary", mx: 0.5 }}>
                     &middot;
                   </Typography>
                   <Tag fontSize="inherit" sx={{ color: "text.secondary" }} />
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     #arcgenie-daily
                   </Typography>
                 </Stack>

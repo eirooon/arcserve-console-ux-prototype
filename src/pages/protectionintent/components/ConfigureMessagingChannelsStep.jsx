@@ -15,17 +15,17 @@ export default function ConfigureMessagingChannelsStep({
   return (
     <Stack spacing={3}>
       <Box>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           {MESSAGING_STEP_COPY.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {MESSAGING_STEP_COPY.description}
         </Typography>
       </Box>
 
       <MessagingChannelsPanel {...messagingChannels} />
 
-      <Stack direction="row" justifyContent="space-between">
+      <Stack direction="row" sx={{ justifyContent: "space-between" }}>
         <Button variant="outlined" color="secondary" onClick={onCancel}>
           Cancel
         </Button>

@@ -161,7 +161,7 @@ const rpoDescription = (
     <Typography variant="body2">
       Shows sources with a successful backup in the last
     </Typography>
-    <Link href="#" variant="body2" color="secondary" fontWeight={600}>
+    <Link href="#" variant="body2" color="secondary" sx={{ fontWeight: 600 }}>
       3 days
     </Link>
   </Stack>

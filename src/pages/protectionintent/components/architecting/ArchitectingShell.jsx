@@ -20,13 +20,13 @@ export default function ArchitectingShell({
         p: 3,
       }}
     >
-      <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mb: 2.5 }}>
+      <Stack direction="row" spacing={2} sx={{ alignItems: "flex-start", mb: 2.5 }}>
         <Avatar sx={{ bgcolor: avatarBgColor, color: avatarIconColor }}>{avatarIcon}</Avatar>
         <Stack spacing={0.25}>
-          <Typography variant="subtitle1" fontWeight={700} color="text.primary">
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary" }}>
             {heading}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             {subheading}
           </Typography>
         </Stack>

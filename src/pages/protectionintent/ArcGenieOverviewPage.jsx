@@ -65,13 +65,10 @@ function SectionHeading({ children, badge, action }) {
   return (
     <Stack
       direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-      flexWrap="wrap"
-      rowGap={0.5}
+      sx={{ justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", rowGap: 0.5 }}
     >
-      <Stack direction="row" alignItems="center" spacing={1}>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+      <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           {children}
         </Typography>
         {badge}
@@ -108,16 +105,16 @@ export default function ArcGenieOverviewPage() {
     >
       <Stack spacing={3} sx={{ width: "100%", px: { xs: 2, sm: 4, md: 6 } }}>
         <Stack spacing={0.5}>
-          <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" rowGap={1}>
-            <Typography variant="h6" color="text.primary">
+          <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", flexWrap: "wrap", rowGap: 1 }}>
+            <Typography variant="h6" sx={{ color: "text.primary" }}>
               Your Protection Overview
             </Typography>
             <StatusPill label="Agent Active" bgcolor={green[50]} color={green[700]} dot fontWeight={700} />
           </Stack>
 
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             {`${OVERVIEW_SUMMARY.activeGoalCount} automations running across ${OVERVIEW_SUMMARY.totalSources} sources. `}
-            <Typography component="span" variant="body2" fontWeight={500} color="text.primary">
+            <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: "text.primary" }}>
               {`${totalWaiting} decisions are waiting on you`}
             </Typography>
             {` — the oldest since ${WAITING_ON_YOU_OLDEST_SINCE_LABEL}.`}
@@ -127,7 +124,9 @@ export default function ArcGenieOverviewPage() {
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={4}
-          alignItems={{ xs: "stretch", md: "flex-start" }}
+          sx={{
+            alignItems: { xs: "stretch", md: "flex-start" },
+          }}
         >
           <Stack spacing={2} sx={{ flex: 1, minWidth: 0 }}>
             <SectionHeading
@@ -149,7 +148,7 @@ export default function ArcGenieOverviewPage() {
             </SectionHeading>
 
             {items.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 Currently, there are no activities to report. ArcGenie will
                 automatically record policy checks and optimizations in this
                 section as they happen.
@@ -164,7 +163,7 @@ export default function ArcGenieOverviewPage() {
                 />
 
                 {visibleItems.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     No items match this filter.
                   </Typography>
                 ) : (

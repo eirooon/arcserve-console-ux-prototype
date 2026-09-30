@@ -26,7 +26,7 @@ export default function ArcGenieSuggestArchitecting() {
       heading={scenario.heading}
       subheading={scenario.subheading}
       footerNote={
-        <Stack direction="row" alignItems="center" spacing={1}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
           <Box
             sx={{
               width: 6,
@@ -36,7 +36,7 @@ export default function ArcGenieSuggestArchitecting() {
               flexShrink: 0,
             }}
           />
-          <Typography variant="caption" color="text.secondary" noWrap>
+          <Typography variant="caption" noWrap sx={{ color: "text.secondary" }}>
             {scenario.evidenceTicker[evidenceIndex]}
           </Typography>
         </Stack>

@@ -26,7 +26,7 @@ import { EXTENSION_ROWS } from "../protectionIntentRecommendationData";
 // Resilient has six) doesn't force a single cramped row.
 function ExtensionCheckboxFields({ fields, formValues, setField }) {
   return (
-    <Stack direction="row" flexWrap="wrap" columnGap={3} rowGap={1}>
+    <Stack direction="row" sx={{ flexWrap: "wrap", columnGap: 3, rowGap: 1 }}>
       {fields.map((checkboxSpec) => (
         <FormControlLabel
           key={checkboxSpec.field}
@@ -39,7 +39,7 @@ function ExtensionCheckboxFields({ fields, formValues, setField }) {
             />
           }
           label={
-            <Typography variant="body2" color="text.primary">
+            <Typography variant="body2" sx={{ color: "text.primary" }}>
               {checkboxSpec.label}
             </Typography>
           }
@@ -82,12 +82,10 @@ function ExtensionEditRow({ label, expanded, onToggle, children }) {
     <Box sx={{ borderBottom: 1, borderColor: "divider", "&:last-of-type": { borderBottom: 0 } }}>
       <Stack
         direction="row"
-        alignItems="center"
-        justifyContent="space-between"
         onClick={onToggle}
-        sx={{ px: 2, py: 1.25, cursor: "pointer" }}
+        sx={{ alignItems: "center", justifyContent: "space-between", px: 2, py: 1.25, cursor: "pointer" }}
       >
-        <Typography variant="body2" fontWeight={600} color="text.primary">
+        <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
           {label}
         </Typography>
         <IconButton
@@ -133,7 +131,7 @@ export default function ProtectionCategoryFormFields({
       </FormField>
 
       <Stack spacing={2}>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           General settings
         </Typography>
         <Stack spacing={1.5}>
@@ -157,7 +155,7 @@ export default function ProtectionCategoryFormFields({
       <Divider />
 
       <Stack spacing={2}>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Extensions
         </Typography>
         <Box sx={{ border: 1, borderColor: "divider", borderRadius: "8px", overflow: "hidden" }}>
@@ -195,7 +193,7 @@ export default function ProtectionCategoryFormFields({
                   setField={setField}
                 />
               ) : (
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   {extension.values[categoryId]?.detail ??
                     "No additional configuration for this extension."}
                 </Typography>
@@ -208,7 +206,7 @@ export default function ProtectionCategoryFormFields({
       <Divider />
 
       <Stack spacing={2}>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Default Destination Settings
         </Typography>
         <FieldSelect

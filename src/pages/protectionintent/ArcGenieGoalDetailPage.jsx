@@ -45,8 +45,8 @@ export default function ArcGenieGoalDetailPage() {
   return (
     <Box sx={{ bgcolor: "background.paper", minHeight: "calc(100vh - 64px)", py: 6 }}>
       <Stack spacing={4} sx={{ width: "100%", px: 6 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
-          <Typography variant="h6" color="text.primary" sx={{ maxWidth: 900 }}>
+        <Stack direction="row" spacing={2} sx={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+          <Typography variant="h6" sx={{ color: "text.primary", maxWidth: 900 }}>
             {goal.title}
           </Typography>
           <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
@@ -70,11 +70,11 @@ export default function ArcGenieGoalDetailPage() {
           </Stack>
         </Stack>
 
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {goal.description}
         </Typography>
 
-        <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={2} useFlexGap sx={{ flexWrap: "wrap" }}>
           {AUTO_PROTECT_STAT_FIELDS.map((field) => (
             <Box key={field.key} sx={{ flex: "1 1 220px", minWidth: 220 }}>
               <AutoProtectStatTile field={field} value={stats[field.key]} />
@@ -82,7 +82,7 @@ export default function ArcGenieGoalDetailPage() {
           ))}
         </Stack>
 
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
           <TextField
             size="small"
             placeholder="Search source name"
@@ -118,7 +118,7 @@ export default function ArcGenieGoalDetailPage() {
             initialState={{ pinnedColumns: { left: [ACTIONS_COLUMN_FIELD] } }}
             slots={{
               noRowsOverlay: () => (
-                <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
+                <Typography variant="body2" sx={{ color: "text.secondary", p: 2 }}>
                   No sources match your search or filter.
                 </Typography>
               ),

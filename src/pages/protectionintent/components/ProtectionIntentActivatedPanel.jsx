@@ -38,8 +38,8 @@ export default function ProtectionIntentActivatedPanel({ goals, globalSettings, 
   return (
     <Stack
       spacing={4}
-      alignItems="center"
       sx={{
+        alignItems: "center",
         width: "100%",
         maxWidth: "640px",
         mx: "auto",
@@ -154,16 +154,16 @@ export default function ProtectionIntentActivatedPanel({ goals, globalSettings, 
       </Box>
 
       <Stack spacing={1.5}>
-        <Typography variant="h5" fontWeight={700} color="text.primary">
+        <Typography variant="h5" sx={{ fontWeight: 700, color: "text.primary" }}>
           You&rsquo;re All Set — ArcGenie Is Now Protecting Your Environment
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ color: "text.secondary" }}>
           Your automation guardrails are live. ArcGenie will monitor, protect, and report
           according to the goals you configured — no further action needed.
         </Typography>
       </Stack>
 
-      <Stack direction="row" spacing={1.5} flexWrap="wrap" justifyContent="center" useFlexGap>
+      <Stack direction="row" spacing={1.5} useFlexGap sx={{ flexWrap: "wrap", justifyContent: "center" }}>
         <Chip
           label={`${PROTECTION_CATEGORY_COLUMNS.length} protection categories applied`}
           sx={CHIP_SX}

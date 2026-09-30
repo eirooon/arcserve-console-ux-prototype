@@ -9,7 +9,7 @@ import { getContextLabel } from "../../../routes/subRoutes";
 import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import { useDebouncedSearchInput } from "../../../hooks/useDebouncedSearchInput";
 import { useEntityFilterState } from "../../../hooks/useEntityFilterState";
-import { INFRASTRUCTURE_FILTER_FIELDS, infrastructureFilterStore } from "../hooks/infrastructureFilters";
+import { getInfrastructureFilterConfig } from "../hooks/infrastructureFilters";
 import {
   filterInfrastructureByCategory,
   infrastructureStore,
@@ -23,7 +23,15 @@ const selectToolbarState = (state) => ({
   apiRef: state.apiRef,
 });
 
-export default function InfrastructuresToolbar({ secondaryAction, showColumnsButton }) {
+export default function InfrastructuresToolbar({
+  addLabel,
+  secondaryAction,
+  showColumnsButton,
+  searchPlaceholder = "Search infrastructure",
+  addMenuItems,
+  addMenuAlign,
+  showAddMenuIcon,
+}) {
   const { selectedId } = useOutletContext();
   const { rows, selectionModel, saving, apiRef } = useInfrastructureData(selectToolbarState);
   const { open: confirmDeleteOpen, openConfirm, closeConfirm, confirmDelete } =
@@ -32,7 +40,8 @@ export default function InfrastructuresToolbar({ secondaryAction, showColumnsBut
   const context = getContextLabel(selectedId);
 
   const categoryRows = filterInfrastructureByCategory(rows, selectedId);
-  const filterState = useEntityFilterState(infrastructureFilterStore, categoryRows);
+  const { filterStore, filterFields } = getInfrastructureFilterConfig(selectedId);
+  const filterState = useEntityFilterState(filterStore, categoryRows);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
   const [saveSearchDialogOpen, setSaveSearchDialogOpen] = useState(false);
   const searchInput = useDebouncedSearchInput(filterState.searchText, filterState.onSearchTextChange);
@@ -40,12 +49,15 @@ export default function InfrastructuresToolbar({ secondaryAction, showColumnsBut
   return (
     <>
       <ListToolbar
-        addLabel={`Add ${context}`}
+        addLabel={addLabel ?? `Add ${context}`}
         onAdd={infrastructureStore.openAdd}
+        addMenuItems={addMenuItems}
+        addMenuAlign={addMenuAlign}
+        showAddMenuIcon={showAddMenuIcon}
         secondaryAction={secondaryAction}
         showColumnsButton={showColumnsButton}
         showSearch
-        searchPlaceholder="Search infrastructure"
+        searchPlaceholder={searchPlaceholder}
         searchValue={searchInput.value}
         onSearchChange={searchInput.onChange}
         onSearchSubmit={searchInput.onSubmit}
@@ -69,7 +81,7 @@ export default function InfrastructuresToolbar({ secondaryAction, showColumnsBut
       />
       <EntityFiltersDialog
         open={filtersDialogOpen}
-        fields={INFRASTRUCTURE_FILTER_FIELDS}
+        fields={filterFields}
         rows={categoryRows}
         initialFilters={filterState.filters}
         onClose={() => setFiltersDialogOpen(false)}

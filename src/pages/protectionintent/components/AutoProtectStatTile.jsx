@@ -7,8 +7,8 @@ export default function AutoProtectStatTile({ field, value }) {
     <Stack
       direction="row"
       spacing={2}
-      alignItems="center"
       sx={{
+        alignItems: "center",
         flex: 1,
         minWidth: 0,
         border: 1,
@@ -34,10 +34,10 @@ export default function AutoProtectStatTile({ field, value }) {
         <Icon sx={{ fontSize: 22 }} />
       </Box>
       <Box sx={{ minWidth: 0 }}>
-        <Typography variant="body2" fontWeight={500} sx={{ color: field.color }} noWrap>
+        <Typography variant="body2" noWrap sx={{ fontWeight: 500, color: field.color }}>
           {field.label}
         </Typography>
-        <Typography variant="h6" fontWeight={700} color="text.primary">
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "text.primary" }}>
           {value}
         </Typography>
       </Box>

@@ -32,10 +32,10 @@ export default function ProtectionIntentOptionCard({
       >
         <Avatar sx={{ bgcolor: avatarBgColor, color: iconColor }}>{icon}</Avatar>
         <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-          <Typography variant="body2" fontWeight={700} color="text.primary">
+          <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
             {title}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: "text.secondary" }}>
             {description}
           </Typography>
         </Stack>

@@ -31,7 +31,7 @@ export default function ProtectionCategoryEditDialog({
               py: 2,
             }}
           >
-            <Typography variant="body1" fontWeight={700} color="text.primary">
+            <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
               Edit Protection Category - {formValues.categoryName}
             </Typography>
             <IconButton onClick={onClose} aria-label="Close dialog" size="small">

@@ -38,7 +38,7 @@ export default function CategoryBasedArchitecting() {
       heading={scenario.heading}
       subheading={scenario.subheading}
       footerNote={
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: "text.secondary" }}>
           {scenario.footerNote}
         </Typography>
       }

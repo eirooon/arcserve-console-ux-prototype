@@ -26,7 +26,7 @@ export default function ProtectionIntentSummaryPanel({
   return (
     <Stack spacing={4}>
       <Stack spacing={2}>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Protection Categories
         </Typography>
         <Stack spacing={2}>
@@ -50,9 +50,9 @@ export default function ProtectionIntentSummaryPanel({
         </Stack>
       </Stack>
 
-      <Stack direction="row" spacing={4} alignItems="flex-start">
+      <Stack direction="row" spacing={4} sx={{ alignItems: "flex-start" }}>
         <Stack spacing={2} sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="body1" fontWeight={700} color="text.primary">
+          <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
             Your Agentic Goals
           </Typography>
           <Stack spacing={2}>
@@ -63,7 +63,7 @@ export default function ProtectionIntentSummaryPanel({
         </Stack>
 
         <Stack spacing={2} sx={{ width: 360, flexShrink: 0 }}>
-          <Typography variant="body1" fontWeight={700} color="text.primary">
+          <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
             Global Goal Settings
           </Typography>
           <Stack spacing={1.5}>

@@ -16,10 +16,10 @@ export default function ConfigureGoalsAutonomyStep({
   return (
     <Stack spacing={3}>
       <Box>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           {GOALS_STEP_COPY.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {GOALS_STEP_COPY.description}
         </Typography>
       </Box>
@@ -32,7 +32,7 @@ export default function ConfigureGoalsAutonomyStep({
         setGlobalField={setGlobalField}
       />
 
-      <Stack direction="row" justifyContent="space-between">
+      <Stack direction="row" sx={{ justifyContent: "space-between" }}>
         <Button variant="outlined" color="secondary" onClick={onCancel}>
           Cancel
         </Button>

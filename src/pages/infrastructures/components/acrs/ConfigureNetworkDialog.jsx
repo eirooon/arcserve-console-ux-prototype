@@ -146,7 +146,7 @@ function ConfigureNetworkForm({ nic, entryPoint, onClose, onSave, saving }) {
   return (
     <>
       <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", py: 2 }}>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           Configure Network - {nic.name}
         </Typography>
         <IconButton onClick={onClose} aria-label="Close dialog" size="small">

@@ -32,7 +32,7 @@ export function useAutoProtectSourcesColumns() {
         flex: 1.5,
         renderCell: (params) => (
           <CellContent>
-            <Typography variant="body2" color="secondary.main" fontWeight={500}>
+            <Typography variant="body2" sx={{ color: "secondary.main", fontWeight: 500 }}>
               {params.value}
             </Typography>
           </CellContent>

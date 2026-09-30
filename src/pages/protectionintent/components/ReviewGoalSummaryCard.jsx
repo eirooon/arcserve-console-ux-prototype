@@ -10,18 +10,18 @@ export default function ReviewGoalSummaryCard({ goal }) {
       spacing={1.5}
       sx={{ p: "20px", border: 1, borderColor: "divider", borderRadius: "8px" }}
     >
-      <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase" }}>
+      <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "uppercase" }}>
         {goal.category}
       </Typography>
       <Stack spacing={0.5}>
-        <Typography variant="body1" fontWeight={700} color="text.primary">
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
           {goal.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {goal.description}
         </Typography>
       </Stack>
-      <Typography variant="body2" color="text.primary">
+      <Typography variant="body2" sx={{ color: "text.primary" }}>
         {getAutonomyLevelLabel(goal.autonomyLevel)} &bull;{" "}
         {getAssessmentFrequencyLabel(goal.assessmentFrequency)}
       </Typography>

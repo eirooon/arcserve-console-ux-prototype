@@ -28,7 +28,7 @@ function MessagingChannelCard({ channel, connecting, onConfigure, onToggleConnec
         bgcolor: "background.paper",
       }}
     >
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
+      <Stack direction="row" spacing={2} sx={{ alignItems: "center", flex: 1, minWidth: 0 }}>
         <Box
           component="img"
           src={definition.icon}
@@ -36,7 +36,7 @@ function MessagingChannelCard({ channel, connecting, onConfigure, onToggleConnec
           sx={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }}
         />
         <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-          <Typography variant="body1" color="text.primary">
+          <Typography variant="body1" sx={{ color: "text.primary" }}>
             {definition.name}
           </Typography>
           <Typography
@@ -48,7 +48,7 @@ function MessagingChannelCard({ channel, connecting, onConfigure, onToggleConnec
         </Stack>
       </Stack>
 
-      <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ flexShrink: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end", flexShrink: 0 }}>
         <Button
           size="small"
           color="secondary"

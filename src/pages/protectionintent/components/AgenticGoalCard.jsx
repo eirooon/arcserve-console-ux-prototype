@@ -35,20 +35,16 @@ export default function AgenticGoalCard({ goal, onToggleEnabled, onFieldChange }
         borderRadius: "8px",
       }}
     >
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ textTransform: "uppercase" }}
-      >
+      <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "uppercase" }}>
         {goal.category}
       </Typography>
 
-      <Stack direction="row" spacing={3} alignItems="flex-start">
+      <Stack direction="row" spacing={3} sx={{ alignItems: "flex-start" }}>
         <Stack spacing={0.5} sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="body1" fontWeight={700} color="text.primary">
+          <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
             {goal.title}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             {goal.description}
           </Typography>
         </Stack>

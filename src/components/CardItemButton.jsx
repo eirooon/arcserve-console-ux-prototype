@@ -15,12 +15,7 @@ export default function CardItemButton({ icon, label, description }) {
         },
       }}
     >
-      <Stack
-        direction="row"
-        spacing={3}
-        alignItems="center"
-        sx={{ p: 1, width: "100%" }} // ✅ ensure row has a measurable width
-      >
+      <Stack direction="row" spacing={3} sx={{ alignItems: "center", p: 1, width: "100%" }}>
         <Avatar
           variant="rounded"
           sx={{
@@ -47,7 +42,7 @@ export default function CardItemButton({ icon, label, description }) {
             variant="body2"
             noWrap
             title={description}
-            color="text.secondary"
+            sx={{ color: "text.secondary" }}
           >
             {description}
           </Typography>

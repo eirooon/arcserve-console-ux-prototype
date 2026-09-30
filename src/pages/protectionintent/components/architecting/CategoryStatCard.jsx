@@ -12,8 +12,8 @@ export default function CategoryStatCard({ label, count, target, done, accentCol
         p: 2,
       }}
     >
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-        <Typography variant="body2" fontWeight={700} color="text.primary">
+      <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+        <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
           {label}
         </Typography>
         {done ? (
@@ -22,16 +22,16 @@ export default function CategoryStatCard({ label, count, target, done, accentCol
           <CircularProgress aria-label="Assigning" size={14} thickness={6} sx={{ color: accentColor }} />
         )}
       </Stack>
-      <Typography variant="h5" fontWeight={700} color="text.primary">
+      <Typography variant="h5" sx={{ fontWeight: 700, color: "text.primary" }}>
         {count}
         {!done && (
-          <Typography component="span" variant="body2" color="text.secondary">
+          <Typography component="span" variant="body2" sx={{ color: "text.secondary" }}>
             {" "}
             / {target}
           </Typography>
         )}
       </Typography>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: "text.secondary" }}>
         {done ? "sources assigned" : "assigning..."}
       </Typography>
     </Box>

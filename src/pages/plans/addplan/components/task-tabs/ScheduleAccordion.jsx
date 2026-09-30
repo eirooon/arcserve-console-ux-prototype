@@ -13,7 +13,7 @@ export default function ScheduleAccordion({ title, expanded, onToggleExpand, onA
       onToggleExpand={onToggleExpand}
       summary={
         <>
-          <Typography variant="body1" fontWeight={700} color="text.primary">
+          <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>
             {title}
           </Typography>
           <Button

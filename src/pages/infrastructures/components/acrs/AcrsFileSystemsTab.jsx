@@ -156,12 +156,16 @@ export default function AcrsFileSystemsTab({ server }) {
     <Box sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
       <Stack
         direction="row"
-        alignItems="center"
-        justifyContent="flex-end"
-        sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}
+        sx={{
+          alignItems: "center",
+          justifyContent: "flex-end",
+          p: 2,
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
       >
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          <Typography fontSize={14} color="text.secondary">
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+          <Typography sx={{ fontSize: 14, color: "text.secondary" }}>
             {selectionModel.length} selected
           </Typography>
           <Button
@@ -206,7 +210,7 @@ export default function AcrsFileSystemsTab({ server }) {
           rowActionsAriaLabel={(row) => `Actions for ${row.name}`}
           slots={{
             noRowsOverlay: () => (
-              <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
+              <Typography variant="body2" sx={{ color: "text.secondary", p: 2 }}>
                 No file system available.
               </Typography>
             ),
