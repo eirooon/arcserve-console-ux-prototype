@@ -1,0 +1,1 @@
+import{j as s}from"./vendor-mui-S-2RDhkM.js";import{I as a}from"./IconCell-_FwT5rf1.js";function p(n,e,l,{width:t=110,flex:r,showLabel:c=!1}={}){return{field:n,headerName:e,...r?{flex:r}:{width:t},renderCell:({row:i})=>{const o=l(i);return s.jsx(a,{icon:o?.icon,label:o?.label,color:o?.color,showLabel:c})}}}export{p as i};

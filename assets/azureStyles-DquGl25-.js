@@ -1,1 +1,0 @@
-import{e as t}from"./vendor-mui-Dd7w74Rk.js";const r=o=>t(o.palette.primary.main,.08),a={"& .MuiInputBase-root":{fontSize:14},"& .MuiFormControlLabel-label":{fontSize:14},"& .MuiFormHelperText-root":{fontSize:12}},s={MenuProps:{slotProps:{paper:{sx:{"& .MuiMenuItem-root":{fontSize:14}}}}}};export{s as S,r as p,a as s};
